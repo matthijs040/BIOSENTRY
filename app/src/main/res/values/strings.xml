@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">test</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">BIOSENTRY Test Application</string>
+    <string name="nav_header_subtitle">m.besselink@student.fontys.nl</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Hardware Info</string>
+    <string name="menu_gallery">Sensor Readouts</string>
+    <string name="menu_slideshow">Settings</string>
+
+    <string name="TVLongitude">NaN</string>
+    <string name="TVLatitude">NaN</string>
+    <string name="TVLocation">NaN</string>
+
+    <string name="TVRoll">NaN</string>
+    <string name="TVLongitudeLabel">Lon:</string>
+    <string name="TVLatitudeLabel">Lat:</string>
+    <string name="TVRollLabel">R:</string>
+    <string name="TVAccelXLabel">"X: "</string>
+    <string name="TVAccelYLabel">Y:</string>
+    <string name="TVAccelZLabel">Z:</string>
+    <string name="TVAccelZ">NaN</string>
+    <string name="TVAccelX">NaN</string>
+    <string name="TVAccelY">NaN</string>
+    <string name="TVPitchLabel">P:</string>
+    <string name="TVYawLabel">Y:</string>
+    <string name="TVPitch">NaN</string>
+    <string name="TVYaw">NaN</string>
+    <string name="fragment_gallery_title">This is the sensor-readouts tab:</string>
+    <string name="TV_accelerometer_name_label">name:</string>
+    <string name="TV_accelerometer_label">Accelerometer:</string>
+    <string name="TV_accelerometer_name">null</string>
+</resources>
