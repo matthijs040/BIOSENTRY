@@ -29,7 +29,7 @@ class SlideshowFragment : Fragment() {
         slideshowViewModel =
                 ViewModelProviders.of(this).get(SlideshowViewModel::class.java)
 
-        val root = inflater.inflate(R.layout.fragment_gallery, container, false)
+        val root = inflater.inflate(R.layout.fragment_slideshow, container, false)
 
         sensors = Sensors(
             context = activity!!.baseContext,
@@ -54,9 +54,28 @@ class SlideshowFragment : Fragment() {
 
     fun getSensorMetadata()
     {
-        activity?.runOnUiThread() {
-            val frag : Fragment? = this
-            frag?.TV_accelerometer_name?.text = sensors?.accelerometer?.name
+        activity?.runOnUiThread()
+        {
+            try {
+                val frag : Fragment? = this
+                frag?.TV_accelerometer_name?.text = sensors?.accelerometer?.name
+                frag?.TV_accelerometer_vendor?.text = sensors?.accelerometer?.vendor
+                frag?.TV_accelerometer_resolution?.text = sensors?.accelerometer?.resolution.toString()
+                frag?.TV_accelerometer_minDelay?.text = sensors?.accelerometer?.minDelay.toString()
+                frag?.TV_accelerometer_range?.text = sensors?.accelerometer?.maximumRange.toString()
+
+                //text = sensors?.gyroscope?.name
+                //text = sensors?.gyroscope?.vendor
+                //text = sensors?.gyroscope?.minDelay
+                //text = sensors?.gyroscope?.resolution
+
+            }
+            catch ( ex : NullPointerException)
+            {
+                // Do nothing. This exception happens when a switch in UI is made while changes are being written to it.
+                // Even if safe calls are made to them. It will not break the application to silently fail.
+            }
+
 
         }
     }

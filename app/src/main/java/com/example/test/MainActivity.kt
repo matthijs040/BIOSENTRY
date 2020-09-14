@@ -56,18 +56,6 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        sensors = Sensors(
-            context = this.baseContext,
-            activity = this
-        )
-        val timerObj = Timer()
-        val timerTaskObj: TimerTask = object : TimerTask() {
-            override fun run() {
-                refreshSensorReadings()
-            }
-        }
-        timerObj.schedule(timerTaskObj, 0, 500)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -79,24 +67,5 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    fun refreshSensorReadings()
-    {
-        val newReadings = sensors!!.read()
-        if(newReadings.haveChanged)
-            runOnUiThread(){
-                val frag : Fragment? = supportFragmentManager.findFragmentById(R.layout.fragment_gallery.toInt())
-                frag?.TVLongitude?.text = newReadings.LocationLongitude.toString()
-                frag?.TVLatitude?.text = newReadings.LocationLatitude.toString()
-
-                frag?.TVAccelX?.text = newReadings.AccelerationX.toString()
-                frag?.TVAccelY?.text = newReadings.AccelerationY.toString()
-                frag?.TVAccelZ?.text = newReadings.AccelerationZ.toString()
-
-                frag?.TVRoll?.text = newReadings.RotationX.toString()
-                frag?.TVPitch?.text = newReadings.RotationY.toString()
-                frag?.TVYaw?.text = newReadings.RotationZ.toString()
-            }
     }
 }

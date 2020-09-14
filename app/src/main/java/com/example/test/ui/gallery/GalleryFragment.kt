@@ -41,7 +41,7 @@ class GalleryFragment : Fragment() {
                 refreshSensorReadings()
             }
         }
-        timer.schedule(timerTaskObj, 0, 500)
+        timer.schedule(timerTaskObj, 0, 200)
 
         return root
     }

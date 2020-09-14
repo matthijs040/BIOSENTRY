@@ -29,8 +29,21 @@
     <string name="TVYawLabel">Y:</string>
     <string name="TVPitch">NaN</string>
     <string name="TVYaw">NaN</string>
+
     <string name="fragment_gallery_title">This is the sensor-readouts tab:</string>
-    <string name="TV_accelerometer_name_label">name:</string>
-    <string name="TV_accelerometer_label">Accelerometer:</string>
+
     <string name="TV_accelerometer_name">null</string>
+    <string name="TV_accelerometer_vendor">null</string>
+    <string name="TV_accelerometer_minDelay">null</string>
+    <string name="TV_accelerometer_resolution">null</string>
+    <string name="TV_accelerometer_range">null</string>
+
+    <string name="TV_sensor_range_label">range:</string>
+    <string name="TV_sensor_resolution_label">resolution:</string>
+    <string name="TV_sensor_delay_label">delay:</string>
+    <string name="TV_sensor_name_label">name:</string>
+    <string name="TV_sensor_vendor_label">vendor:</string>
+
+    <string name="TV_accelerometer_label">Accelerometer:</string>
+    <string name="TV_gyro_label">Gyroscope:</string>
 </resources>
