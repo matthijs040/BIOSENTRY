@@ -1,36 +1,29 @@
 <resources>
+    // Application data.
     <string name="app_name">test</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">BIOSENTRY Test Application</string>
     <string name="nav_header_subtitle">m.besselink@student.fontys.nl</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
 
-    <string name="menu_home">Hardware Info</string>
+    // UI element names
+    <string name="menu_home">Home</string>
     <string name="menu_gallery">Sensor Readouts</string>
-    <string name="menu_slideshow">Settings</string>
+    <string name="menu_slideshow">Hardware Info</string>
+    <string name="nav_header_desc">Navigation header</string>
 
-    <string name="TVLongitude">NaN</string>
-    <string name="TVLatitude">NaN</string>
-    <string name="TVLocation">NaN</string>
+    <string name="action_settings">Settings</string>
+    <string name="fragment_gallery_title">This is the sensor-readouts tab:</string>
 
-    <string name="TVRoll">NaN</string>
-    <string name="TVLongitudeLabel">Lon:</string>
-    <string name="TVLatitudeLabel">Lat:</string>
-    <string name="TVRollLabel">R:</string>
+    // Accelerometer labels
     <string name="TVAccelXLabel">"X: "</string>
     <string name="TVAccelYLabel">Y:</string>
     <string name="TVAccelZLabel">Z:</string>
+
+    // Accelerometer data fields
     <string name="TVAccelZ">NaN</string>
     <string name="TVAccelX">NaN</string>
     <string name="TVAccelY">NaN</string>
-    <string name="TVPitchLabel">P:</string>
-    <string name="TVYawLabel">Y:</string>
-    <string name="TVPitch">NaN</string>
-    <string name="TVYaw">NaN</string>
-
-    <string name="fragment_gallery_title">This is the sensor-readouts tab:</string>
 
     <string name="TV_accelerometer_name">null</string>
     <string name="TV_accelerometer_vendor">null</string>
@@ -38,12 +31,54 @@
     <string name="TV_accelerometer_resolution">null</string>
     <string name="TV_accelerometer_range">null</string>
 
+    // Gyroscope Labels
+    <string name="TVRollLabel">R:</string>
+    <string name="TVPitchLabel">P:</string>
+    <string name="TVYawLabel">Y:</string>
+
+    // Gyroscope data fields
+    <string name="TVRoll">NaN</string>
+    <string name="TVPitch">NaN</string>
+    <string name="TVYaw">NaN</string>
+
+    <string name="TV_gyroscope_resolution">null</string>
+    <string name="TV_gyroscope_name">null</string>
+    <string name="TV_gyroscope_vendor">null</string>
+    <string name="TV_gyroscope_range">null</string>
+    <string name="TV_gyroscope_minDelay">null</string>
+
+    // Generic Sensor Labels
+    <string name="TV_accelerometer_label">Accelerometer:</string>
+    <string name="TV_gyro_label">Gyroscope:</string>
     <string name="TV_sensor_range_label">range:</string>
     <string name="TV_sensor_resolution_label">resolution:</string>
     <string name="TV_sensor_delay_label">delay:</string>
     <string name="TV_sensor_name_label">name:</string>
     <string name="TV_sensor_vendor_label">vendor:</string>
 
-    <string name="TV_accelerometer_label">Accelerometer:</string>
-    <string name="TV_gyro_label">Gyroscope:</string>
+    // GPS Labels
+    <string name="TV_GPS_label">GPS:</string>
+    <string name="TV_GPS_name">null</string>
+    <string name="TV_GPS_vendor">null</string>
+    <string name="TVLongitudeLabel">Lon:</string>
+    <string name="TVLatitudeLabel">Lat:</string>
+
+    // GPS data fields
+    <string name="TVLongitude">NaN</string>
+    <string name="TVLatitude">NaN</string>
+    <string name="TVLocation">NaN</string>
+
+    // WebSocket Labels
+    <string name="TV_websocket_label">Websocket:</string>
+    <string name="TV_URL_label">URL:</string>
+    <string name="TV_error_label">Error:</string>
+    <string name="TV_status_label">Status:</string>
+
+    // WebSocket data fields.
+    <string name="BT_Websocket_Connect">Connect / Disconnect</string>
+    <string name="BT_websocket_send">Send data</string>
+    <string name="TV_websocket_status">Not Connected</string>
+    <string name="TV_websocket_error">None</string>
+    <string name="TB_URL">ws://192.168.178.23:9090</string>
+
 </resources>

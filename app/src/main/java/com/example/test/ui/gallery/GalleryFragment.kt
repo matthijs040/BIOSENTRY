@@ -9,8 +9,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.example.test.R
+import com.example.test.MainActivity
 import com.example.test.Sensors
+import com.example.test.R
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import java.lang.NullPointerException
 import java.util.*
@@ -18,7 +19,7 @@ import java.util.*
 class GalleryFragment : Fragment() {
 
     private lateinit var galleryViewModel: GalleryViewModel
-    private var sensors : Sensors? = null
+    private var mSensors : Sensors? = null
     private val timer = Timer()
 
     override fun onCreateView(
@@ -30,7 +31,7 @@ class GalleryFragment : Fragment() {
                 ViewModelProviders.of(this).get(GalleryViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_gallery, container, false)
 
-        sensors = Sensors(
+        mSensors = Sensors(
             context = activity!!.baseContext,
             activity = activity as Activity
         )
@@ -54,22 +55,22 @@ class GalleryFragment : Fragment() {
 
     fun refreshSensorReadings()
     {
-        val newReadings = sensors?.read()
-        if(newReadings?.haveChanged == true)
+        val newReadings = mSensors?.read()
+        if(newReadings?.mHaveChanged == true)
             this.activity?.runOnUiThread(){
                 val frag : Fragment? = this
 
                 try {
-                    frag?.TVLongitude?.text = newReadings.LocationLongitude.toString()
-                    frag?.TVLatitude?.text = newReadings.LocationLatitude.toString()
+                    frag?.TVLongitude?.text = newReadings.mLocationLongitude.toString()
+                    frag?.TVLatitude?.text = newReadings.mLocationLatitude.toString()
 
-                    frag?.TVAccelX?.text = newReadings.AccelerationX.toString()
-                    frag?.TVAccelY?.text = newReadings.AccelerationY.toString()
-                    frag?.TVAccelZ?.text = newReadings.AccelerationZ.toString()
+                    frag?.TVAccelX?.text = newReadings.mAccelerationX.toString()
+                    frag?.TVAccelY?.text = newReadings.mAccelerationY.toString()
+                    frag?.TVAccelZ?.text = newReadings.mAccelerationZ.toString()
 
-                    frag?.TVRoll?.text = newReadings.RotationX.toString()
-                    frag?.TVPitch?.text = newReadings.RotationY.toString()
-                    frag?.TVYaw?.text = newReadings.RotationZ.toString()
+                    frag?.TVRoll?.text = newReadings.mRotationX.toString()
+                    frag?.TVPitch?.text = newReadings.mRotationY.toString()
+                    frag?.TVYaw?.text = newReadings.mRotationZ.toString()
                 }
                 catch (ex : NullPointerException)
                 {
@@ -78,5 +79,8 @@ class GalleryFragment : Fragment() {
                 }
 
             }
+
+        // Send data through mainactivity's websocket.
+
     }
 }

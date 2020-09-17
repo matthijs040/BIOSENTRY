@@ -1,6 +1,7 @@
 package com.example.test.ui.slideshow
 
 import android.app.Activity
+import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,8 @@ import com.example.test.R
 import com.example.test.Sensors
 import kotlinx.android.synthetic.main.fragment_slideshow.*
 import java.util.*
+
+import com.example.test.MainActivity
 
 class SlideshowFragment : Fragment() {
 
@@ -58,16 +61,25 @@ class SlideshowFragment : Fragment() {
         {
             try {
                 val frag : Fragment? = this
-                frag?.TV_accelerometer_name?.text = sensors?.accelerometer?.name
-                frag?.TV_accelerometer_vendor?.text = sensors?.accelerometer?.vendor
-                frag?.TV_accelerometer_resolution?.text = sensors?.accelerometer?.resolution.toString()
-                frag?.TV_accelerometer_minDelay?.text = sensors?.accelerometer?.minDelay.toString()
-                frag?.TV_accelerometer_range?.text = sensors?.accelerometer?.maximumRange.toString()
+                frag?.TV_accelerometer_name?.text = sensors?.mAccelerometer?.name
+                frag?.TV_accelerometer_vendor?.text = sensors?.mAccelerometer?.vendor
+                frag?.TV_accelerometer_resolution?.text = sensors?.mAccelerometer?.resolution.toString()
+                frag?.TV_accelerometer_minDelay?.text = sensors?.mAccelerometer?.minDelay.toString()
+                frag?.TV_accelerometer_range?.text = sensors?.mAccelerometer?.maximumRange.toString()
 
-                //text = sensors?.gyroscope?.name
-                //text = sensors?.gyroscope?.vendor
-                //text = sensors?.gyroscope?.minDelay
-                //text = sensors?.gyroscope?.resolution
+                frag?.TV_gyroscope_name?.text = sensors?.mGyroscope?.name
+                frag?.TV_gyroscope_vendor?.text = sensors?.mGyroscope?.vendor
+                frag?.TV_gyroscope_minDelay?.text = sensors?.mGyroscope?.minDelay.toString()
+                frag?.TV_gyroscope_resolution?.text = sensors?.mGyroscope?.resolution.toString()
+                frag?.TV_gyroscope_range?.text = sensors?.mGyroscope?.maximumRange.toString()
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                    frag?.TV_GPS_name?.text = sensors?.mLocationManager?.gnssHardwareModelName
+
+                }
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    frag?.TV_GPS_vendor?.text = sensors?.mLocationManager?.gnssCapabilities.toString()
+                }
 
             }
             catch ( ex : NullPointerException)
@@ -76,7 +88,7 @@ class SlideshowFragment : Fragment() {
                 // Even if safe calls are made to them. It will not break the application to silently fail.
             }
 
-
+            
         }
     }
 }

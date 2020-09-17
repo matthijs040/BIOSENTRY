@@ -22,17 +22,17 @@ import androidx.core.content.ContextCompat.getSystemService
 
 class SensorReadings {
 
-    var haveChanged         : Boolean = false
-    var LocationLatitude    : Double = Double.NaN
-    var LocationLongitude   : Double = Double.NaN
+    var mHaveChanged         : Boolean = false
+    var mLocationLatitude    : Double = Double.NaN
+    var mLocationLongitude   : Double = Double.NaN
 
-    var AccelerationX       : Double = Double.NaN
-    var AccelerationY       : Double = Double.NaN
-    var AccelerationZ       : Double = Double.NaN
+    var mAccelerationX       : Double = Double.NaN
+    var mAccelerationY       : Double = Double.NaN
+    var mAccelerationZ       : Double = Double.NaN
 
-    var RotationX           : Double = Double.NaN
-    var RotationY           : Double = Double.NaN
-    var RotationZ           : Double = Double.NaN
+    var mRotationX           : Double = Double.NaN
+    var mRotationY           : Double = Double.NaN
+    var mRotationZ           : Double = Double.NaN
 }
 
 
@@ -40,15 +40,15 @@ class SensorReadings {
  * Class containing all sensors in the phone that can be read during runtime of the application.
  *
  */
-class Sensors {
+class Sensors(context: Context, activity: Activity) {
 
     // Sensors, listed as private variables.
-    var locationManager: LocationManager? = null
-    var sensorManager: SensorManager? = null
+    var mLocationManager: LocationManager? = null
+    var mSensorManager: SensorManager? = null
 
-    var accelerometer: Sensor? = null
-    var gyroscope: Sensor? = null
-    var sensorReadings: SensorReadings = SensorReadings()
+    var mAccelerometer: Sensor? = null
+    var mGyroscope: Sensor? = null
+    var mSensorReadings: SensorReadings = SensorReadings()
 
     private fun askForPermissions(context: Context, activity: Activity) {
         // Ask nicely for permissions to use the GPS.
@@ -67,16 +67,16 @@ class Sensors {
 
     private fun initLocationListener(context: Context) {
         // Construct a manager object to create a listener from.
-        locationManager = context.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager?
+        mLocationManager = context.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager?
 
         // Try to construct a listener.
         try {
             // Request location updates
-            locationManager?.requestLocationUpdates(
+            mLocationManager?.requestLocationUpdates(
                 LocationManager.NETWORK_PROVIDER,
                 0L,
                 0.0f,
-                locationListener
+                mLocationListener
             )
         } catch (ex: SecurityException) {
             Log.d("LocationManager", "Security Exception, no location available")
@@ -85,44 +85,38 @@ class Sensors {
 
     private fun initSensorListeners(context: Context) {
         // First, init sensor manager to create sensors from.
-        sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
-        accelerometer = sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        gyroscope = sensorManager!!.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        mSensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
+        mAccelerometer = mSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        mGyroscope = mSensorManager!!.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
         // Register accelerometer event.
-        sensorManager!!.registerListener(
+        mSensorManager!!.registerListener(
             accelerometerListener,
-            accelerometer,
+            mAccelerometer,
             SensorManager.SENSOR_DELAY_NORMAL
         )
 
-        sensorManager!!.registerListener(
+        mSensorManager!!.registerListener(
             gyroscopeListener,
-            gyroscope,
+            mGyroscope,
             SensorManager.SENSOR_DELAY_NORMAL
         )
-    }
-
-    constructor(context: Context, activity: Activity) {
-        askForPermissions(context, activity)
-        initLocationListener(context)
-        initSensorListeners(context)
     }
 
     fun read(): SensorReadings {
-        return sensorReadings
+        return mSensorReadings
     }
 
     /**
      * Simple implementation of a locationListener that updates the location data in
      * SensorReadings every time a new location is received.
      */
-    val locationListener: LocationListener = object : LocationListener {
+    private val mLocationListener: LocationListener = object : LocationListener {
         //Trigger on location change:
         override fun onLocationChanged(location: Location) {
-            sensorReadings.LocationLatitude = location.latitude
-            sensorReadings.LocationLongitude = location.longitude
-            sensorReadings.haveChanged = true
+            mSensorReadings.mLocationLatitude = location.latitude
+            mSensorReadings.mLocationLongitude = location.longitude
+            mSensorReadings.mHaveChanged = true
         }
 
         //Empty events:
@@ -134,10 +128,10 @@ class Sensors {
 
     private val accelerometerListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {
-            sensorReadings.AccelerationX = event.values[0].toDouble()
-            sensorReadings.AccelerationY = event.values[1].toDouble()
-            sensorReadings.AccelerationZ = event.values[2].toDouble()
-            sensorReadings.haveChanged = true
+            mSensorReadings.mAccelerationX = event.values[0].toDouble()
+            mSensorReadings.mAccelerationY = event.values[1].toDouble()
+            mSensorReadings.mAccelerationZ = event.values[2].toDouble()
+            mSensorReadings.mHaveChanged = true
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
@@ -145,12 +139,18 @@ class Sensors {
 
     private val gyroscopeListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {
-            sensorReadings.RotationX = event.values[0].toDouble()
-            sensorReadings.RotationY = event.values[0].toDouble()
-            sensorReadings.RotationZ = event.values[0].toDouble()
-            sensorReadings.haveChanged = true
+            mSensorReadings.mRotationX = event.values[0].toDouble()
+            mSensorReadings.mRotationY = event.values[0].toDouble()
+            mSensorReadings.mRotationZ = event.values[0].toDouble()
+            mSensorReadings.mHaveChanged = true
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    }
+
+    init {
+        askForPermissions(context, activity)
+        initLocationListener(context)
+        initSensorListeners(context)
     }
 }

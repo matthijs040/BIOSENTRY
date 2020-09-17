@@ -1,16 +1,13 @@
 package com.example.test
 
 
-import android.location.LocationManager
 import android.os.Bundle
-
 import android.view.Menu
-
+import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -19,14 +16,40 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.fragment_gallery.*
-import java.util.*
+import com.google.gson.Gson
+import com.neovisionaries.ws.client.*
+import kotlinx.android.synthetic.main.fragment_home.*
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private var sensors : Sensors? = null
+
+    // WebSocket stuff
+    private var mWebsocketFactory : WebSocketFactory = WebSocketFactory()
+    var  mWebSocket : WebSocket? = null
+
+    private var mGson : Gson = Gson()
+
+    private val mWebSocketListener : WebSocketAdapter = object : WebSocketAdapter() {
+        override fun onTextFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
+            frame?.toString()
+        }
+
+        override fun onConnectError(websocket: WebSocket?, exception: WebSocketException?) {
+
+            TV_status_label.text = exception.toString()
+
+            super.onConnectError(websocket, exception)
+        }
+
+        override fun onStateChanged(websocket: WebSocket?, newState: WebSocketState?) {
+
+
+            super.onStateChanged(websocket, newState)
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -55,7 +78,6 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -68,4 +90,19 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+    fun connectClicked() {
+        val url : String = TB_URL.text.toString()
+        mWebSocket = mWebsocketFactory.createSocket(url)
+        mWebSocket?.addListener(mWebSocketListener)
+        mWebSocket?.connectAsynchronously()
+    }
+
+    fun SendSensorReadings(readings: SensorReadings)
+    {
+        val json : String = mGson.toJson(readings)
+        val frame : WebSocketFrame = WebSocketFrame.createTextFrame(json)
+        mWebSocket?.sendFrame(frame)
+    }
+
 }
