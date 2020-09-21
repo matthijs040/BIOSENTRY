@@ -13,21 +13,26 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.test.ui.gallery.GalleryFragment
+import com.example.test.ui.slideshow.SlideshowFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.neovisionaries.ws.client.*
 import kotlinx.android.synthetic.main.fragment_home.*
+import java.lang.reflect.Type
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
+
+    private var mIsAdvertised : Boolean = false
+
     // WebSocket stuff
-    private var mWebsocketFactory : WebSocketFactory = WebSocketFactory()
-    var  mWebSocket : WebSocket? = null
+    private var mROSBridge : ROSBridge? = null
 
     private var mGson : Gson = Gson()
 
@@ -38,15 +43,13 @@ class MainActivity : AppCompatActivity() {
 
         override fun onConnectError(websocket: WebSocket?, exception: WebSocketException?) {
 
-            TV_status_label.text = exception.toString()
+            TV_websocket_error.text = exception.toString()
 
-            super.onConnectError(websocket, exception)
         }
 
         override fun onStateChanged(websocket: WebSocket?, newState: WebSocketState?) {
 
-
-            super.onStateChanged(websocket, newState)
+            TV_websocket_status.text = newState.toString()
         }
     }
 
@@ -80,6 +83,21 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
+    private fun writeError(errorMessage : String)
+    {
+        TV_websocket_error.text = errorMessage
+    }
+
+    private fun writeStatus(statusMessage : String)
+    {
+        TV_websocket_status.text = statusMessage
+    }
+
+    private fun receiveData(message : ROSMessage)
+    {
+        println(message.toString())
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
@@ -92,17 +110,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun connectClicked() {
-        val url : String = TB_URL.text.toString()
-        mWebSocket = mWebsocketFactory.createSocket(url)
-        mWebSocket?.addListener(mWebSocketListener)
-        mWebSocket?.connectAsynchronously()
+        mROSBridge = ROSBridge(TB_URL.text.toString())
+        mROSBridge?.mErrorHandler  = ::writeError
+        mROSBridge?.mStatusHandler = ::writeStatus
+        mROSBridge?.mDataHandler   = ::receiveData
+
     }
 
-    fun SendSensorReadings(readings: SensorReadings)
+    fun disconnectClicked() {
+        mROSBridge?.disconnect()
+    }
+
+    fun sendData(readings: SensorReadings)
     {
-        val json : String = mGson.toJson(readings)
-        val frame : WebSocketFrame = WebSocketFrame.createTextFrame(json)
-        mWebSocket?.sendFrame(frame)
+        val twist = Twist(   Vector3(readings.mAccelerationX, readings.mAccelerationY, readings.mAccelerationZ ),
+                             Vector3(readings.mRotationX, readings.mRotationY, readings.mRotationZ)    )
+
+        if (!mIsAdvertised)
+        {
+            mROSBridge?.advertise("geometry_msgs/Twist" )
+            mIsAdvertised = true
+        }
+
+        mROSBridge?.send(twist)
     }
 
 }

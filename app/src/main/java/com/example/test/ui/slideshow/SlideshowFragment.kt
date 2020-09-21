@@ -87,8 +87,6 @@ class SlideshowFragment : Fragment() {
                 // Do nothing. This exception happens when a switch in UI is made while changes are being written to it.
                 // Even if safe calls are made to them. It will not break the application to silently fail.
             }
-
-            
         }
     }
 }

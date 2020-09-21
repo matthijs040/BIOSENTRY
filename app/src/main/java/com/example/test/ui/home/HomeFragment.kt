@@ -25,8 +25,11 @@ class HomeFragment : Fragment() {
 
         val root = inflater.inflate(R.layout.fragment_home, container, false)
 
-        val button: Button = root.findViewById(R.id.BT_Websocket_Connect)
+        val button : Button = root.findViewById(R.id.BT_Websocket_Connect)
         button.setOnClickListener { (activity as MainActivity?)?.connectClicked() }
+
+        val disconnectButton : Button = root.findViewById(R.id.BT_Websocket_Disconnect)
+        disconnectButton.setOnClickListener { (activity as MainActivity?)?.disconnectClicked() }
 
         return root
 

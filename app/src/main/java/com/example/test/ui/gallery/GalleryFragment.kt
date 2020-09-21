@@ -5,13 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.example.test.MainActivity
-import com.example.test.Sensors
-import com.example.test.R
+import com.example.test.*
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import java.lang.NullPointerException
 import java.util.*
@@ -19,7 +18,11 @@ import java.util.*
 class GalleryFragment : Fragment() {
 
     private lateinit var galleryViewModel: GalleryViewModel
-    private var mSensors : Sensors? = null
+    private var mROSBridge : ROSBridge? = null
+    var mSensors : Sensors? = null
+    var mSending : Boolean = false
+
+    var mSendOnce : Boolean = false
     private val timer = Timer()
 
     override fun onCreateView(
@@ -27,14 +30,26 @@ class GalleryFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?  ): View?
     {
-        galleryViewModel =
-                ViewModelProviders.of(this).get(GalleryViewModel::class.java)
+        galleryViewModel = ViewModelProviders.of(this).get(GalleryViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_gallery, container, false)
 
         mSensors = Sensors(
             context = activity!!.baseContext,
             activity = activity as Activity
         )
+
+        val sendContButton : Button = root.findViewById(R.id.BT_send_data_cont)
+        sendContButton.setOnClickListener{
+            mSending = !mSending
+            TV_sending_data.text = mSending.toString()
+
+        }
+
+        val sendOnceButton : Button = root.findViewById(R.id.BT_send_data_once)
+        sendOnceButton.setOnClickListener{
+            mSendOnce = !mSendOnce
+            TV_send_once.text = mSendOnce.toString()
+        }
 
         val timerTaskObj: TimerTask = object : TimerTask() {
 
@@ -77,10 +92,25 @@ class GalleryFragment : Fragment() {
                     // Do nothing. UI elements did not exist anymore at time of writing to them.
                     // This function is run asynchronously so this is an expected exception.
                 }
-
+                sendSensorReadings(newReadings)
             }
 
-        // Send data through mainactivity's websocket.
+
+    }
+
+    fun sendSensorReadings(readings : SensorReadings?)
+    {
+        if(mSending)
+            if(activity is MainActivity && readings != null)
+            {
+                (activity as MainActivity).sendData(readings)
+                if(mSendOnce)
+                {
+                    mSending = false
+                    TV_sending_data.text = mSending.toString()
+                }
+
+            }
 
     }
 }

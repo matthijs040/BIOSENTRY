@@ -75,10 +75,13 @@
     <string name="TV_status_label">Status:</string>
 
     // WebSocket data fields.
-    <string name="BT_Websocket_Connect">Connect / Disconnect</string>
+    <string name="BT_Websocket_Connect">Connect</string>
+    <string name="BT_Websocket_Disconnect">Disconnect</string>
     <string name="BT_websocket_send">Send data</string>
     <string name="TV_websocket_status">Not Connected</string>
     <string name="TV_websocket_error">None</string>
     <string name="TB_URL">ws://192.168.178.23:9090</string>
+    <string name="TV_sending_data">false</string>
+    <string name="TV_send_once">false</string>
 
 </resources>
