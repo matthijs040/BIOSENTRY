@@ -93,7 +93,8 @@ class MainActivity : AppCompatActivity() {
         TV_websocket_status.text = statusMessage
     }
 
-    private fun receiveData(message : ROSMessage)
+    // THIS template IMPLEMENTATION IS PLACEHOLDER!!
+    private fun receiveData(message : ROSMessage<Any>)
     {
         println(message.toString())
     }
@@ -119,20 +120,24 @@ class MainActivity : AppCompatActivity() {
 
     fun disconnectClicked() {
         mROSBridge?.disconnect()
+        mIsAdvertised = false
     }
 
     fun sendData(readings: SensorReadings)
     {
-        val twist = Twist(   Vector3(readings.mAccelerationX, readings.mAccelerationY, readings.mAccelerationZ ),
-                             Vector3(readings.mRotationX, readings.mRotationY, readings.mRotationZ)    )
+        //val twist = Twist(   Vector3(readings.mAccelerationX, readings.mAccelerationY, readings.mAccelerationZ ),
+        //                    Vector3(readings.mRotationX, readings.mRotationY, readings.mRotationZ)    )
+
+        // val linear = Point ( readings.mAccelerationX, readings.mAccelerationY, readings.mAccelerationZ )
+        val angular = ROSMessage<Point>( type= "geometry_msgs/Point", msg= Point(readings.mAccelerationX, readings.mAccelerationY, readings.mAccelerationZ) )
 
         if (!mIsAdvertised)
         {
-            mROSBridge?.advertise("geometry_msgs/Twist" )
+            mROSBridge?.advertise("geometry_msgs/Point" )
             mIsAdvertised = true
         }
 
-        mROSBridge?.send(twist)
+        mROSBridge?.send(angular)
     }
 
 }

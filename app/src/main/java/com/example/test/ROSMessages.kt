@@ -5,37 +5,39 @@ package com.example.test
  * By default publish to make data classes work as publish messages.
  * typename by default child classname. overridable for non-publish messages.
  */
-open class ROSMessage(open val op : String = "publish", open val type: String, open val topic : String = "bridge/$type"  ) {
-
-}
+open class ROSMessage<T>(val op : String = "publish"
+                         , val type: String
+                         , val topic : String = "bridge/$type"
+                         , val msg : T)
 
 /**
  * http://docs.ros.org/noetic/api/nav_msgs/html/msg/Odometry.html
  */
-data class Vector3( val x : Double, val y : Double, val z : Double) : ROSMessage(type = "geometry_msgs/Vector3")
+data class Vector3( val x : Double, val y : Double, val z : Double)
 
-data class Point( val x : Double, val y : Double, val z : Double) : ROSMessage(type = "geometry_msgs/Point")
+data class Point( val x : Double, val y : Double, val z : Double)
 
-data class Quaternion( val x : Double, val y : Double, val z : Double, val w : Double) : ROSMessage(type = "geometry_msgs/")
+data class Quaternion( val x : Double, val y : Double, val z : Double, val w : Double)
 
 /**
  * http://docs.ros.org/noetic/api/geometry_msgs/html/msg/Pose.html
  */
-data class Pose( val position : Point, val orientation : Quaternion ) : ROSMessage(type = "geometry_msgs/Pose")
+data class Pose( val position : Point, val orientation : Quaternion )
 
-data class Twist(val linear : Vector3, val angular : Vector3) : ROSMessage(type = "geometry_msgs/Twist")
+data class Twist(val linear : Vector3, val angular : Vector3)
 
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/NavSatStatus.html
  */
-data class NavSatStatus(val status : Byte, val service : Short) : ROSMessage(type = "sensor_msgs/NavSatStatus")
+data class NavSatStatus(val status : Byte, val service : Short)
 
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/NavSatFix.html
  */
 data class NavSatFix(val status : NavSatStatus, val latitude : Double, val longitude : Double,
                      val altitude : Double , val position_covariance : Array<Double>,
-                     val position_covariance_type : Byte ) : ROSMessage(type = "sensor_msgs/NavSatFix") {
+                     val position_covariance_type : Byte )
+{
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
