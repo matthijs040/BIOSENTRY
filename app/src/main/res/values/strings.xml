@@ -83,5 +83,8 @@
     <string name="TB_URL">ws://192.168.178.23:9090</string>
     <string name="TV_sending_data">false</string>
     <string name="TV_send_once">false</string>
+    <string name="TV_camera_label">Camera:</string>
+    <string name="TV_camera_error">None</string>
+    <string name="TV_camera_status">inactive</string>
 
 </resources>

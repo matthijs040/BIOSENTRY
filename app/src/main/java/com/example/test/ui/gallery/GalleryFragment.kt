@@ -31,35 +31,34 @@ class GalleryFragment : Fragment() {
             savedInstanceState: Bundle?  ): View?
     {
         galleryViewModel = ViewModelProviders.of(this).get(GalleryViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_gallery, container, false)
 
+        return  inflater.inflate(R.layout.fragment_gallery, container, false)
+    }
+
+    override fun onResume() {
         mSensors = Sensors(
             context = activity!!.baseContext,
             activity = activity as Activity
         )
 
-        val sendContButton : Button = root.findViewById(R.id.BT_send_data_cont)
-        sendContButton.setOnClickListener{
+        BT_send_data_cont.setOnClickListener{
             mSending = !mSending
             TV_sending_data.text = mSending.toString()
-
         }
 
-        val sendOnceButton : Button = root.findViewById(R.id.BT_send_data_once)
-        sendOnceButton.setOnClickListener{
+        BT_send_data_once.setOnClickListener{
             mSendOnce = !mSendOnce
             TV_send_once.text = mSendOnce.toString()
         }
 
-        val timerTaskObj: TimerTask = object : TimerTask() {
-
+        val timerTaskObj = object : TimerTask() {
             override fun run() {
                 refreshSensorReadings()
             }
         }
         timer.schedule(timerTaskObj, 0, 200)
 
-        return root
+        super.onResume()
     }
 
     override fun onDestroy() {

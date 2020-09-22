@@ -17,7 +17,7 @@ class ROSBridge(uri: String) {
 
     private val mWebSocketListener : WebSocketAdapter = object : WebSocketAdapter() {
         override fun onTextFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
-            val data = frame.toString()
+            //val data = frame.toString()
             /**
              * TODO : Parse string and create struct.
              */

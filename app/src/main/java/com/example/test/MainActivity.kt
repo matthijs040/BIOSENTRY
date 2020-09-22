@@ -3,8 +3,6 @@ package com.example.test
 
 import android.os.Bundle
 import android.view.Menu
-import android.view.View
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -13,46 +11,19 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.test.ui.gallery.GalleryFragment
-import com.example.test.ui.slideshow.SlideshowFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
-import com.neovisionaries.ws.client.*
 import kotlinx.android.synthetic.main.fragment_home.*
-import java.lang.reflect.Type
-
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-
     private var mIsAdvertised : Boolean = false
 
     // WebSocket stuff
     private var mROSBridge : ROSBridge? = null
-
-    private var mGson : Gson = Gson()
-
-    private val mWebSocketListener : WebSocketAdapter = object : WebSocketAdapter() {
-        override fun onTextFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
-            frame?.toString()
-        }
-
-        override fun onConnectError(websocket: WebSocket?, exception: WebSocketException?) {
-
-            TV_websocket_error.text = exception.toString()
-
-        }
-
-        override fun onStateChanged(websocket: WebSocket?, newState: WebSocketState?) {
-
-            TV_websocket_status.text = newState.toString()
-        }
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -75,6 +46,8 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
 
+
+
         appBarConfiguration = AppBarConfiguration(
             setOf(R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow),
             drawerLayout
@@ -82,6 +55,8 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
+
+
 
     private fun writeError(errorMessage : String)
     {
