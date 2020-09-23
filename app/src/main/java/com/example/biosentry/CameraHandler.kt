@@ -1,4 +1,4 @@
-package com.example.test
+package com.example.biosentry
 
 import android.Manifest
 import android.app.Activity

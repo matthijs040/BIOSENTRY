@@ -1,4 +1,4 @@
-package com.example.test
+package com.example.biosentry
 
 import android.Manifest
 import android.app.Activity
@@ -17,7 +17,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 
 
 class SensorReadings {

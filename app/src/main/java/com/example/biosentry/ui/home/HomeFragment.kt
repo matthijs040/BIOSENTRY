@@ -1,4 +1,4 @@
-package com.example.test.ui.home
+package com.example.biosentry.ui.home
 
 import android.app.Activity
 import android.os.Build
@@ -9,10 +9,10 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import com.example.test.MainActivity
-import com.example.test.R
-import com.example.test.CameraHandler
-import com.example.test.CameraPermissionHelper
+import com.example.biosentry.MainActivity
+import com.example.biosentry.R
+import com.example.biosentry.CameraHandler
+import com.example.biosentry.CameraPermissionHelper
 import kotlinx.android.synthetic.main.fragment_home.*
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

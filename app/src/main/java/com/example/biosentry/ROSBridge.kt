@@ -1,9 +1,8 @@
-package com.example.test
+package com.example.biosentry
 
 import android.util.Log
 import com.google.gson.Gson
 import com.neovisionaries.ws.client.*
-import java.util.*
 
 class ROSBridge(uri: String) {
     // Class for conversion between Data classes and JSON formatted strings.

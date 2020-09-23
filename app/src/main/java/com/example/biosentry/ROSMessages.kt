@@ -1,4 +1,4 @@
-package com.example.test
+package com.example.biosentry
 
 /**
  * https://github.com/RobotWebTools/rosbridge_suite/blob/master/ROSBRIDGE_PROTOCOL.md#343-publish--publish-

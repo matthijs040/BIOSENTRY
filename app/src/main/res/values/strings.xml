@@ -1,9 +1,9 @@
 <resources>
     // Application data.
-    <string name="app_name">test</string>
+    <string name="app_name">Biosentry</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">BIOSENTRY Test Application</string>
+    <string name="nav_header_title">BIOSENTRY Bridge application</string>
     <string name="nav_header_subtitle">m.besselink@student.fontys.nl</string>
 
     // UI element names

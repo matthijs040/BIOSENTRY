@@ -1,16 +1,13 @@
-package com.example.test.ui.gallery
+package com.example.biosentry.ui.gallery
 
 import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.example.test.*
+import com.example.biosentry.*
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import java.lang.NullPointerException
 import java.util.*
@@ -56,7 +53,7 @@ class GalleryFragment : Fragment() {
                 refreshSensorReadings()
             }
         }
-        timer.schedule(timerTaskObj, 0, 200)
+        timer.schedule(timerTaskObj, 0, 8)
 
         super.onResume()
     }
