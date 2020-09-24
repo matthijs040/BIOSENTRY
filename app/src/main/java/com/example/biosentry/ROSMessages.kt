@@ -29,15 +29,30 @@ data class Twist(val linear : Vector3, val angular : Vector3)
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/NavSatStatus.html
  */
-data class NavSatStatus(val status : Byte, val service : Short)
+data class NavSatStatus(val status : Int, val service : Int)
+{
+    companion object {
+        const val STATUS_NO_FIX   = -1
+        const val STATUS_FIX      =  0
+        const val STATUS_SBAS_FIX =  1
+        const val STATUS_GBAS_FIX =  2
+
+        const val SERVICE_GPS     = 1
+        const val SERVICE_GLONASS = 2
+        const val SERVICE_COMPASS = 4
+        const val SERVICE_GALILEO = 8
+    }
+}
 
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/NavSatFix.html
  */
 data class NavSatFix(val status : NavSatStatus, val latitude : Double, val longitude : Double,
-                     val altitude : Double , val position_covariance : Array<Double>,
+                     val altitude : Double , val position_covariance : DoubleArray,
                      val position_covariance_type : Byte )
 {
+
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

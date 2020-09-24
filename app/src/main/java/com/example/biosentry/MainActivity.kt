@@ -1,20 +1,34 @@
 package com.example.biosentry
 
 
+import android.Manifest
+import android.app.Activity
+import android.app.AlertDialog
+import android.app.PendingIntent.getActivity
+import android.content.DialogInterface
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.biosentry.NavSatStatus.Companion.SERVICE_GLONASS
+import com.example.biosentry.NavSatStatus.Companion.STATUS_FIX
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_home.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -56,20 +70,25 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
+    override fun onResume() {
+        mIsAdvertised = false
+        super.onResume()
+    }
 
 
-    private fun writeError(errorMessage : String)
+
+    private fun writeError(errorMessage: String)
     {
         TV_websocket_error.text = errorMessage
     }
 
-    private fun writeStatus(statusMessage : String)
+    private fun writeStatus(statusMessage: String)
     {
         TV_websocket_status.text = statusMessage
     }
 
     // THIS template IMPLEMENTATION IS PLACEHOLDER!!
-    private fun receiveData(message : ROSMessage<Any>)
+    private fun receiveData(message: ROSMessage<Any>)
     {
         println(message.toString())
     }
@@ -104,15 +123,39 @@ class MainActivity : AppCompatActivity() {
         //                    Vector3(readings.mRotationX, readings.mRotationY, readings.mRotationZ)    )
 
         // val linear = Point ( readings.mAccelerationX, readings.mAccelerationY, readings.mAccelerationZ )
-        val angular = ROSMessage<Point>( type= "geometry_msgs/Point", msg= Point(readings.mAccelerationX, readings.mAccelerationY, readings.mAccelerationZ) )
+        val angular = ROSMessage<Point>(
+            type = "geometry_msgs/Point", msg = Point(
+                readings.mAccelerationX,
+                readings.mAccelerationY,
+                readings.mAccelerationZ
+            )
+        )
+        val locationMsg = ROSMessage<NavSatFix>(type = "sensor_msgs/NavSatStatus", msg = NavSatFix(
+                NavSatStatus(
+                    STATUS_FIX,
+                    SERVICE_GLONASS
+                ),
+
+            readings.mLocationLatitude,
+            readings.mLocationLongitude,
+            altitude = 0.0,
+            position_covariance = DoubleArray(9),
+            position_covariance_type = 0
+            )
+        )
 
         if (!mIsAdvertised)
         {
-            mROSBridge?.advertise("geometry_msgs/Point" )
+            mROSBridge?.advertise("geometry_msgs/Point")
+            mROSBridge?.advertise("sensor_msgs/NavSatStatus")
             mIsAdvertised = true
         }
 
         mROSBridge?.send(angular)
+        mROSBridge?.send(locationMsg)
     }
+
+
+
 
 }

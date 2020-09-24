@@ -17,6 +17,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import java.lang.Math.pow
+import kotlin.math.pow
 
 
 class SensorReadings {
@@ -32,6 +34,8 @@ class SensorReadings {
     var mRotationX           : Double = Double.NaN
     var mRotationY           : Double = Double.NaN
     var mRotationZ           : Double = Double.NaN
+
+    var mAltitude            : Double = 0.0
 }
 
 
@@ -47,6 +51,7 @@ class Sensors(context: Context, activity: Activity) {
 
     var mAccelerometer: Sensor? = null
     var mGyroscope: Sensor? = null
+    var mBarometer : Sensor? = null
     var mSensorReadings: SensorReadings = SensorReadings()
 
     private fun askForPermissions(context: Context, activity: Activity) {
@@ -87,6 +92,7 @@ class Sensors(context: Context, activity: Activity) {
         mSensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
         mAccelerometer = mSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         mGyroscope = mSensorManager!!.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        mBarometer = mSensorManager!!.getDefaultSensor(Sensor.TYPE_PRESSURE)
 
         // Register accelerometer event.
         mSensorManager!!.registerListener(
@@ -145,6 +151,17 @@ class Sensors(context: Context, activity: Activity) {
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    }
+
+    private val barometerListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent) {
+            mSensorReadings.mAltitude =
+                145366 * ( 1 - (event.values[0].toDouble() / 1013.25).pow(0.190284) )
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+            TODO("Not yet implemented")
+        }
     }
 
     init {

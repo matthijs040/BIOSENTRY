@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.biosentry"
-        minSdkVersion 21
+        minSdkVersion 28
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -38,6 +38,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.activity:activity-ktx:1.2.0-alpha08'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
@@ -55,6 +56,7 @@ dependencies {
     implementation 'com.neovisionaries:nv-websocket-client:2.10'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.android.support:multidex:1.0.3'
+
 
     implementation 'com.dji:dji-sdk:4.13.1'
     compileOnly 'com.dji:dji-sdk-provided:4.13.1'
