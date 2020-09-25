@@ -32,6 +32,7 @@ data class Twist(val linear : Vector3, val angular : Vector3)
 data class NavSatStatus(val status : Int, val service : Int)
 {
     companion object {
+
         const val STATUS_NO_FIX   = -1
         const val STATUS_FIX      =  0
         const val STATUS_SBAS_FIX =  1

@@ -7,12 +7,12 @@
     tools:context=".ui.gallery.GalleryFragment">
 
     <TextView
-        android:id="@+id/TV_send_once"
+        android:id="@+id/TV_altitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="124dp"
-        android:layout_marginTop="356dp"
-        android:text="@string/TV_send_once"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="108dp"
+        android:text="@string/TV_altitude"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,32 +47,22 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/TVRollLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="116dp"
-        android:text="@string/TVRollLabel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
         android:id="@+id/TVRoll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="116dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="144dp"
         android:text="@string/TVRoll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/TVPitchLabel"
+        android:id="@+id/TVRollLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="140dp"
-        android:text="@string/TVPitchLabel"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="144dp"
+        android:text="@string/TVRollLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -80,8 +70,8 @@
         android:id="@+id/TVPitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="140dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="168dp"
         android:text="@string/TVPitch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -90,8 +80,8 @@
         android:id="@+id/TVYawLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="164dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="192dp"
         android:text="@string/TVYawLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -100,8 +90,8 @@
         android:id="@+id/TVYaw"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="164dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="192dp"
         android:text="@string/TVYaw"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -110,8 +100,8 @@
         android:id="@+id/TVAccelXLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="228dp"
         android:text="@string/TVAccelXLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -120,8 +110,8 @@
         android:id="@+id/TVAccelX"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="228dp"
         android:text="@string/TVAccelX"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -130,8 +120,8 @@
         android:id="@+id/TVAccelYLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="224dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="252dp"
         android:text="@string/TVAccelYLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -140,8 +130,8 @@
         android:id="@+id/TVAccelY"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="224dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="252dp"
         android:text="@string/TVAccelY"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -150,8 +140,8 @@
         android:id="@+id/TVAccelZLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="252dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="280dp"
         android:text="@string/TVAccelZLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -160,9 +150,19 @@
         android:id="@+id/TVAccelZ"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="252dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="280dp"
         android:text="@string/TVAccelZ"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/TVPitchLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="168dp"
+        android:text="@string/TVPitchLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -190,19 +190,19 @@
         android:id="@+id/BT_send_data_cont"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="280dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="308dp"
         android:text="send"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/BT_send_data_once"
+    <TextView
+        android:id="@+id/TV_send_once"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="340dp"
-        android:text="send once"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="384dp"
+        android:text="@string/TV_send_once"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -210,18 +210,30 @@
         android:id="@+id/TV_sending_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="116dp"
-        android:layout_marginTop="296dp"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="324dp"
         android:text="@string/TV_sending_data"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.chip.ChipGroup
+    <Button
+        android:id="@+id/BT_send_data_once"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="91dp"
-        tools:layout_editor_absoluteY="434dp">
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="368dp"
+        android:text="send once"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    </com.google.android.material.chip.ChipGroup>
+    <TextView
+        android:id="@+id/TV_altitude_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="109dp"
+        android:text="@string/TV_altitude_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

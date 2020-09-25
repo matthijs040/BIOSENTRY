@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
                 readings.mAccelerationZ
             )
         )
-        val locationMsg = ROSMessage<NavSatFix>(type = "sensor_msgs/NavSatStatus", msg = NavSatFix(
+        val locationMsg = ROSMessage<NavSatFix>(type = "sensor_msgs/NavSatFix", msg = NavSatFix(
                 NavSatStatus(
                     STATUS_FIX,
                     SERVICE_GLONASS
@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
         if (!mIsAdvertised)
         {
             mROSBridge?.advertise("geometry_msgs/Point")
-            mROSBridge?.advertise("sensor_msgs/NavSatStatus")
+            mROSBridge?.advertise("sensor_msgs/NavSatFix")
             mIsAdvertised = true
         }
 

@@ -86,5 +86,7 @@
     <string name="TV_camera_label">Camera:</string>
     <string name="TV_camera_error">None</string>
     <string name="TV_camera_status">inactive</string>
+    <string name="TV_altitude_label">alt:</string>
+    <string name="TV_altitude">NaN</string>
 
 </resources>

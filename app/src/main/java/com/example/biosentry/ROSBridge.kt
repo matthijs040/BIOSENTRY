@@ -1,5 +1,6 @@
 package com.example.biosentry
 
+import android.hardware.Sensor
 import android.util.Log
 import com.google.gson.Gson
 import com.neovisionaries.ws.client.*
@@ -39,9 +40,25 @@ class ROSBridge(uri: String) {
         mWebSocket.connectAsynchronously()
     }
 
+    private fun setAccelTransmission(rate : Int)
+    {
+
+    }
+
+    fun setTransmission(sensorType : Int, rate : Int)
+    {
+        when(sensorType)
+        {
+            Sensor.TYPE_ACCELEROMETER -> setAccelTransmission(rate)
+            else -> return
+
+        }
+    }
+
     fun<T> send(data : ROSMessage<T>)
     {
         val json = mGson.toJson(data)
+
         mWebSocket.sendFrame( WebSocketFrame.createTextFrame( json ) )
     }
 

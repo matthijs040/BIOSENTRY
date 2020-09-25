@@ -15,9 +15,8 @@ import java.util.*
 class GalleryFragment : Fragment() {
 
     private lateinit var galleryViewModel: GalleryViewModel
-    private var mROSBridge : ROSBridge? = null
-    var mSensors : Sensors? = null
-    var mSending : Boolean = false
+    private var mSensors : Sensors? = null
+    private var mSending : Boolean = false
 
     var mSendOnce : Boolean = false
     private val timer = Timer()
@@ -82,6 +81,8 @@ class GalleryFragment : Fragment() {
                     frag?.TVRoll?.text = newReadings.mRotationX.toString()
                     frag?.TVPitch?.text = newReadings.mRotationY.toString()
                     frag?.TVYaw?.text = newReadings.mRotationZ.toString()
+
+                    frag?.TV_altitude?.text = newReadings.mAltitude.toString()
                 }
                 catch (ex : NullPointerException)
                 {

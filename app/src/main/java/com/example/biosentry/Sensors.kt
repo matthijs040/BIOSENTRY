@@ -20,7 +20,10 @@ import androidx.core.content.ContextCompat
 import java.lang.Math.pow
 import kotlin.math.pow
 
-
+/**
+ * Sensor data that changes at high frequency.
+ * To be polled by outside classes.
+ */
 class SensorReadings {
 
     var mHaveChanged         : Boolean = false
@@ -35,7 +38,7 @@ class SensorReadings {
     var mRotationY           : Double = Double.NaN
     var mRotationZ           : Double = Double.NaN
 
-    var mAltitude            : Double = 0.0
+    var mAltitude            : Double = Double.NaN
 }
 
 
@@ -46,13 +49,19 @@ class SensorReadings {
 class Sensors(context: Context, activity: Activity) {
 
     // Sensors, listed as private variables.
-    var mLocationManager: LocationManager? = null
-    var mSensorManager: SensorManager? = null
+    var mLocationManager: LocationManager = context.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+    var mSensorManager: SensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
 
-    var mAccelerometer: Sensor? = null
-    var mGyroscope: Sensor? = null
-    var mBarometer : Sensor? = null
+    var mAccelerometer: Sensor? =    mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    var mGyroscope: Sensor? =        mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+    var mBarometer : Sensor? =       mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
     var mSensorReadings: SensorReadings = SensorReadings()
+
+    // Location data that changes at uncertain and lower frequency times.
+    // To be worked with as new data comes in through this function.
+    var mLocationChangedCallback : ( (altitude : Double, latitude : Double, longitude : Double) -> Unit )? = null
+    var mAccelerometerCallback : ( ( X : Double, Y : Double, Z : Double ) -> Unit)? = null
+    var mGyroscopeCallback :    ( ( R : Double, P : Double, Y : Double) -> Unit )?  = null
 
     private fun askForPermissions(context: Context, activity: Activity) {
         // Ask nicely for permissions to use the GPS.
@@ -70,13 +79,11 @@ class Sensors(context: Context, activity: Activity) {
     }
 
     private fun initLocationListener(context: Context) {
-        // Construct a manager object to create a listener from.
-        mLocationManager = context.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager?
 
         // Try to construct a listener.
         try {
             // Request location updates
-            mLocationManager?.requestLocationUpdates(
+            mLocationManager.requestLocationUpdates(
                 LocationManager.NETWORK_PROVIDER,
                 0L,
                 0.0f,
@@ -87,23 +94,25 @@ class Sensors(context: Context, activity: Activity) {
         }
     }
 
-    private fun initSensorListeners(context: Context) {
-        // First, init sensor manager to create sensors from.
-        mSensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
-        mAccelerometer = mSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        mGyroscope = mSensorManager!!.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-        mBarometer = mSensorManager!!.getDefaultSensor(Sensor.TYPE_PRESSURE)
-
+    private fun initSensorListeners() {
         // Register accelerometer event.
-        mSensorManager!!.registerListener(
+        Log.println(Log.INFO, "Sensors", mSensorManager.getSensorList(Sensor.TYPE_ALL).toString())
+
+        mSensorManager.registerListener(
             accelerometerListener,
             mAccelerometer,
             SensorManager.SENSOR_DELAY_NORMAL
         )
 
-        mSensorManager!!.registerListener(
+        mSensorManager.registerListener(
             gyroscopeListener,
             mGyroscope,
+            SensorManager.SENSOR_DELAY_NORMAL
+        )
+
+        mSensorManager.registerListener(
+            barometerListener,
+            mBarometer,
             SensorManager.SENSOR_DELAY_NORMAL
         )
     }
@@ -121,6 +130,8 @@ class Sensors(context: Context, activity: Activity) {
         override fun onLocationChanged(location: Location) {
             mSensorReadings.mLocationLatitude = location.latitude
             mSensorReadings.mLocationLongitude = location.longitude
+            mSensorReadings.mAltitude = location.altitude
+            mLocationChangedCallback?.invoke(location.altitude, location.latitude, location.longitude)
             mSensorReadings.mHaveChanged = true
         }
 
@@ -136,6 +147,7 @@ class Sensors(context: Context, activity: Activity) {
             mSensorReadings.mAccelerationX = event.values[0].toDouble()
             mSensorReadings.mAccelerationY = event.values[1].toDouble()
             mSensorReadings.mAccelerationZ = event.values[2].toDouble()
+            mAccelerometerCallback?.invoke(event.values[0].toDouble(), event.values[1].toDouble(), event.values[2].toDouble())
             mSensorReadings.mHaveChanged = true
         }
 
@@ -147,6 +159,7 @@ class Sensors(context: Context, activity: Activity) {
             mSensorReadings.mRotationX = event.values[0].toDouble()
             mSensorReadings.mRotationY = event.values[0].toDouble()
             mSensorReadings.mRotationZ = event.values[0].toDouble()
+            mGyroscopeCallback?.invoke(event.values[0].toDouble(), event.values[1].toDouble(), event.values[2].toDouble())
             mSensorReadings.mHaveChanged = true
         }
 
@@ -157,16 +170,15 @@ class Sensors(context: Context, activity: Activity) {
         override fun onSensorChanged(event: SensorEvent) {
             mSensorReadings.mAltitude =
                 145366 * ( 1 - (event.values[0].toDouble() / 1013.25).pow(0.190284) )
+            mSensorReadings.mHaveChanged = true
         }
 
-        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-            TODO("Not yet implemented")
-        }
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {  }
     }
 
     init {
         askForPermissions(context, activity)
         initLocationListener(context)
-        initSensorListeners(context)
+        initSensorListeners()
     }
 }
