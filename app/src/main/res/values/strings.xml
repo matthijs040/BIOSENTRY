@@ -88,5 +88,6 @@
     <string name="TV_camera_status">inactive</string>
     <string name="TV_altitude_label">alt:</string>
     <string name="TV_altitude">NaN</string>
+    <string name="camera_button">Take Photo</string>
 
 </resources>
