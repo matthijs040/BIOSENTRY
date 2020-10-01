@@ -10,7 +10,10 @@ import android.util.Log
 /**
  * Class containing logic to fetch accelerometer data from Android's native HAL.
  */
-class ROSAccelerometer(context: Context) : IROSSensor<Vector3> {
+class ROSAccelerometer(context: Context,
+                       messageTypeName : String = "geometry_msgs/Vector3",
+                       topicName : String = "bridge/android/accelerometer" ) : IROSSensor<Vector3>
+{
 
     // Android HAL objects exposing the phone's sensors.
     private val mSensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -20,10 +23,8 @@ class ROSAccelerometer(context: Context) : IROSSensor<Vector3> {
     override var mDataHandler :  ( (ROSMessage<Vector3>) -> Unit )? = null
     private var mReading = Vector3(Double.NaN,Double.NaN,Double.NaN)
 
-    override val mMessageTypeName: String
-        get() = "sensor_msgs/Vector3"
-    override val mMessageTopicName: String
-        get() = "bridge/android/accelerometer"
+    override val mMessageTypeName: String = messageTypeName
+    override val mMessageTopicName: String = topicName
 
     // Android's listener interface for sensors.
     private val mAccelerometerListener = object : SensorEventListener {

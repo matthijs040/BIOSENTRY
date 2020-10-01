@@ -1,29 +1,34 @@
 package com.example.biosentry
 
-import android.app.Activity
-import android.content.Context
+import kotlinx.coroutines.delay
 import java.util.*
 import kotlin.concurrent.timerTask
 
-class ROSMessageHandler(uri : String, context: Context, activity: Activity) {
+class ROSMessageHandler(private val bridge : ROSBridge) {
 
-    private val mROSBridge : ROSBridge = ROSBridge(uri)
     private val mTimer : Timer = Timer()
 
-    fun attachSensor( sensor : IROSSensor<Any>, rateInMs : Long )
+    fun attachSensor(sensor: IROSSensor<*>, rateInMs: Long )
     {
-        mROSBridge.advertise( sensor.mMessageTypeName, sensor.mMessageTopicName)
+        bridge.advertise( sensor.mMessageTypeName, sensor.mMessageTopicName)
+
 
         if(rateInMs == 0L)
         {
-            sensor.mDataHandler = mROSBridge::send
+            sensor.mDataHandler = bridge::send
         }
         else
         {
             mTimer.schedule(
                 timerTask {
-                        mROSBridge.send( sensor.read() )
+                        bridge.send( sensor.read() )
                 },0, rateInMs )
         }
+    }
+
+    fun removeSensors()
+    {
+        mTimer.cancel()
+        mTimer.purge()
     }
 }

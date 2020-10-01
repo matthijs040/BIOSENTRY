@@ -10,7 +10,11 @@ import android.util.Log
 /**
  * Class containing logic to fetch gyroscope data from Android's native HAL.
  */
-class ROSGyroscope(context: Context) : IROSSensor<Vector3> {
+class ROSGyroscope(context: Context,
+                   override val mMessageTypeName: String = "geometry_msgs/Vector3",
+                   override val mMessageTopicName: String = "bridge/android/gyroscope"
+) : IROSSensor<Vector3>
+{
 
     // Android HAL objects exposing the phone's sensors.
     private val mSensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -19,11 +23,6 @@ class ROSGyroscope(context: Context) : IROSSensor<Vector3> {
     // Data that will be read from the outside.
     override var mDataHandler :  ( ( ROSMessage<Vector3> ) -> Unit )? = null
     private var mReading = Vector3(Double.NaN,Double.NaN,Double.NaN)
-
-    override val mMessageTypeName: String
-        get() = "sensor_msgs/Vector3"
-    override val mMessageTopicName: String
-        get() = "bridge/android/gyroscope"
 
     // Android's listener interface for sensors.
     private val mGyroscopeListener = object : SensorEventListener {

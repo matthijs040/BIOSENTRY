@@ -40,22 +40,7 @@ class ROSBridge(uri: String) {
         mWebSocket.connectAsynchronously()
     }
 
-    private fun setAccelTransmission(rate : Int)
-    {
-
-    }
-
-    fun setTransmission(sensorType : Int, rate : Int)
-    {
-        when(sensorType)
-        {
-            Sensor.TYPE_ACCELEROMETER -> setAccelTransmission(rate)
-            else -> return
-
-        }
-    }
-
-    fun<T> send(data : ROSMessage<T>)
+    fun send(data : ROSMessage<*>)
     {
         val json = mGson.toJson(data)
 
@@ -69,12 +54,12 @@ class ROSBridge(uri: String) {
 
     fun advertise( typeName: String, topicName : String)
     {
-        send( ROSMessage<Unit>(op = "advertise", type = typeName, msg = Unit, topic = topicName))
+        send( ROSMessage(op = "advertise", type = typeName, topic = topicName, msg = Unit) )
     }
 
     fun unadvertise( typeName : String)
     {
-        send( ROSMessage<Unit>(op = "unadvertise", type = typeName, msg = Unit))
+        send( ROSMessage(op = "unadvertise", type = typeName, msg = Unit))
     }
 
     fun disconnect()
