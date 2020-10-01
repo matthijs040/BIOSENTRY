@@ -67,6 +67,11 @@ class ROSBridge(uri: String) {
         send( ROSMessage<Unit>(op = "advertise", type = typeName, msg = Unit))
     }
 
+    fun advertise( typeName: String, topicName : String)
+    {
+        send( ROSMessage<Unit>(op = "advertise", type = typeName, msg = Unit, topic = topicName))
+    }
+
     fun unadvertise( typeName : String)
     {
         send( ROSMessage<Unit>(op = "unadvertise", type = typeName, msg = Unit))

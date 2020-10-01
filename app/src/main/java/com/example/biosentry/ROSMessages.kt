@@ -1,5 +1,7 @@
 package com.example.biosentry
 
+import java.nio.ByteBuffer
+
 /**
  * https://github.com/RobotWebTools/rosbridge_suite/blob/master/ROSBRIDGE_PROTOCOL.md#343-publish--publish-
  * By default publish to make data classes work as publish messages.
@@ -9,6 +11,32 @@ open class ROSMessage<T>(val op : String = "publish"
                          , val type: String
                          , val topic : String = "bridge/$type"
                          , val msg : T)
+
+/**
+ * http://docs.ros.org/noetic/api/std_msgs/html/msg/Header.html
+ */
+data class time(val sec : Long, val nsec: Long)
+
+data class Header( val seq : Long, val stamp : time, val frame_id : String )
+
+data class CameraInfo( val header: Header, val height: Long, val width: Long,
+                       val distortion_model : String, val D : DoubleArray, val K : DoubleArray,
+                       val R : DoubleArray, val P : DoubleArray,
+                       val binning_x : Long, val binning_y : Long )
+
+/**
+ * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/Image.html
+ */
+data class Image( val header : Header, val height : Long, val width : Long, val encoding : String,
+                  val is_bigendian : Byte, val step : Long, val data : UByteArray )
+
+/**
+ * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/CameraInfo.html
+ */
+data class CompressedImage( val header: Header, val format : String, val data : UByteArray)
+
+data class RegionOfInterest( val x_offset : Long, val y_offset : Long,
+                             val height : Long, val width: Long, val do_rectify : Boolean)
 
 /**
  * http://docs.ros.org/noetic/api/nav_msgs/html/msg/Odometry.html

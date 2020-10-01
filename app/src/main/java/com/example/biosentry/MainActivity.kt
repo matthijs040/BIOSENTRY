@@ -2,11 +2,13 @@ package com.example.biosentry
 
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.PendingIntent.getActivity
 import android.content.DialogInterface
 import android.content.pm.PackageManager
+import android.graphics.ImageFormat
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Build
@@ -16,10 +18,7 @@ import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -36,10 +35,15 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_home.*
 import java.io.File
+import java.nio.ByteBuffer
 import java.util.*
+import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-typealias LumaListener = (luma: Double) -> Unit
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,47 +55,55 @@ class MainActivity : AppCompatActivity() {
     private var mROSBridge : ROSBridge? = null
 
     private var imageCapture: ImageCapture? = null
-    private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
+
+    private var mImageSequenceNumber : Long = 0
+    private var mCameraAdvertized : Boolean = false
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun getOutputDirectory(): File {
-        val mediaDir = externalMediaDirs.firstOrNull()?.let {
-            File(it, resources.getString(R.string.app_name)).apply { mkdirs() } }
-        return if (mediaDir != null && mediaDir.exists())
-            mediaDir else filesDir
-    }
-
     private fun takePhoto() {
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
 
-        // Create time-stamped output file to hold the image
-        val photoFile = File(
-            outputDirectory,
-            SimpleDateFormat(FILENAME_FORMAT, Locale.ENGLISH
-            ).format(System.currentTimeMillis()) + ".jpg")
-
-        // Create output options object which contains file + metadata
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-
         // Set up image capture listener, which is triggered after photo has
         // been taken
-        imageCapture.takePicture(
-            outputOptions, ContextCompat.getMainExecutor(this), object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: ImageCaptureException) {
-                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+        imageCapture.takePicture(ContextCompat.getMainExecutor(this), object :
+            ImageCapture.OnImageCapturedCallback()
+            {
+
+
+                @SuppressLint("UnsafeExperimentalUsageError") // I SHOULD BE ABLE TO DO THIS!
+                override fun onCaptureSuccess(image: ImageProxy)
+                {
+                    mROSBridge ?: return
+
+                    println(image.toString())
+
+
+                    if(!mCameraAdvertized)
+                    {
+                        mROSBridge?.advertise("sensor_msgs/CompressedImage", "bridge/image_raw/compressed")
+                        mCameraAdvertized = true
+                    }
+
+                    val msg = image.image?.toROSCompressedMessage("bridge/image_raw/compressed")
+
+                    if(msg != null)
+                        mROSBridge?.send( msg)
+
+
+                    super.onCaptureSuccess(image)
+                    image.close()
                 }
 
-                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
-                    val msg = "Photo capture succeeded: $savedUri"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, msg)
+                override fun onError(exception: ImageCaptureException)
+                {
+                    println(exception.toString())
+                    super.onError(exception)
                 }
             })
     }
@@ -113,6 +125,7 @@ class MainActivity : AppCompatActivity() {
 
             imageCapture = ImageCapture.Builder()
                 .build()
+
 
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -193,7 +206,6 @@ class MainActivity : AppCompatActivity() {
         camera_capture_button.setOnClickListener { takePhoto() }
         mIsAdvertised = false
         // Set up the listener for take photo button
-        outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         super.onResume()
@@ -260,6 +272,7 @@ class MainActivity : AppCompatActivity() {
     fun disconnectClicked() {
         mROSBridge?.disconnect()
         mIsAdvertised = false
+        mCameraAdvertized = false
     }
 
     fun sendData(readings: SensorReadings)
@@ -300,7 +313,35 @@ class MainActivity : AppCompatActivity() {
         mROSBridge?.send(locationMsg)
     }
 
+    fun android.media.Image.toROSCompressedMessage(topic : String) : ROSMessage<CompressedImage>?
+    {
+        if(this.format != ImageFormat.JPEG)
+            return null
 
+        val size = this.width * this.height * this.planes.size
+        var arr : ByteArray = ByteArray(size)
 
+        var ind = 0
+        for( plane in this.planes)
+        {
+            if(plane.buffer.hasArray())
+                  System.arraycopy(plane.buffer.array(), 0, arr, ind * plane.buffer.array().size, plane.buffer.array().size )
+            ind++
+        }
 
+        val uArr = arr.toUByteArray()
+
+        return ROSMessage(
+            type= "sensor_msgs/CompressedImage",
+            topic= topic,
+            msg= CompressedImage(
+                header = Header(seq = mImageSequenceNumber,
+                    stamp = time( sec= this.timestamp, nsec = 0 ),
+                    frame_id = "camera info frame ID" ),
+
+                format = "jpeg",
+                data = uArr
+            )
+        )
+    }
 }
