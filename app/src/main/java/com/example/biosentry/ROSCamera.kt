@@ -1,5 +1,5 @@
 package com.example.biosentry
-/**
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -7,22 +7,53 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.ImageFormat
 import android.util.Log
-import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.fragment_home.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.concurrent.timerTask
 
-class ROSCamera(val activity: Activity,val context : Context) {
+class ROSCamera(private val activity: Activity, private val context : Context, private val FPS : Int = 10) : IROSSensor<CompressedImage>, LifecycleOwner
+{
+    // Lifecycle stuff for allowing the camera to exist.
+    private var mLifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
+    override fun getLifecycle(): Lifecycle {
+        return mLifecycleRegistry
+    }
+
+    // Permission definitions for asking for the right permissions towards the UI.
+    companion object {
+        private const val REQUEST_CODE_PERMISSIONS = 10
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+    }
+
 
     private var imageCapture: ImageCapture? = null
-    private lateinit var cameraExecutor: ExecutorService
+    private val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    var mPreviewView : PreviewView? = null
 
-    private var mImageSequenceNumber : Long = 0
-    private var mCameraAdvertized : Boolean = false
+    private val mTimer : Timer = Timer()
+
+
+
+    override var mDataHandler :  ( (ROSMessage<CompressedImage>) -> Unit )? = null
+
+    private var mSequenceNumber : Long = 0
+    private var mReading : CompressedImage = CompressedImage( Header(
+        mSequenceNumber,
+        time( 0,0),
+        ""
+    ),
+    "jpeg",
+    ubyteArrayOf(0U)
+    )
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
@@ -35,33 +66,29 @@ class ROSCamera(val activity: Activity,val context : Context) {
 
         // Set up image capture listener, which is triggered after photo has
         // been taken
-        imageCapture.takePicture(ContextCompat.getMainExecutor(this), object :
+        imageCapture.takePicture(ContextCompat.getMainExecutor(context), object :
             ImageCapture.OnImageCapturedCallback()
         {
-
-
-            @SuppressLint("UnsafeExperimentalUsageError") // I SHOULD BE ABLE TO DO THIS!
             override fun onCaptureSuccess(image: ImageProxy)
             {
-                mROSBridge ?: return
-
-                println(image.toString())
-
-
-                if(!mCameraAdvertized)
+                if(image.format == ImageFormat.JPEG)
                 {
-                    mROSBridge?.advertise("sensor_msgs/CompressedImage", "bridge/image_raw/compressed")
-                    mCameraAdvertized = true
+                    val arr = image.planes[0].buffer.array().asUByteArray()
+
+
+                    mReading = CompressedImage(
+                        Header(
+                            mSequenceNumber,
+                            time( image.imageInfo.timestamp, 0),
+                            "CameraInfoID"
+                        ),
+                        format = "jpeg",
+                        data = arr
+                    )
                 }
 
-                val msg = image.image?.toROSCompressedMessage("bridge/image_raw/compressed")
-
-                if(msg != null)
-                    mROSBridge?.send( msg)
-
-
-                super.onCaptureSuccess(image)
                 image.close()
+                super.onCaptureSuccess(image)
             }
 
             override fun onError(exception: ImageCaptureException)
@@ -74,7 +101,7 @@ class ROSCamera(val activity: Activity,val context : Context) {
 
     private fun startCamera()
     {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
 
         cameraProviderFuture.addListener(Runnable {
             // Used to bind the lifecycle of cameras to the lifecycle owner
@@ -84,7 +111,7 @@ class ROSCamera(val activity: Activity,val context : Context) {
             val preview = Preview.Builder()
                 .build()
                 .also {
-                    it.setSurfaceProvider(viewFinder.createSurfaceProvider())
+                    it.setSurfaceProvider(mPreviewView?.createSurfaceProvider())
                 }
 
             imageCapture = ImageCapture.Builder()
@@ -102,11 +129,11 @@ class ROSCamera(val activity: Activity,val context : Context) {
                 cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture)
 
-            } catch(exc: Exception) {
-                Log.e(MainActivity.TAG, "Use case binding failed", exc)
+            } catch(e: Exception) {
+                Log.println(Log.ERROR, "Use case binding failed", e.toString())
             }
 
-        }, ContextCompat.getMainExecutor(this))
+        }, ContextCompat.getMainExecutor(context))
     }
 
     init {
@@ -115,70 +142,31 @@ class ROSCamera(val activity: Activity,val context : Context) {
             startCamera()
         } else {
             ActivityCompat.requestPermissions(
-                activity, MainActivity.REQUIRED_PERMISSIONS, MainActivity.REQUEST_CODE_PERMISSIONS
+                activity, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
 
-        // camera_capture_button.setOnClickListener { takePhoto() }
-        mIsAdvertised = false
-        // Set up the listener for take photo button
-        cameraExecutor = Executors.newSingleThreadExecutor()
+        mTimer.schedule(
+            timerTask {
+                takePhoto()
+            },1000, 1000L / FPS )
+
+
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray) {
-        if (requestCode == MainActivity.REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                startCamera()
-            } else {
-                Toast.makeText(this,
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
+    override val mMessageTypeName: String
+        get() = "sensor_msgs/CompressedImage"
+    override val mMessageTopicName: String
+        get() = "bridge/android/image_raw/compressed"
 
-    fun android.media.Image.toROSCompressedMessage(topic : String) : ROSMessage<CompressedImage>?
-    {
-        if(this.format != ImageFormat.JPEG)
-            return null
-
-        val size = this.width * this.height * this.planes.size
-        var arr : ByteArray = ByteArray(size)
-
-        var ind = 0
-        for( plane in this.planes)
-        {
-            if(plane.buffer.hasArray())
-                System.arraycopy(plane.buffer.array(), 0, arr, ind * plane.buffer.array().size, plane.buffer.array().size )
-            ind++
-        }
-
-        val uArr = arr.toUByteArray()
-
+    override fun read(): ROSMessage<CompressedImage> {
         return ROSMessage(
-            type= "sensor_msgs/CompressedImage",
-            topic= topic,
-            msg= CompressedImage(
-                header = Header(seq = mImageSequenceNumber,
-                    stamp = time( sec= this.timestamp, nsec = 0 ),
-                    frame_id = "camera info frame ID" ),
-
-                format = "jpeg",
-                data = uArr
-            )
+            type= mMessageTypeName,
+            topic= mMessageTopicName,
+            msg= mReading
         )
     }
 
-    companion object {
-        private const val TAG = "CameraXBasic"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-        private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-    }
+
 
 }
- **/

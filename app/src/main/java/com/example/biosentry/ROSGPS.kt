@@ -29,7 +29,13 @@ class ROSGPS(context: Context, activity: Activity) : IROSSensor<NavSatFix>
         SERVICE_GLONASS + SERVICE_GPS
     )
 
-    private var  mReading : NavSatFix = NavSatFix ( mStatus,
+    private var mSeqNumber : Long = 0
+
+    // Frame ID: I.E. Euclidean distance from vehicle centre to GPS antenna is currently unknown.
+    private var mHeader = Header(0, time(0,0), "N.A.")
+
+    private var  mReading : NavSatFix = NavSatFix ( mHeader,
+                                                    mStatus,
                                                     Double.NaN,
                                                     Double.NaN,
                                                     Double.NaN,
@@ -46,16 +52,20 @@ class ROSGPS(context: Context, activity: Activity) : IROSSensor<NavSatFix>
         override fun onLocationChanged(location: Location) {
             mStatus = NavSatStatus(status = STATUS_FIX, service = SERVICE_GLONASS + SERVICE_GPS)
 
+            mHeader = Header(seq = mSeqNumber, stamp = time(location.time, location.elapsedRealtimeNanos), frame_id = "N.A.")
+
             mReading = NavSatFix(
+                mHeader,
                 mStatus,
                 latitude = location.latitude,
                 longitude = location.longitude,
                 altitude = location.altitude,
-                position_covariance = DoubleArray(0),
+                position_covariance = DoubleArray(9),
                 position_covariance_type = 0
             )
 
             mDataHandler?.invoke( read() )
+            mSeqNumber++
         }
 
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}

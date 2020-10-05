@@ -1,6 +1,5 @@
 package com.example.biosentry
 
-import android.hardware.Sensor
 import android.util.Log
 import com.google.gson.Gson
 import com.neovisionaries.ws.client.*
@@ -16,12 +15,15 @@ class ROSBridge(uri: String) {
     var mDataHandler   : ( (ROSMessage<Any>) -> Unit)?   = null
 
     private val mWebSocketListener : WebSocketAdapter = object : WebSocketAdapter() {
-        override fun onTextFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
-            //val data = frame.toString()
+        override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
+            super.onFrame(websocket, frame)
+
+            Log.println(Log.WARN, "ROSBridge", frame.toString())
             /**
              * TODO : Parse string and create struct.
              */
             mDataHandler?.invoke(ROSMessage(type = "Empty", msg = ""))
+
         }
 
         override fun onError(websocket: WebSocket?, cause: WebSocketException?) {
@@ -54,7 +56,8 @@ class ROSBridge(uri: String) {
 
     fun advertise( typeName: String, topicName : String)
     {
-        send( ROSMessage(op = "advertise", type = typeName, topic = topicName, msg = Unit) )
+
+            send( ROSMessage(op = "advertise", type = typeName, topic = topicName, msg = Unit) )
     }
 
     fun unadvertise( typeName : String)

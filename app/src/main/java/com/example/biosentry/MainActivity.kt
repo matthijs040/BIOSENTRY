@@ -15,6 +15,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.*
+import kotlin.system.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,6 +25,10 @@ class MainActivity : AppCompatActivity() {
     private var mROSMessageHandler :ROSMessageHandler? = null
 
     private var mROSAccelerometer : ROSAccelerometer? = null
+    private var mROSGyroscope : ROSGyroscope? = null
+    private var mROSGPS : ROSGPS? = null
+    private var mROSCamera : ROSCamera? = null
+    //private var
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -54,7 +60,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        mROSAccelerometer = ROSAccelerometer(context = baseContext)
+        mROSAccelerometer = ROSAccelerometer(baseContext)
+        mROSGyroscope = ROSGyroscope(baseContext)
+        mROSGPS = ROSGPS(baseContext, this)
+        mROSCamera = ROSCamera(this, this.baseContext)
+        mROSCamera?.mPreviewView = viewFinder
+
         super.onResume()
     }
 
@@ -100,9 +111,11 @@ class MainActivity : AppCompatActivity() {
         {
         }
 
-         mROSMessageHandler?.attachSensor(mROSAccelerometer!!, 1000L)
-
-
+        // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html
+        mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
+        mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
+        mROSGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
+        mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 1000) }
     }
 
     fun disconnectClicked() {

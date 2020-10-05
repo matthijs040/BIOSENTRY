@@ -76,7 +76,7 @@ data class NavSatStatus(val status : Int, val service : Int)
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/NavSatFix.html
  */
-data class NavSatFix(val status : NavSatStatus, val latitude : Double, val longitude : Double,
+data class NavSatFix(val header : Header, val status : NavSatStatus, val latitude : Double, val longitude : Double,
                      val altitude : Double , val position_covariance : DoubleArray,
                      val position_covariance_type : Byte )
 {
