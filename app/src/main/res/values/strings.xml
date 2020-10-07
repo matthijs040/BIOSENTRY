@@ -90,4 +90,6 @@
     <string name="TV_altitude">NaN</string>
     <string name="camera_button">Take Photo</string>
 
+    <string name="menu_camera">Camera Views</string>
+
 </resources>

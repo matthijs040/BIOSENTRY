@@ -151,29 +151,27 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@string/TV_camera_label" />
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/viewFinder"
-        android:layout_width="213dp"
-        android:layout_height="194dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="280dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.941" />
-
     <Button
-        android:id="@+id/camera_capture_button"
+        android:id="@+id/btn_takepicture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="43dp"
+        android:layout_marginEnd="176dp"
+        android:layout_marginBottom="48dp"
         android:text="@string/camera_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextureView
+        android:id="@+id/texture"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="19dp"
+        app:layout_constraintBottom_toTopOf="@+id/TV_status_label3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TV_camera_label"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

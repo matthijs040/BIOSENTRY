@@ -22,4 +22,10 @@
         android:name="com.example.biosentry.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/nav_camera"
+        android:name="com.example.biosentry.ui.camera.CameraFragment"
+        android:label="@string/menu_camera"
+        tools:layout="@layout/camera_fragment" />
 </navigation>

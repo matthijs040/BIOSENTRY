@@ -1,8 +1,10 @@
 package com.example.biosentry
 
 
+import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.view.Menu
+import android.view.TextureView.SurfaceTextureListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -15,8 +17,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.coroutines.*
-import kotlin.system.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,12 +59,37 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
+    var textureListener: SurfaceTextureListener = object : SurfaceTextureListener {
+        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
+            //open your camera here
+            mROSCamera?.openCamera()
+        }
+
+        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
+            // Transform you image captured size according to the surface width and height
+        }
+
+        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
+            return false
+        }
+
+        override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
+    }
+
     override fun onResume() {
         mROSAccelerometer = ROSAccelerometer(baseContext)
         mROSGyroscope = ROSGyroscope(baseContext)
         mROSGPS = ROSGPS(baseContext, this)
+
         mROSCamera = ROSCamera(this, this.baseContext)
-        mROSCamera?.mPreviewView = viewFinder
+
+        btn_takepicture.setOnClickListener{ mROSCamera?.takePicture() }
+
+        if (texture.isAvailable) {
+            mROSCamera?.openCamera()
+        } else {
+            texture.surfaceTextureListener = textureListener
+        }
 
         super.onResume()
     }
@@ -107,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         try {
             mROSMessageHandler = ROSMessageHandler(mROSBridge!!)
         }
-        catch (e : Exception)
+        catch (e: Exception)
         {
         }
 
@@ -115,7 +140,7 @@ class MainActivity : AppCompatActivity() {
         mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mROSGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
-        mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 1000) }
+        mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0) }
     }
 
     fun disconnectClicked() {
