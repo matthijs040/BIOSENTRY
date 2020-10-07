@@ -6,16 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <TextView
-        android:id="@+id/TV_status_label3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="72dp"
-        android:text="@string/TV_error_label"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <EditText
         android:id="@+id/TB_URL"
         android:layout_width="249dp"
@@ -61,16 +51,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/TV_status_label4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="48dp"
-        android:text="@string/TV_status_label"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
         android:id="@+id/TV_websocket_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -81,16 +61,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/TV_camera_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginBottom="48dp"
-        android:text="@string/TV_camera_status"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
         android:id="@+id/TV_websocket_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -99,16 +69,6 @@
         android:text="@string/TV_websocket_error"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/TV_camera_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginBottom="5dp"
-        android:text="@string/TV_camera_error"
-        app:layout_constraintBottom_toTopOf="@+id/TV_camera_status"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/TV_URL_label"
@@ -150,28 +110,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@string/TV_camera_label" />
-
-    <Button
-        android:id="@+id/btn_takepicture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="176dp"
-        android:layout_marginBottom="48dp"
-        android:text="@string/camera_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <TextureView
-        android:id="@+id/texture"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="19dp"
-        app:layout_constraintBottom_toTopOf="@+id/TV_status_label3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TV_camera_label"
-        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

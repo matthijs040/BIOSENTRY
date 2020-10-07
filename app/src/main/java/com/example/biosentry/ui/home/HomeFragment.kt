@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.biosentry.MainActivity
 import com.example.biosentry.R
+import kotlinx.android.synthetic.main.camera_fragment.*
 
 import kotlinx.android.synthetic.main.fragment_home.*
 

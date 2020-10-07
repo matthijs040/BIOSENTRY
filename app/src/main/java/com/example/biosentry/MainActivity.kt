@@ -16,6 +16,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.camera_fragment.*
 import kotlinx.android.synthetic.main.fragment_home.*
 
 class MainActivity : AppCompatActivity() {
@@ -27,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private var mROSAccelerometer : ROSAccelerometer? = null
     private var mROSGyroscope : ROSGyroscope? = null
     private var mROSGPS : ROSGPS? = null
-    private var mROSCamera : ROSCamera? = null
+    var mROSCamera : ROSCamera? = null
     //private var
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -83,13 +84,6 @@ class MainActivity : AppCompatActivity() {
 
         mROSCamera = ROSCamera(this, this.baseContext)
 
-        btn_takepicture.setOnClickListener{ mROSCamera?.takePicture() }
-
-        if (texture.isAvailable) {
-            mROSCamera?.openCamera()
-        } else {
-            texture.surfaceTextureListener = textureListener
-        }
 
         super.onResume()
     }
