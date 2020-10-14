@@ -1,23 +1,22 @@
 package com.example.biosentry.ui.camera
 
-import android.graphics.SurfaceTexture
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.Image
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.example.biosentry.MainActivity
 import com.example.biosentry.R
 import kotlinx.android.synthetic.main.camera_fragment.*
 
+
 class CameraFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = CameraFragment()
-    }
-
-    private val mOutput = camera_output
-
-    private lateinit var viewModel: CameraViewModel
+    private lateinit var mOutput : ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,15 +27,19 @@ class CameraFragment : Fragment() {
 
     override fun onResume() {
 
+        mOutput = this.activity!!.findViewById(R.id.camera_image_view)
         btn_takepicture?.setOnClickListener{ (activity as MainActivity?)?.mROSCamera?.takePicture() }
-        (activity as MainActivity?)?.mROSCamera?.mImageHandler = ::showImageOnTexture
+
+        (activity as MainActivity?)?.mROSCamera?.mBitmapHandler = ::showBitmap
 
         super.onResume()
     }
 
-    private fun showImageOnTexture(image : Image)
+    private fun showBitmap(bitmap: Bitmap)
     {
-        mOutput.apply { image.cropRect }
+        mOutput.setImageBitmap(bitmap)
     }
+
+
 
 }

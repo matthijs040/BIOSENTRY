@@ -1,7 +1,5 @@
 package com.example.biosentry
 
-import java.nio.ByteBuffer
-
 /**
  * https://github.com/RobotWebTools/rosbridge_suite/blob/master/ROSBRIDGE_PROTOCOL.md#343-publish--publish-
  * By default publish to make data classes work as publish messages.
@@ -29,13 +27,13 @@ data class CameraInfo( val header: Header, val height: Long, val width: Long,
  */
 
 data class Image(val header : Header, val height : Long, val width : Long, val encoding : String,
-                 val is_bigendian : Byte, val step : Long, val data : ShortArray )
+                 val is_bigendian : Byte, val step : Long, val data : ByteArray )
 
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/CameraInfo.html
  */
 
-data class CompressedImage(val header: Header, val format : String, val data : ShortArray)
+data class CompressedImage(val header: Header, val format: String, val data: ByteArray)
 
 data class RegionOfInterest( val x_offset : Long, val y_offset : Long,
                              val height : Long, val width: Long, val do_rectify : Boolean)

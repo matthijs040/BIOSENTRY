@@ -72,18 +72,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/TV_status_label3" />
 
-        <view
-            android:id="@+id/camera_output"
-            class="androidx.camera.view.PreviewView"
+        <ImageView
+            android:id="@+id/camera_image_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
+            android:src="@drawable/side_nav_bar"
             app:layout_constraintBottom_toTopOf="@+id/TV_status_label3"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/TV_camera_label" />
 

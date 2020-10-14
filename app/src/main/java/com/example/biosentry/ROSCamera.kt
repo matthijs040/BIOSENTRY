@@ -4,29 +4,19 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.ImageFormat
+import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
-import android.hardware.camera2.*
-import android.hardware.camera2.CameraCaptureSession.CaptureCallback
-import android.media.Image
-import android.media.ImageReader
-import android.os.Environment
-import android.os.Handler
-import android.os.HandlerThread
 import android.util.Log
-import android.util.Size
-import android.view.Surface
 import android.view.TextureView
-import android.widget.Toast
-import androidx.camera.core.ImageProxy
-import androidx.camera.view.PreviewView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.camera_fragment.*
-import kotlinx.android.synthetic.main.fragment_home.*
-import java.io.*
+import co.infinum.goldeneye.GoldenEye
+import co.infinum.goldeneye.InitCallback
+import co.infinum.goldeneye.PictureCallback
+import co.infinum.goldeneye.models.Facing
+import java.io.ByteArrayOutputStream
+import java.lang.Exception
 import java.util.*
-import kotlin.experimental.and
+import kotlin.concurrent.timerTask
 
 
 class ROSCamera(
@@ -35,23 +25,8 @@ class ROSCamera(
     private val FPS: Int = 10
 ) : IROSSensor<CompressedImage>
 {
-    private var cameraDevice: CameraDevice? = null
-    private var cameraCaptureSessions: CameraCaptureSession? = null
-    private var captureRequestBuilder: CaptureRequest.Builder? = null
-    private var imageDimension: Size? = null
-    private var imageReader: ImageReader? = null
-    private val REQUEST_CAMERA_PERMISSION = 200
-    private val mBackgroundHandler: Handler? = null
-
-    // Permission definitions for asking for the right permissions towards the UI.
-    companion object {
-        private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-    }
-
-
+    // ===================================== IMPLEMENTATION OF ROS-SENSOR INTERFACE =====================================
     override var mDataHandler :  ((ROSMessage<CompressedImage>) -> Unit )? = null
-    var mImageHandler : ((Image) -> Unit)? = null
 
     private var mSequenceNumber : Long = 0
     private var mReading : CompressedImage = CompressedImage(
@@ -61,193 +36,8 @@ class ROSCamera(
             ""
         ),
         "jpeg",
-        shortArrayOf(0)
+        byteArrayOf(0)
     )
-
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(
-            activity.baseContext, it
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    fun updatePreview() {
-        if (null == cameraDevice) {
-            Log.e("Camera", "updatePreview error, return")
-        }
-        captureRequestBuilder!!.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
-        try {
-            cameraCaptureSessions!!.setRepeatingRequest(
-                captureRequestBuilder!!.build(),
-                null,
-                mBackgroundHandler
-            )
-        } catch (e: CameraAccessException) {
-            e.printStackTrace()
-        }
-    }
-
-    private val stateCallback: CameraDevice.StateCallback = object : CameraDevice.StateCallback() {
-        override fun onOpened(camera: CameraDevice) {
-            //This is called when the camera is open
-            Log.e("ROS_CAM", "onOpened")
-            cameraDevice = camera
-            takePicture()
-        }
-
-        override fun onDisconnected(camera: CameraDevice) {
-            cameraDevice!!.close()
-        }
-
-        override fun onError(camera: CameraDevice, error: Int) {
-            cameraDevice?.close()
-            cameraDevice = null
-        }
-    }
-
-
-
-    fun openCamera() {
-        val manager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-        Log.e("Camera", "is camera open")
-        try {
-            val cameraId = manager.cameraIdList[0]
-            val characteristics = manager.getCameraCharacteristics(cameraId)
-            val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
-            imageDimension = map.getOutputSizes(SurfaceTexture::class.java)[0]
-            // Add permission for camera and let user grant the permission
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.CAMERA
-                ) !== PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) !== PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    REQUEST_CAMERA_PERMISSION
-                )
-                return
-            }
-            manager.openCamera(cameraId!!, stateCallback, null)
-        } catch (e: CameraAccessException) {
-            e.printStackTrace()
-        }
-        Log.e("Camera", "openCamera X")
-    }
-
-
-    private fun closeCamera() {
-        if (null != cameraDevice) {
-            cameraDevice!!.close()
-            cameraDevice = null
-        }
-        if (null != imageReader) {
-            imageReader?.close()
-            imageReader = null
-        }
-    }
-
-    fun takePicture() {
-        if (null == cameraDevice) {
-            Log.e("Camera", "cameraDevice is null")
-            return
-        }
-        val manager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-        try {
-            val characteristics = manager.getCameraCharacteristics(
-                cameraDevice!!.id
-            )
-            var jpegSizes: Array<Size>? = null
-            jpegSizes =
-                characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
-                    .getOutputSizes(ImageFormat.JPEG)
-            var width = 640
-            var height = 480
-
-            if (jpegSizes != null && jpegSizes.isNotEmpty()
-            ) {
-                width = jpegSizes[0].width
-                height = jpegSizes[0].height
-            }
-            val reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1)
-            val outputSurfaces: MutableList<Surface> = ArrayList(1)
-
-            outputSurfaces.add(reader.surface)
-
-            val captureBuilder =
-                cameraDevice!!.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
-            captureBuilder.addTarget(reader.surface)
-            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
-
-            val readerListener: ImageReader.OnImageAvailableListener =
-                ImageReader.OnImageAvailableListener { reader ->
-                    var image: Image? = null
-                    try {
-                        image = reader.acquireLatestImage()
-                        val buffer = image.planes[0].buffer
-                        val bytes = ByteArray(buffer.capacity())
-                        buffer.get(bytes, 0, bytes.size)
-
-                        mReading = CompressedImage(
-                            mReading.header,
-                            mReading.format,
-                            bytes.toShortArray()
-                        )
-
-                        if(mDataHandler != null)
-                            mDataHandler?.invoke(read())
-                        if(mImageHandler != null && image != null)
-                            mImageHandler?.invoke(image)
-                    } catch (e: FileNotFoundException) {
-                        e.printStackTrace()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    } finally {
-                        image?.close()
-                    }
-                }
-            reader.setOnImageAvailableListener(readerListener, mBackgroundHandler)
-
-            val captureListener: CaptureCallback = object : CaptureCallback() {
-            }
-            cameraDevice!!.createCaptureSession(
-                outputSurfaces,
-                object : CameraCaptureSession.StateCallback() {
-                    override fun onConfigured(session: CameraCaptureSession) {
-                        try {
-                            session.capture(
-                                captureBuilder.build(),
-                                captureListener,
-                                mBackgroundHandler
-                            )
-                        } catch (e: CameraAccessException) {
-                            e.printStackTrace()
-                        }
-                    }
-
-                    override fun onConfigureFailed(session: CameraCaptureSession) {}
-                },
-                mBackgroundHandler
-            )
-        } catch (e: CameraAccessException) {
-            e.printStackTrace()
-        }
-    }
-
-    init {
-        // Request camera permissions
-        if (allPermissionsGranted()) {
-
-            openCamera()
-        } else {
-            ActivityCompat.requestPermissions(
-                activity, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-            )
-        }
-    }
-
 
     override val mMessageTypeName: String
         get() = "sensor_msgs/CompressedImage"
@@ -261,18 +51,91 @@ class ROSCamera(
             msg = mReading
         )
     }
-}
 
-private fun ByteArray.toShortArray(): ShortArray {
-    var ret : ShortArray = ShortArray(this.size)
-    var ind : Int = 0
-    forEach {
-        if(it < 0)
-            ret[ind] = (it + 255).toShort()
-        else
-            ret[ind] = it.toShort()
-        ind++
+    // ===================================== /IMPLEMENTATION OF ROS-SENSOR INTERFACE =====================================
+
+    private val mGoldenEye = GoldenEye.Builder(activity).build() // Main wrapper object.
+    private var mTextureView : TextureView = TextureView(context)  // UI element to show output on.
+
+    private val mInitCallback = object : InitCallback()  // Callback to show error through.
+    {
+        override fun onError(t: Throwable) {
+            Log.println(Log.ERROR, "Camera", t.toString())
+        }
+
+        override fun onActive() {
+
+            // If push interface is desired using the user-definable callback functions exposed in this class.
+            // Else the user pulls data when relevant to him using the takePicture function manually.
+            if( FPS > 0 )
+            {
+                val rateInMs = FPS * 1000L
+                mTimer.schedule(
+                    timerTask {
+                        if(mGoldenEye.config != null)
+                            try {
+                                mGoldenEye.takePicture(mPictureCallback)
+                            }
+                            catch ( e : Exception) // Exception can fire if camera is not properly accessable.
+                            {
+                                Log.println(Log.ERROR, "Camera", e.toString() )
+                            }
+
+                    },1000, rateInMs )
+            }
+
+            super.onActive()
+        }
+
     }
-    return ret
-}
 
+    private val mPictureCallback = object : PictureCallback()
+    {
+        override fun onError(t: Throwable) {
+            Log.println(Log.ERROR, "ROSCamera onError", t.toString() )
+            mTextureView = TextureView(context)
+
+    }
+
+        override fun onPictureTaken(picture: Bitmap) {
+            mBitmapHandler?.invoke(picture)
+
+            // https://stackoverflow.com/questions/20329090/how-to-convert-a-bitmap-to-a-jpeg-file-in-android
+                val stream = ByteArrayOutputStream()
+                picture.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+
+                mReading = CompressedImage(
+                    mReading.header,
+                    picture.config.name,
+                    stream.toByteArray()
+                )
+
+
+            //picture.recycle()
+        }
+    }
+
+    private val mTimer : Timer = Timer()
+    var mBitmapHandler : ( (Bitmap) -> Unit)? = null
+
+    init {
+        mTextureView.setSurfaceTexture(SurfaceTexture(1))
+
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED )
+        {
+            /* Find back camera */
+            val backCamera = mGoldenEye.availableCameras.find { it.facing == Facing.BACK }
+            /* Open back camera */
+            if (backCamera != null) {
+                mGoldenEye.open(mTextureView, backCamera, mInitCallback )
+            }
+        }
+
+    }
+
+    fun takePicture()
+    {
+        mGoldenEye.takePicture(mPictureCallback)
+    }
+}

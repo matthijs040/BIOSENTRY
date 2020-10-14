@@ -60,30 +60,12 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    var textureListener: SurfaceTextureListener = object : SurfaceTextureListener {
-        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-            //open your camera here
-            mROSCamera?.openCamera()
-        }
-
-        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-            // Transform you image captured size according to the surface width and height
-        }
-
-        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-            return false
-        }
-
-        override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
-    }
-
     override fun onResume() {
         mROSAccelerometer = ROSAccelerometer(baseContext)
         mROSGyroscope = ROSGyroscope(baseContext)
         mROSGPS = ROSGPS(baseContext, this)
 
         mROSCamera = ROSCamera(this, this.baseContext)
-
 
         super.onResume()
     }
