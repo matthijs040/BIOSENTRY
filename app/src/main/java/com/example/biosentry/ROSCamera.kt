@@ -19,6 +19,7 @@ import java.util.*
 import kotlin.concurrent.timerTask
 
 
+@ExperimentalUnsignedTypes
 class ROSCamera(
     private val activity: Activity,
     private val context: Context,
@@ -36,7 +37,7 @@ class ROSCamera(
             ""
         ),
         "jpeg",
-        byteArrayOf(0)
+        listOf(255U)
     )
 
     override val mMessageTypeName: String
@@ -101,15 +102,19 @@ class ROSCamera(
             mBitmapHandler?.invoke(picture)
 
             // https://stackoverflow.com/questions/20329090/how-to-convert-a-bitmap-to-a-jpeg-file-in-android
-                val stream = ByteArrayOutputStream()
-                picture.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            val stream = ByteArrayOutputStream()
+            picture.compress(Bitmap.CompressFormat.JPEG, 50, stream)
 
-                mReading = CompressedImage(
-                    mReading.header,
-                    picture.config.name,
-                    stream.toByteArray()
-                )
 
+
+            mReading = CompressedImage(
+                mReading.header,
+                "jpeg",
+                stream.toByteArray().toUByteArray().slice(IntRange(0, stream.size() - 1))
+            )
+            println(mReading.data.subList(0, 10) )
+
+            mDataHandler?.invoke( read() )
 
             //picture.recycle()
         }

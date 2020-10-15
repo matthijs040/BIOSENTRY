@@ -69,6 +69,4 @@ class ROSBridge(uri: String) {
     {
         mWebSocket.disconnect()
     }
-
-
 }

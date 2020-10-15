@@ -11,7 +11,7 @@ class ROSMessageHandler(private val bridge : ROSBridge) {
     fun attachSensor(sensor: IROSSensor<*>, rateInMs: Long ) : Boolean
     {
         bridge.advertise( sensor.mMessageTypeName, sensor.mMessageTopicName)
-        if(rateInMs == 0L)
+        if(rateInMs <= 0L)
         {
             sensor.mDataHandler = bridge::send
         }

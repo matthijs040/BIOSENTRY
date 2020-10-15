@@ -113,10 +113,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html
-        mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
-        mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
-        mROSGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
-        mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0) }
+       // mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
+       // mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
+       // mROSGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
+        mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
     }
 
     fun disconnectClicked() {
