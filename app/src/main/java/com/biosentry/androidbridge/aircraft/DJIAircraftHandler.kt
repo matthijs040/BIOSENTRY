@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) -> Unit)?) : ActivityCompat.OnRequestPermissionsResultCallback{
 
     private val mHandler: Handler = Handler(Looper.getMainLooper()) //handler thread that takes care of async behaviour.
-    private var mAircraft : Aircraft? = null
+    var mAircraft : Aircraft? = null
     var mStatusHandler : ((String) -> Unit)? = null // function this class can send status updates about the drone to.
     var mNameHandler : ((String) -> Unit)? = null // function this class can send the name of the drone to when registered.
 

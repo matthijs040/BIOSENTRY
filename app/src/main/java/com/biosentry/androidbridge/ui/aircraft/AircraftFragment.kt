@@ -6,11 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.biosentry.androidbridge.MainActivity
 import com.biosentry.androidbridge.R
+import kotlinx.android.synthetic.main.fragment_aircraft.*
+import java.util.*
 
 class AircraftFragment : Fragment() {
 
     private lateinit var aircraftViewModel: AircraftViewModel
+
+    private val mTimer : Timer = Timer()
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -24,9 +29,65 @@ class AircraftFragment : Fragment() {
 
     }
 
+    override fun onResume() {
+        mTimer.schedule( object : TimerTask() {
+            override fun run() {
+                updateUI()
+            }
+        },
+            500,
+            500
+        )
+        super.onResume()
+    }
+
     override fun onDestroy() {
 
+        mTimer.cancel()
+        mTimer.purge()
+
         super.onDestroy()
+    }
+
+    fun updateUI()
+    {
+        val act = requireActivity()
+        if(act is MainActivity)
+        {
+            if (act.mAircraftHandler != null)
+            {
+                act.runOnUiThread()
+                { TV_aircraft_status.text = act.mLatestAircraftStatus }
+            }
+
+            if (act.mAircraftHandler?.mAircraft != null) {
+                act.runOnUiThread()
+                {
+                    TV_aircraft_status.text = act.mLatestAircraftStatus
+                    TV_aircraft_name.text = act.mAircraftHandler?.mAircraft.toString()
+                }
+
+                act.mAircraftHandler!!.mAircraft?.flightController?.state?.let {
+                    act.runOnUiThread()
+                    {
+
+                        TV_aircraft_latitude.text = it.aircraftLocation.latitude.toString()
+                        TV_aircraft_longitude.text = it.aircraftLocation.longitude.toString()
+                        TV_aircraft_altitude.text = it.aircraftLocation.altitude.toString()
+
+                        TV_aircraft_velocityX.text = it.velocityX.toString()
+                        TV_aircraft_velocityY.text = it.velocityY.toString()
+                        TV_aircraft_velocityZ.text = it.velocityZ.toString()
+
+                        TV_aircraft_roll.text = it.attitude.roll.toString()
+                        TV_aircraft_pitch.text = it.attitude.pitch.toString()
+                        TV_aircraft_yaw.text = it.attitude.yaw.toString()
+                    }
+                }
+
+                act.mAircraftHandler?.mAircraft?.camera?.playbackManager?.playVideo()
+            }
+        }
     }
 
 }

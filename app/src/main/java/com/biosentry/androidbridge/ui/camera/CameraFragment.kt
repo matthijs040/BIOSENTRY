@@ -12,7 +12,7 @@ import com.biosentry.androidbridge.R
 import kotlinx.android.synthetic.main.camera_fragment.*
 
 
-@Suppress("EXPERIMENTAL_API_USAGE")
+
 class CameraFragment : Fragment() {
 
     private lateinit var mOutput : ImageView

@@ -94,10 +94,24 @@
     <string name="TV_camera_error">None</string>
     <string name="TV_camera_status">inactive</string>
     <string name="camera_button">Take Photo</string>
+
+    // Drone general labels and info:
     <string name="TV_drone_name">....</string>
     <string name="TV_drone_status">Not Connected</string>
     <string name="reboot_label">Reboot</string>
     <string name="aircraft_label">Aircraft:</string>
+
+    // Drone sensors:
+    <string name="TV_aircraft_latitude">NaN</string>
+    <string name="TV_aircraft_longitude">NaN</string>
+    <string name="TV_aircraft_altitude">NaN</string>
+    <string name="TV_aircraft_velocityX">NaN</string>
+    <string name="TV_aircraft_velocityY">NaN</string>
+    <string name="TV_aircraft_velocityZ">NaN</string>
+    <string name="TV_aircraft_roll">NaN</string>
+    <string name="TV_aircraft_pitch">NaN</string>
+    <string name="TV_aircraft_yaw">NaN</string>
+    <string name="IV_drone_camera">Live drone vide</string>
 
 
 </resources>

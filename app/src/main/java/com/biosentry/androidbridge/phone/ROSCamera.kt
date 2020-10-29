@@ -23,7 +23,7 @@ import kotlin.concurrent.timerTask
 
 
 
-@ExperimentalUnsignedTypes
+@Suppress("EXPERIMENTAL_API_USAGE")
 class ROSCamera(
     activity: Activity,
     private val context: Context,

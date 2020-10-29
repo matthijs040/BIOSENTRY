@@ -93,7 +93,7 @@ dependencies {
          * Both will greatly reducing the size of the APK.
          */
         exclude module: 'library-anti-distortion'
-        //exclude module: 'fly-safe-database'
+        exclude module: 'fly-safe-database'
     })
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'

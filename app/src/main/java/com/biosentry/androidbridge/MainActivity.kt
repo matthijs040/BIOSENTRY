@@ -21,9 +21,10 @@ import com.biosentry.androidbridge.ui.home.HomeFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.fragment_aircraft.*
 import kotlinx.android.synthetic.main.fragment_home.*
 
-@Suppress("EXPERIMENTAL_API_USAGE")
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -35,7 +36,8 @@ class MainActivity : AppCompatActivity() {
     private var mROSGPS : ROSGPS? = null
     var mROSCamera : ROSCamera? = null
 
-    private var mAircraftHandler : DJIAircraftHandler? = null
+    var mAircraftHandler : DJIAircraftHandler? = null
+    var mLatestAircraftStatus : String? = null
 
     private var mHomeFragment : HomeFragment? = null
     //private var
@@ -141,7 +143,17 @@ class MainActivity : AppCompatActivity() {
     // PLACEHOLDER
     private fun receiveData(message: ROSMessage<Any>) { println(message.toString() ) }
 
-    private fun droneWriteName(s : String) { runOnUiThread{ TV_drone_name?.text = s } }
-    private fun droneWriteStatus(s : String) { runOnUiThread{ TV_drone_status?.text = s } }
+    private fun droneWriteName(s : String) { runOnUiThread{ TV_drone_name?.text = s
+                                                            TV_aircraft_name?.text = s} }
+
+    private fun droneWriteStatus(s : String)
+    {
+        mLatestAircraftStatus = s
+        runOnUiThread{
+            TV_drone_status?.text = s
+            TV_aircraft_status?.text = s}
+    }
+
+
 
 }
