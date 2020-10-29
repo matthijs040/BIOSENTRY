@@ -1,4 +1,4 @@
-package com.biosentry.androidbridge
+package com.biosentry.androidbridge.phone
 
 import android.content.Context
 import android.hardware.Sensor
@@ -6,13 +6,16 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
+import com.biosentry.androidbridge.IROSSensor
+import com.biosentry.androidbridge.ROSMessage
+import com.biosentry.androidbridge.Vector3
 
 /**
  * Class containing logic to fetch accelerometer data from Android's native HAL.
  */
 class ROSAccelerometer(context: Context,
                        messageTypeName : String = "geometry_msgs/Vector3",
-                       topicName : String = "bridge/android/accelerometer" ) : IROSSensor<Vector3>
+                       topicName : String = "android/phone/accelerometer" ) : IROSSensor<Vector3>
 {
 
     // Android HAL objects exposing the phone's sensors.

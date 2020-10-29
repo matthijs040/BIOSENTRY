@@ -1,4 +1,4 @@
-package com.biosentry.androidbridge
+package com.biosentry.androidbridge.phone
 
 import android.Manifest
 import android.app.Activity
@@ -13,6 +13,7 @@ import co.infinum.goldeneye.GoldenEye
 import co.infinum.goldeneye.InitCallback
 import co.infinum.goldeneye.PictureCallback
 import co.infinum.goldeneye.models.Facing
+import com.biosentry.androidbridge.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -24,7 +25,7 @@ import kotlin.concurrent.timerTask
 
 @ExperimentalUnsignedTypes
 class ROSCamera(
-    private val activity: Activity,
+    activity: Activity,
     private val context: Context,
     private val FPS: Int = 10
 ) : IROSSensor<CompressedImage>
@@ -47,7 +48,7 @@ class ROSCamera(
     override val mMessageTypeName: String
         get() = "sensor_msgs/CompressedImage"
     override val mMessageTopicName: String
-        get() = "bridge/android/image_raw/compressed"
+        get() = "android/phone/image_raw/compressed"
 
     override fun read(): ROSMessage<CompressedImage> {
         return ROSMessage(

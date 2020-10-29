@@ -1,14 +1,13 @@
 package com.biosentry.androidbridge.ui.sensors
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.biosentry.androidbridge.R
-import com.biosentry.androidbridge.Sensors
+import com.biosentry.androidbridge.phone.Sensors
 import kotlinx.android.synthetic.main.fragment_sensors.*
 import java.util.*
 
@@ -27,7 +26,7 @@ class SensorsFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?  ): View?
     {
-        sensorsViewModel = ViewModelProviders.of(this).get(SensorsViewModel::class.java)
+        sensorsViewModel = ViewModelProvider(this).get(SensorsViewModel::class.java)
 
         return  inflater.inflate(R.layout.fragment_sensors, container, false)
     }
@@ -44,8 +43,8 @@ class SensorsFragment : Fragment() {
         }
 
         mSensors = Sensors(
-            context = activity!!.baseContext,
-            activity = activity as Activity
+            context = requireActivity().baseContext,
+            activity = requireActivity()
         )
 
         mTimer.schedule(

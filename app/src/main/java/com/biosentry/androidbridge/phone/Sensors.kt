@@ -1,4 +1,4 @@
-package com.biosentry.androidbridge
+package com.biosentry.androidbridge.phone
 
 import android.Manifest
 import android.app.Activity
@@ -17,7 +17,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import java.lang.Math.pow
 import kotlin.math.pow
 
 /**
@@ -78,7 +77,7 @@ class Sensors(context: Context, activity: Activity) {
         }
     }
 
-    private fun initLocationListener(context: Context) {
+    private fun initLocationListener() {
 
         // Try to construct a listener.
         try {
@@ -178,7 +177,7 @@ class Sensors(context: Context, activity: Activity) {
 
     init {
         askForPermissions(context, activity)
-        initLocationListener(context)
+        initLocationListener()
         initSensorListeners()
     }
 }

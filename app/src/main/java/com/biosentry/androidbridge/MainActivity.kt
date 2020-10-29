@@ -4,6 +4,7 @@ package com.biosentry.androidbridge
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -12,6 +13,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.biosentry.androidbridge.aircraft.DJIAircraftHandler
+import com.biosentry.androidbridge.communication.ROSBridge
+import com.biosentry.androidbridge.communication.ROSMessageHandler
+import com.biosentry.androidbridge.phone.*
 import com.biosentry.androidbridge.ui.home.HomeFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
@@ -23,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     var mROSBridge : ROSBridge? = null
-    private var mROSMessageHandler :ROSMessageHandler? = null
+    private var mROSMessageHandler : ROSMessageHandler? = null
 
     private var mROSAccelerometer : ROSAccelerometer? = null
     private var mROSGyroscope : ROSGyroscope? = null
@@ -75,6 +80,7 @@ class MainActivity : AppCompatActivity() {
         runOnUiThread{
             mAircraftHandler = DJIAircraftHandler(this, null)
         }
+        mAircraftHandler?.mStatusHandler = ::droneWriteStatus
 
 
         super.onResume()
@@ -93,6 +99,7 @@ class MainActivity : AppCompatActivity() {
 
     fun printDroneStatus(message : String)
     {
+        Toast.makeText(this.baseContext, message, Toast.LENGTH_LONG).show()
         println(message)
     }
 
@@ -100,8 +107,8 @@ class MainActivity : AppCompatActivity() {
     {
         mROSBridge = ROSBridge(TB_URL.text.toString())
 
-        mROSBridge!!.mErrorHandler  = ::writeError
-        mROSBridge!!.mStatusHandler = ::writeStatus
+        mROSBridge!!.mErrorHandler  = ::webSocketWriteError
+        mROSBridge!!.mStatusHandler = ::webSocketWriteStatus
         mROSBridge!!.mDataHandler   = ::receiveData
 
         try {
@@ -127,19 +134,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     // FUNCTIONS THAT WRITE INFORMATION TO UI! -----------------------------
-    private fun writeError(errorMessage: String)
-    {
-        TV_websocket_error?.text = errorMessage
-    }
-
-    private fun writeStatus(statusMessage: String)
-    {
-        TV_websocket_status?.text = statusMessage
-    }
+    private fun webSocketWriteError(s: String) { runOnUiThread{ TV_websocket_error?.text = s } }
+    private fun webSocketWriteStatus(s: String) { runOnUiThread{ TV_websocket_status?.text = s } }
 
     // PLACEHOLDER
-    private fun receiveData(message: ROSMessage<Any>)
-    {
-        println(message.toString())
-    }
+    private fun receiveData(message: ROSMessage<Any>) { println(message.toString() ) }
+
+    private fun droneWriteName(s : String) { runOnUiThread{ TV_drone_name?.text = s } }
+    private fun droneWriteStatus(s : String) { runOnUiThread{ TV_drone_status?.text = s } }
+
 }

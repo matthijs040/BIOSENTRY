@@ -1,4 +1,4 @@
-package com.biosentry.androidbridge
+package com.biosentry.androidbridge.phone
 
 import android.Manifest
 import android.app.Activity
@@ -12,6 +12,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.biosentry.androidbridge.*
 import com.biosentry.androidbridge.NavSatStatus.Companion.SERVICE_GLONASS
 import com.biosentry.androidbridge.NavSatStatus.Companion.SERVICE_GPS
 import com.biosentry.androidbridge.NavSatStatus.Companion.STATUS_FIX
@@ -45,7 +46,7 @@ class ROSGPS(context: Context, activity: Activity) : IROSSensor<NavSatFix>
     override val mMessageTypeName: String
         get() = "sensor_msgs/NavSatFix"
     override val mMessageTopicName: String
-        get() = "bridge/android/gps"
+        get() = "android/phone/gps"
 
     private val mLocationListener: LocationListener = object : LocationListener {
 

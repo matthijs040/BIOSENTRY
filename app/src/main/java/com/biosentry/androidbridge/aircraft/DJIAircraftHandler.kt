@@ -1,8 +1,7 @@
-package com.biosentry.androidbridge
+package com.biosentry.androidbridge.aircraft
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -13,6 +12,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.requestPermissions
 
 import androidx.core.content.ContextCompat
+import com.biosentry.androidbridge.IROSSensor
+import com.biosentry.androidbridge.MainActivity
+import com.biosentry.androidbridge.ROSMessage
+import com.biosentry.androidbridge.Vector3
 
 import dji.common.error.DJIError
 import dji.common.error.DJISDKError
@@ -31,6 +34,7 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
     private val mHandler: Handler = Handler(Looper.getMainLooper()) //handler thread that takes care of async behaviour.
     private var mAircraft : Aircraft? = null
     var mStatusHandler : ((String) -> Unit)? = null // function this class can send status updates about the drone to.
+    var mNameHandler : ((String) -> Unit)? = null // function this class can send the name of the drone to when registered.
 
     private val isRegistrationInProgress: AtomicBoolean = AtomicBoolean(false)
 
@@ -43,6 +47,20 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
             checkAndRequestPermissions()
         }
         startSDKRegistration()
+    }
+
+    private fun initComponents()
+    {
+        if(mAircraft == null)
+            return
+
+        mAircraft!!.let {
+            mNameHandler?.invoke(it.model.displayName)
+
+
+
+
+        }
     }
 
     /**
@@ -102,11 +120,11 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
                         override fun onProductConnect(newProduct: BaseProduct?) {
                             val message: String
                             if (newProduct != null) {
-                                message =
-                                    String.format("onProductConnect newProduct:%s", newProduct)
+                                message = String.format("onProductConnect newProduct:%s", newProduct.model.displayName)
+                                if(newProduct is Aircraft)
+                                    mAircraft = newProduct
                             } else
-                                message =
-                                    String.format("onProductConnect newProduct:%s", "NULL")
+                                message = String.format("onProductConnect newProduct:%s", "NULL")
 
                             mStatusHandler?.invoke(message)
                             Log.d(TAG, message)
@@ -160,8 +178,6 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
                 }
 
             }
-
-
     }
 
     private fun notifyStatusChange() {
@@ -175,6 +191,7 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
     }
 
     companion object {
+        @Suppress("EXPERIMENTAL_API_USAGE")
         private val TAG = MainActivity::class.java.name
         const val FLAG_CONNECTION_CHANGE = "dji_sdk_connection_change"
         private val REQUIRED_PERMISSION_LIST = arrayOf<String>(
@@ -216,5 +233,38 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
             mStatusHandler?.invoke("Still missing Permissions...")
         }
     }
+
+    /**
+    inner class AircraftIMU : IROSSensor<Vector3>
+    {
+        private val name : String = mAircraft!!.model.displayName
+        
+        override val mMessageTypeName: String = "geometry_msgs/Vector3";
+        override val mMessageTopicName: String = "android/$name/IMU"
+        override var mDataHandler: ((ROSMessage<Vector3>) -> Unit)? = null
+
+        override fun read(): ROSMessage<Vector3>
+        {
+            mAircraft!!.flightController.state.let {
+                return ROSMessage(
+                    type = mMessageTypeName,
+                    topic = mMessageTopicName,
+                    msg = Vector3(
+                        it.velocityX.toDouble(),
+                        it.velocityY.toDouble(),
+                        it.velocityZ.toDouble() )
+                    )
+            }
+
+            private val mIMUListener = object : IMUListener
+        }
+
+        init {
+            if(mAircraft == null)
+                throw IllegalArgumentException()
+        }
+
+    }
+    **/
 
 }

@@ -1,4 +1,4 @@
-package com.biosentry.androidbridge
+package com.biosentry.androidbridge.phone
 
 import android.content.Context
 import android.hardware.Sensor
@@ -6,13 +6,16 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
+import com.biosentry.androidbridge.IROSSensor
+import com.biosentry.androidbridge.ROSMessage
+import com.biosentry.androidbridge.Vector3
 
 /**
  * Class containing logic to fetch gyroscope data from Android's native HAL.
  */
 class ROSGyroscope(context: Context,
                    override val mMessageTypeName: String = "geometry_msgs/Vector3",
-                   override val mMessageTopicName: String = "bridge/android/gyroscope"
+                   override val mMessageTopicName: String = "android/phone/gyroscope"
 ) : IROSSensor<Vector3>
 {
 
@@ -21,7 +24,7 @@ class ROSGyroscope(context: Context,
     private var mGyroscope: Sensor? = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
     // Data that will be read from the outside.
-    override var mDataHandler :  ( ( ROSMessage<Vector3> ) -> Unit )? = null
+    override var mDataHandler :  ( (ROSMessage<Vector3>) -> Unit )? = null
     private var mReading = Vector3(Double.NaN,Double.NaN,Double.NaN)
 
     // Android's listener interface for sensors.
