@@ -13,10 +13,15 @@ import co.infinum.goldeneye.GoldenEye
 import co.infinum.goldeneye.InitCallback
 import co.infinum.goldeneye.PictureCallback
 import co.infinum.goldeneye.models.Facing
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
+import java.sql.Time
+import java.time.Instant
 import java.util.*
 import kotlin.concurrent.timerTask
+
 
 
 @ExperimentalUnsignedTypes
@@ -28,6 +33,7 @@ class ROSCamera(
 {
     // ===================================== IMPLEMENTATION OF ROS-SENSOR INTERFACE =====================================
     override var mDataHandler :  ((ROSMessage<CompressedImage>) -> Unit )? = null
+    var mErrorHandler : ((String) -> Unit)? = null
 
     private var mSequenceNumber : Long = 0
     private var mReading : CompressedImage = CompressedImage(
@@ -37,7 +43,7 @@ class ROSCamera(
             ""
         ),
         "jpeg",
-        listOf(255U)
+        ""
     )
 
     override val mMessageTypeName: String
@@ -58,10 +64,12 @@ class ROSCamera(
     private val mGoldenEye = GoldenEye.Builder(activity).build() // Main wrapper object.
     private var mTextureView : TextureView = TextureView(context)  // UI element to show output on.
 
+
     private val mInitCallback = object : InitCallback()  // Callback to show error through.
     {
         override fun onError(t: Throwable) {
             Log.println(Log.ERROR, "Camera", t.toString())
+            mErrorHandler?.invoke("InitCallback error: $t")
         }
 
         override fun onActive() {
@@ -90,29 +98,42 @@ class ROSCamera(
 
     }
 
+
     private val mPictureCallback = object : PictureCallback()
     {
         override fun onError(t: Throwable) {
-            Log.println(Log.ERROR, "ROSCamera onError", t.toString() )
+            Log.println(Log.ERROR, "ROSCamera picture", t.toString() )
+            mErrorHandler?.invoke("PictureCallback error: $t")
             mTextureView = TextureView(context)
 
     }
 
+
         override fun onPictureTaken(picture: Bitmap) {
             mBitmapHandler?.invoke(picture)
 
-            // https://stackoverflow.com/questions/20329090/how-to-convert-a-bitmap-to-a-jpeg-file-in-android
-            val stream = ByteArrayOutputStream()
-            picture.compress(Bitmap.CompressFormat.JPEG, 50, stream)
+            GlobalScope.launch {
+
+                // https://stackoverflow.com/questions/20329090/how-to-convert-a-bitmap-to-a-jpeg-file-in-android
+                val stream = ByteArrayOutputStream()
+                picture.compress(Bitmap.CompressFormat.JPEG, 0, stream)
+                val arr = stream.toByteArray().toUByteArray()
 
 
 
-            mReading = CompressedImage(
-                mReading.header,
-                "jpeg",
-                stream.toByteArray().toUByteArray().slice(IntRange(0, stream.size() - 1))
-            )
-            println(mReading.data.subList(0, 10) )
+                mReading = CompressedImage(
+                    Header(
+                        mSequenceNumber,
+                        time( Calendar.getInstance().time.time, 0 ),
+                        "Corresponding Camera Info"
+                    ),
+                    "jpeg",
+                    arr.contentToString()
+                )
+
+                mSequenceNumber++
+            }
+
 
             mDataHandler?.invoke( read() )
 

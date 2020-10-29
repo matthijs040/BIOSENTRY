@@ -25,15 +25,13 @@ data class CameraInfo( val header: Header, val height: Long, val width: Long,
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/Image.html
  */
-@ExperimentalUnsignedTypes
 data class Image(val header : Header, val height : Long, val width : Long, val encoding : String,
-                 val is_bigendian : Byte, val step : Long, val data : UByteArray )
+                 val is_bigendian : Byte, val step : Long, val data : String )
 
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/CameraInfo.html
  */
-@ExperimentalUnsignedTypes
-data class CompressedImage(val header: Header, val format: String, val data: List<UByte>)
+data class CompressedImage(val header: Header, val format: String, val data: String)
 
 data class RegionOfInterest( val x_offset : Long, val y_offset : Long,
                              val height : Long, val width: Long, val do_rectify : Boolean)

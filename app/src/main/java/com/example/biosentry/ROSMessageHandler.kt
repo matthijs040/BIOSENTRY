@@ -1,6 +1,5 @@
 package com.example.biosentry
 
-import kotlinx.coroutines.delay
 import java.util.*
 import kotlin.concurrent.timerTask
 

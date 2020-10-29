@@ -3,6 +3,7 @@ package com.example.biosentry
 
 import android.graphics.SurfaceTexture
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.TextureView.SurfaceTextureListener
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.biosentry.ui.home.HomeFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -22,13 +24,15 @@ import kotlinx.android.synthetic.main.fragment_home.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private var mROSBridge : ROSBridge? = null
+    var mROSBridge : ROSBridge? = null
     private var mROSMessageHandler :ROSMessageHandler? = null
 
     private var mROSAccelerometer : ROSAccelerometer? = null
     private var mROSGyroscope : ROSGyroscope? = null
     private var mROSGPS : ROSGPS? = null
     var mROSCamera : ROSCamera? = null
+
+    private var mHomeFragment : HomeFragment? = null
     //private var
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -61,30 +65,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        mROSAccelerometer = ROSAccelerometer(baseContext)
-        mROSGyroscope = ROSGyroscope(baseContext)
-        mROSGPS = ROSGPS(baseContext, this)
 
-        mROSCamera = ROSCamera(this, this.baseContext)
+        // Setup "ROS" hardware classes
+        mROSAccelerometer   = ROSAccelerometer(baseContext)
+        mROSGyroscope       = ROSGyroscope(baseContext)
+        mROSGPS             = ROSGPS(baseContext, this)
+        mROSCamera          = ROSCamera(this, this.baseContext)
 
         super.onResume()
-    }
-
-
-    private fun writeError(errorMessage: String)
-    {
-        TV_websocket_error.text = errorMessage
-    }
-
-    private fun writeStatus(statusMessage: String)
-    {
-        TV_websocket_status.text = statusMessage
-    }
-
-    // THIS template IMPLEMENTATION IS PLACEHOLDER!!
-    private fun receiveData(message: ROSMessage<Any>)
-    {
-        println(message.toString())
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -101,27 +89,47 @@ class MainActivity : AppCompatActivity() {
     fun connectClicked()
     {
         mROSBridge = ROSBridge(TB_URL.text.toString())
-        mROSBridge?.mErrorHandler  = ::writeError
-        mROSBridge?.mStatusHandler = ::writeStatus
-        mROSBridge?.mDataHandler   = ::receiveData
+
+        mROSBridge!!.mErrorHandler  = ::writeError
+        mROSBridge!!.mStatusHandler = ::writeStatus
+        mROSBridge!!.mDataHandler   = ::receiveData
 
         try {
             mROSMessageHandler = ROSMessageHandler(mROSBridge!!)
         }
         catch (e: Exception)
         {
+            Log.println(Log.ERROR, "MainActivity", e.toString())
+            return
         }
 
         // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html
-       // mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
-       // mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
-       // mROSGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
-        mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
+        mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
+        mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
+        mROSGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
+        //mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
     }
 
     fun disconnectClicked() {
         mROSMessageHandler?.removeSensors()
         mROSBridge?.disconnect()
 
+    }
+
+    // FUNCTIONS THAT WRITE INFORMATION TO UI! -----------------------------
+    private fun writeError(errorMessage: String)
+    {
+        TV_websocket_error?.text = errorMessage
+    }
+
+    private fun writeStatus(statusMessage: String)
+    {
+        TV_websocket_status?.text = statusMessage
+    }
+
+    // PLACEHOLDER
+    private fun receiveData(message: ROSMessage<Any>)
+    {
+        println(message.toString())
     }
 }
