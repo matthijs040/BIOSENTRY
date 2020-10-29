@@ -7,25 +7,25 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.biosentry.ui.home.HomeFragment"
+        android:name="com.biosentry.androidbridge.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/nav_sensors"
-        android:name="com.example.biosentry.ui.sensors.SensorsFragment"
+        android:name="com.biosentry.androidbridge.ui.sensors.SensorsFragment"
         android:label="@string/menu_sensors"
         tools:layout="@layout/fragment_sensors" />
 
     <fragment
         android:id="@+id/nav_aircraft"
-        android:name="com.example.biosentry.ui.aircraft.AircraftFragment"
+        android:name="com.biosentry.androidbridge.ui.aircraft.AircraftFragment"
         android:label="@string/menu_aircraft"
         tools:layout="@layout/fragment_aircraft" />
 
     <fragment
         android:id="@+id/nav_camera"
-        android:name="com.example.biosentry.ui.camera.CameraFragment"
+        android:name="com.biosentry.androidbridge.ui.camera.CameraFragment"
         android:label="@string/menu_camera"
         tools:layout="@layout/camera_fragment" />
 </navigation>
