@@ -23,7 +23,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_home.*
 
-@ExperimentalUnsignedTypes
+@Suppress("EXPERIMENTAL_API_USAGE")
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
             mAircraftHandler = DJIAircraftHandler(this, null)
         }
         mAircraftHandler?.mStatusHandler = ::droneWriteStatus
+        mAircraftHandler?.mNameHandler = ::droneWriteName
 
 
         super.onResume()

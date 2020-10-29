@@ -63,6 +63,11 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
         }
     }
 
+    private fun deinitComponents()
+    {
+        //Destruct instances of nested classes.
+    }
+
     /**
      * Checks if there is any missing permissions, and
      * requests runtime permission if needed.
@@ -113,16 +118,21 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
                         override fun onProductDisconnect() {
                             val message = "Product Disconnected"
                             mStatusHandler?.invoke(message)
+                            mNameHandler?.invoke("....")
                             Log.d(TAG, message)
                             notifyStatusChange()
                         }
 
                         override fun onProductConnect(newProduct: BaseProduct?) {
                             val message: String
-                            if (newProduct != null) {
-                                message = String.format("onProductConnect newProduct:%s", newProduct.model.displayName)
-                                if(newProduct is Aircraft)
+                            if (newProduct != null ) {
+                                message = String.format("onProductConnect newProduct:%s", newProduct)
+                                if(newProduct.model != null  && newProduct is Aircraft)
+                                {
                                     mAircraft = newProduct
+                                    initComponents() //Valid controller with aircraft are active. Can now initialize class components.
+
+                                }
                             } else
                                 message = String.format("onProductConnect newProduct:%s", "NULL")
 
@@ -134,7 +144,21 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
                         override fun onProductChanged(p0: BaseProduct?) {
                             val message: String
                             if (p0 != null)
+                            {
                                 message = String.format("onProductChanged: newProduct:%s", p0)
+                                if(p0.model != null && p0 is Aircraft)
+                                {
+                                    mAircraft = p0
+                                    initComponents()
+                                }
+                                else
+                                {
+                                    mAircraft = null
+                                    mNameHandler?.invoke("Controller")
+                                }
+
+
+                            }
                             else
                                 message = "onProductChanged: newProduct is null"
                             mStatusHandler?.invoke(message)
@@ -168,7 +192,7 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
                                 )
 
                             Log.d(TAG, message)
-                            mStatusHandler?.invoke(message)
+                            //mStatusHandler?.invoke(message)
                         }
 
                         override fun onInitProcess(djisdkInitEvent: DJISDKInitEvent, i: Int) {}
@@ -191,7 +215,6 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
     }
 
     companion object {
-        @Suppress("EXPERIMENTAL_API_USAGE")
         private val TAG = MainActivity::class.java.name
         const val FLAG_CONNECTION_CHANGE = "dji_sdk_connection_change"
         private val REQUIRED_PERMISSION_LIST = arrayOf<String>(

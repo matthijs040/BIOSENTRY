@@ -94,7 +94,7 @@
     <string name="TV_camera_error">None</string>
     <string name="TV_camera_status">inactive</string>
     <string name="camera_button">Take Photo</string>
-    <string name="TV_drone_name">None Connected</string>
+    <string name="TV_drone_name">....</string>
     <string name="TV_drone_status">Not Connected</string>
     <string name="reboot_label">Reboot</string>
     <string name="aircraft_label">Aircraft:</string>

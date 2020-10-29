@@ -12,6 +12,7 @@ import com.biosentry.androidbridge.R
 import kotlinx.android.synthetic.main.camera_fragment.*
 
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 class CameraFragment : Fragment() {
 
     private lateinit var mOutput : ImageView
@@ -25,7 +26,7 @@ class CameraFragment : Fragment() {
 
     override fun onResume() {
 
-        mOutput = this.activity!!.findViewById(R.id.camera_image_view)
+        mOutput = requireActivity().findViewById(R.id.camera_image_view)
         btn_takepicture?.setOnClickListener{ (activity as MainActivity?)?.mROSCamera?.takePicture() }
 
         (activity as MainActivity?)?.mROSCamera?.mBitmapHandler = ::showBitmap
