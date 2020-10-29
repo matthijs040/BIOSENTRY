@@ -7,9 +7,11 @@
     <string name="nav_header_subtitle">m.besselink@student.fontys.nl</string>
 
     // UI element names
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Sensor Readouts</string>
-    <string name="menu_slideshow">Hardware Info</string>
+    <string name="menu_home">Home / Connections</string>
+    <string name="menu_camera">Camera Views</string>
+    <string name="menu_aircraft">Drone Info</string>
+    <string name="menu_sensors">Sensor Info</string>
+
     <string name="nav_header_desc">Navigation header</string>
 
     <string name="action_settings">Settings</string>
@@ -50,11 +52,14 @@
     // Generic Sensor Labels
     <string name="TV_accelerometer_label">Accelerometer:</string>
     <string name="TV_gyro_label">Gyroscope:</string>
-    <string name="TV_sensor_range_label">range:</string>
-    <string name="TV_sensor_resolution_label">resolution:</string>
-    <string name="TV_sensor_delay_label">delay:</string>
-    <string name="TV_sensor_name_label">name:</string>
-    <string name="TV_sensor_vendor_label">vendor:</string>
+    <string name="TV_sensor_range_label">Range:</string>
+    <string name="TV_sensor_resolution_label">Resolution:</string>
+    <string name="TV_sensor_delay_label">Delay:</string>
+    <string name="TV_sensor_name_label">Name:</string>
+    <string name="TV_sensor_vendor_label">Vendor:</string>
+
+    <string name="TV_sending_data">false</string>
+    <string name="TV_send_once">false</string>
 
     // GPS Labels
     <string name="TV_GPS_label">GPS:</string>
@@ -62,6 +67,8 @@
     <string name="TV_GPS_vendor">null</string>
     <string name="TVLongitudeLabel">Lon:</string>
     <string name="TVLatitudeLabel">Lat:</string>
+    <string name="TV_altitude_label">Alt:</string>
+    <string name="TV_altitude">NaN</string>
 
     // GPS data fields
     <string name="TVLongitude">NaN</string>
@@ -81,15 +88,13 @@
     <string name="TV_websocket_status">Not Connected</string>
     <string name="TV_websocket_error">None</string>
     <string name="TB_URL">ws://192.168.178.23:9090</string>
-    <string name="TV_sending_data">false</string>
-    <string name="TV_send_once">false</string>
+
+    //Camera fields:
     <string name="TV_camera_label">Camera:</string>
     <string name="TV_camera_error">None</string>
     <string name="TV_camera_status">inactive</string>
-    <string name="TV_altitude_label">alt:</string>
-    <string name="TV_altitude">NaN</string>
     <string name="camera_button">Take Photo</string>
 
-    <string name="menu_camera">Camera Views</string>
+
 
 </resources>

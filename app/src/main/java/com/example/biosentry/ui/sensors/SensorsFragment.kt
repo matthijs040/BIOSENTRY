@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.biosentry.*
 import kotlinx.android.synthetic.main.fragment_sensors.*
-import kotlinx.android.synthetic.main.fragment_slideshow.*
+import kotlinx.android.synthetic.main.fragment_aircraft.*
 import java.util.*
 import kotlin.math.round
 

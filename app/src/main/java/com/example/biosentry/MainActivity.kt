@@ -21,6 +21,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.camera_fragment.*
 import kotlinx.android.synthetic.main.fragment_home.*
 
+@ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
 
         appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow),
+            setOf(R.id.nav_home, R.id.nav_sensors, R.id.nav_camera, R.id.nav_aircraft),
             drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         mROSAccelerometer   = ROSAccelerometer(baseContext)
         mROSGyroscope       = ROSGyroscope(baseContext)
         mROSGPS             = ROSGPS(baseContext, this)
-        mROSCamera          = ROSCamera(this, this.baseContext)
+        //mROSCamera          = ROSCamera(this, this.baseContext)
 
         super.onResume()
     }
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mROSGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
-        //mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
+        mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
     }
 
     fun disconnectClicked() {

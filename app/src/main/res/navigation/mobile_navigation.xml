@@ -12,16 +12,16 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
+        android:id="@+id/nav_sensors"
         android:name="com.example.biosentry.ui.sensors.SensorsFragment"
-        android:label="@string/menu_gallery"
+        android:label="@string/menu_sensors"
         tools:layout="@layout/fragment_sensors" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.biosentry.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/nav_aircraft"
+        android:name="com.example.biosentry.ui.aircraft.AircraftFragment"
+        android:label="@string/menu_aircraft"
+        tools:layout="@layout/fragment_aircraft" />
 
     <fragment
         android:id="@+id/nav_camera"

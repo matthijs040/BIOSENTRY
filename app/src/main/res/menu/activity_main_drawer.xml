@@ -9,13 +9,13 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/menu_home" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_sensors"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/menu_gallery" />
+            android:title="@string/menu_sensors" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_aircraft"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_slideshow" />
+            android:title="@string/menu_aircraft" />
 
         <item
             android:id="@+id/nav_camera"
