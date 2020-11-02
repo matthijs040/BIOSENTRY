@@ -14,6 +14,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.biosentry.androidbridge.aircraft.AircraftGPS
+import com.biosentry.androidbridge.aircraft.AircraftGyroscope
 import com.biosentry.androidbridge.aircraft.AircraftIMU
 import com.biosentry.androidbridge.aircraft.DJIAircraftHandler
 import com.biosentry.androidbridge.communication.ROSBridge
@@ -23,6 +25,7 @@ import com.biosentry.androidbridge.ui.home.HomeFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import dji.sdk.products.Aircraft
 import kotlinx.android.synthetic.main.fragment_aircraft.*
 import kotlinx.android.synthetic.main.fragment_home.*
 
@@ -39,6 +42,8 @@ class MainActivity : AppCompatActivity() {
     var mROSCamera : ROSCamera? = null
     
     private var mAircraftIMU : AircraftIMU? = null
+    private var mAircraftGyro : AircraftGyroscope? = null
+    private var mAircraftGPS : AircraftGPS? = null
 
     var mAircraftHandler : DJIAircraftHandler? = null
     var mLatestAircraftStatus : String? = null
@@ -91,10 +96,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-
-
-
         super.onResume()
     }
 
@@ -136,7 +137,9 @@ class MainActivity : AppCompatActivity() {
         if(mAircraftHandler?.mAircraftConnected!!)
         {
             mAircraftIMU = AircraftIMU()
-            TV_Debug?.text = "${TV_Debug.text}\nAdding aircraft to IMU."
+            mAircraftGyro = AircraftGyroscope()
+            mAircraftGPS = AircraftGPS()
+            TV_Debug?.text = "${TV_Debug.text}\nConstructing Aircraft sensors."
         }
 
 
@@ -148,10 +151,16 @@ class MainActivity : AppCompatActivity() {
         mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
 
         mAircraftIMU?.let {
-
-            TV_Debug?.text = TV_Debug.text.toString() + '\n' + "Aircraft IMU is attached."
+            TV_Debug?.text = "${TV_Debug.text}\nAircraft IMU is attached."
             mROSMessageHandler?.attachSensor(it, 0)
-
+        }
+        mAircraftGyro?.let {
+            TV_Debug?.text = "${TV_Debug.text}\nAircraft Gyro is attached."
+            mROSMessageHandler?.attachSensor(it, 0)
+        }
+        mAircraftGPS?.let {
+            TV_Debug?.text = "${TV_Debug.text}\nAircraft GPS is attached."
+            mROSMessageHandler?.attachSensor(it, 0)
         }
     }
 
