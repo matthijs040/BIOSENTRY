@@ -35,7 +35,7 @@ class ROSMessageHandler(private val bridge : ROSBridge) {
     init {
         // Dummy first advertise to make connecting sensors work.
         // First connect always failed.
-        bridge.advertise("std_msgs/Empty", "/bridge/android/empty")
+        bridge.advertise("std_msgs/Empty", "/android/phone/empty")
         Thread.sleep(1000)
     }
 }

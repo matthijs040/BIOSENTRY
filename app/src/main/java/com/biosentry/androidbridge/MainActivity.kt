@@ -1,6 +1,7 @@
 package com.biosentry.androidbridge
 
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -13,6 +14,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.biosentry.androidbridge.aircraft.AircraftIMU
 import com.biosentry.androidbridge.aircraft.DJIAircraftHandler
 import com.biosentry.androidbridge.communication.ROSBridge
 import com.biosentry.androidbridge.communication.ROSMessageHandler
@@ -35,6 +37,8 @@ class MainActivity : AppCompatActivity() {
     private var mROSGyroscope : ROSGyroscope? = null
     private var mROSGPS : ROSGPS? = null
     var mROSCamera : ROSCamera? = null
+    
+    private var mAircraftIMU : AircraftIMU? = null
 
     var mAircraftHandler : DJIAircraftHandler? = null
     var mLatestAircraftStatus : String? = null
@@ -86,6 +90,11 @@ class MainActivity : AppCompatActivity() {
         mAircraftHandler?.mNameHandler = ::droneWriteName
 
 
+
+
+
+
+
         super.onResume()
     }
 
@@ -106,6 +115,7 @@ class MainActivity : AppCompatActivity() {
         println(message)
     }
 
+    @SuppressLint("SetTextI18n")
     fun connectClicked()
     {
         mROSBridge = ROSBridge(TB_URL.text.toString())
@@ -123,11 +133,26 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        if(mAircraftHandler?.mAircraftConnected!!)
+        {
+            mAircraftIMU = AircraftIMU()
+            TV_Debug?.text = "${TV_Debug.text}\nAdding aircraft to IMU."
+        }
+
+
+
         // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html
         mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mROSGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
+
+        mAircraftIMU?.let {
+
+            TV_Debug?.text = TV_Debug.text.toString() + '\n' + "Aircraft IMU is attached."
+            mROSMessageHandler?.attachSensor(it, 0)
+
+        }
     }
 
     fun disconnectClicked() {

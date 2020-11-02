@@ -112,6 +112,7 @@
     <string name="TV_aircraft_pitch">NaN</string>
     <string name="TV_aircraft_yaw">NaN</string>
     <string name="IV_drone_camera">Live drone vide</string>
+    <string name="TV_Debug">Textbox for debugging.</string>
 
 
 </resources>

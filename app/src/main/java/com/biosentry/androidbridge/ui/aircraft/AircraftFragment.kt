@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.biosentry.androidbridge.MainActivity
 import com.biosentry.androidbridge.R
+import dji.sdk.products.Aircraft
+import dji.sdk.sdkmanager.DJISDKManager
 import kotlinx.android.synthetic.main.fragment_aircraft.*
 import java.util.*
 
@@ -49,25 +51,23 @@ class AircraftFragment : Fragment() {
         super.onDestroy()
     }
 
-    fun updateUI()
-    {
+    fun updateUI() {
         val act = requireActivity()
-        if(act is MainActivity)
+        if (act is MainActivity)
         {
-            if (act.mAircraftHandler != null)
+            if (act.mAircraftHandler != null && act.mAircraftHandler!!.mAircraftConnected)
             {
                 act.runOnUiThread()
                 { TV_aircraft_status.text = act.mLatestAircraftStatus }
             }
+            val prod = DJISDKManager.getInstance().product
+            if (prod is Aircraft && prod.model != null) {
 
-            if (act.mAircraftHandler?.mAircraft != null) {
-                act.runOnUiThread()
-                {
-                    TV_aircraft_status.text = act.mLatestAircraftStatus
-                    TV_aircraft_name.text = act.mAircraftHandler?.mAircraft.toString()
-                }
+                TV_aircraft_status.text = act.mLatestAircraftStatus
+                TV_aircraft_name.text = prod.toString()
 
-                act.mAircraftHandler!!.mAircraft?.flightController?.state?.let {
+
+                prod.flightController?.state?.let {
                     act.runOnUiThread()
                     {
 
@@ -84,8 +84,6 @@ class AircraftFragment : Fragment() {
                         TV_aircraft_yaw.text = it.attitude.yaw.toString()
                     }
                 }
-
-                act.mAircraftHandler?.mAircraft?.camera?.playbackManager?.playVideo()
             }
         }
     }

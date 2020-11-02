@@ -7,8 +7,8 @@ package com.biosentry.androidbridge
  */
 open class ROSMessage<T>(val op : String = "publish"
                          , val type: String
-                         , val topic : String = "bridge/$type"
-                         , val msg : T)
+                         , var topic : String = "bridge/$type"
+                         , var msg : T)
 
 /**
  * http://docs.ros.org/noetic/api/std_msgs/html/msg/Header.html

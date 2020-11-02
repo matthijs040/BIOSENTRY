@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) -> Unit)?) : ActivityCompat.OnRequestPermissionsResultCallback{
 
     private val mHandler: Handler = Handler(Looper.getMainLooper()) //handler thread that takes care of async behaviour.
-    var mAircraft : Aircraft? = null
+    var mAircraftConnected : Boolean = false
     var mStatusHandler : ((String) -> Unit)? = null // function this class can send status updates about the drone to.
     var mNameHandler : ((String) -> Unit)? = null // function this class can send the name of the drone to when registered.
 
@@ -51,16 +51,16 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
 
     private fun initComponents()
     {
-        if(mAircraft == null)
-            return
-
-        mAircraft!!.let {
-            mNameHandler?.invoke(it.model.displayName)
-
-
-
-
+        if(mAircraftConnected)
+        {
+            val product = DJISDKManager.getInstance().product
+            if(product is Aircraft)
+            {
+                mNameHandler?.invoke(product.model.displayName)
+            }
         }
+
+
     }
 
     private fun deinitComponents()
@@ -125,16 +125,26 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
 
                         override fun onProductConnect(newProduct: BaseProduct?) {
                             val message: String
-                            if (newProduct != null ) {
+                            if (newProduct != null )
+                            {
                                 message = String.format("onProductConnect newProduct:%s", newProduct)
-                                if(newProduct.model != null  && newProduct is Aircraft)
+
+                                // Model check is for edge case when drone-controller is detected without a drone.
+                                if( newProduct is Aircraft && newProduct.model != null  )
                                 {
-                                    mAircraft = newProduct
+                                    mAircraftConnected = true
                                     initComponents() //Valid controller with aircraft are active. Can now initialize class components.
 
                                 }
-                            } else
+                                else
+                                    mAircraftConnected = false
+                            }
+                            else
+                            {
                                 message = String.format("onProductConnect newProduct:%s", "NULL")
+                                mAircraftConnected = false
+                            }
+
 
                             mStatusHandler?.invoke(message)
                             Log.d(TAG, message)
@@ -148,19 +158,23 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
                                 message = String.format("onProductChanged: newProduct:%s", p0)
                                 if(p0.model != null && p0 is Aircraft)
                                 {
-                                    mAircraft = p0
+                                    mAircraftConnected = true
                                     initComponents()
                                 }
                                 else
                                 {
-                                    mAircraft = null
+                                    mAircraftConnected = false
                                     mNameHandler?.invoke("Controller")
                                 }
 
 
                             }
                             else
+                            {
                                 message = "onProductChanged: newProduct is null"
+                                mAircraftConnected = false
+                            }
+
                             mStatusHandler?.invoke(message)
                         }
 
@@ -257,37 +271,5 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
         }
     }
 
-    /**
-    inner class AircraftIMU : IROSSensor<Vector3>
-    {
-        private val name : String = mAircraft!!.model.displayName
-        
-        override val mMessageTypeName: String = "geometry_msgs/Vector3";
-        override val mMessageTopicName: String = "android/$name/IMU"
-        override var mDataHandler: ((ROSMessage<Vector3>) -> Unit)? = null
-
-        override fun read(): ROSMessage<Vector3>
-        {
-            mAircraft!!.flightController.state.let {
-                return ROSMessage(
-                    type = mMessageTypeName,
-                    topic = mMessageTopicName,
-                    msg = Vector3(
-                        it.velocityX.toDouble(),
-                        it.velocityY.toDouble(),
-                        it.velocityZ.toDouble() )
-                    )
-            }
-
-            private val mIMUListener = object : IMUListener
-        }
-
-        init {
-            if(mAircraft == null)
-                throw IllegalArgumentException()
-        }
-
-    }
-    **/
 
 }
