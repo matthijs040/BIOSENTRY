@@ -2,10 +2,7 @@ package com.biosentry.androidbridge.ui.aircraft
 
 import android.graphics.SurfaceTexture
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Surface
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.biosentry.androidbridge.MainActivity
@@ -18,7 +15,6 @@ import java.util.*
 class AircraftFragment : Fragment() {
 
     private lateinit var aircraftViewModel: AircraftViewModel
-    private val mSurfaceTexture = SurfaceTexture(1)
 
     private val mTimer : Timer = Timer()
 
@@ -95,8 +91,10 @@ class AircraftFragment : Fragment() {
             if( TX_aircraft_camera?.surfaceTextureListener == null
                 && act.mAircraftCamera != null)
             {
-                TX_aircraft_camera.surfaceTextureListener = act.mAircraftCamera
-                TX_aircraft_camera.setSurfaceTexture(mSurfaceTexture)
+                val tex = requireActivity().findViewById<TextureView>(R.id.TX_aircraft_camera)
+                tex.surfaceTextureListener = act.mAircraftCamera
+                if(tex.isAvailable)
+                    act.mAircraftCamera!!.onSurfaceTextureAvailable(tex.surfaceTexture!!, tex.width, tex.height)
             }
         }
     }

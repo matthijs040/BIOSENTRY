@@ -138,6 +138,8 @@ class MainActivity : AppCompatActivity() {
         mROSBridge!!.mStatusHandler = ::webSocketWriteStatus
         mROSBridge!!.mDataHandler   = ::receiveData
 
+
+
         try {
             mROSMessageHandler = ROSMessageHandler(mROSBridge!!)
         }
