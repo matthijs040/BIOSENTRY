@@ -87,7 +87,7 @@
     <string name="BT_websocket_send">Send data</string>
     <string name="TV_websocket_status">Not Connected</string>
     <string name="TV_websocket_error">None</string>
-    <string name="TB_URL">ws://192.168.178.23:9090</string>
+    <string name="TB_URL">ws://192.168.178.36:9090</string>
 
     //Camera fields:
     <string name="TV_camera_label">Camera:</string>
@@ -113,6 +113,10 @@
     <string name="TV_aircraft_yaw">NaN</string>
     <string name="IV_drone_camera">Live drone vide</string>
     <string name="TV_Debug">Textbox for debugging.</string>
+    <string name="satellite_count_label">Satellite Count:</string>
+    <string name="sat_count">0</string>
+    <string name="signal_level_label">Signal Level:</string>
+    <string name="TV_signal_level">NONE</string>
 
 
 </resources>

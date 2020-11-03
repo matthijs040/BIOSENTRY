@@ -2,6 +2,7 @@ package com.biosentry.androidbridge.aircraft
 
 import com.biosentry.androidbridge.*
 import dji.common.flightcontroller.FlightControllerState
+import dji.common.flightcontroller.GPSSignalLevel
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
 import java.lang.Exception
@@ -18,6 +19,12 @@ class AircraftGPS : IROSSensor<NavSatFix> {
             mReading.topic = value
             field = value
         }
+
+    var mSatelliteCount : Int = 0
+        private set
+
+    var mSignalLevel : GPSSignalLevel = GPSSignalLevel.NONE
+        private set
 
     override var mDataHandler: ((ROSMessage<NavSatFix>) -> Unit)? = null
 
@@ -60,6 +67,9 @@ class AircraftGPS : IROSSensor<NavSatFix> {
             )
             if(mDataHandler != null)
                 mDataHandler!!.invoke(read())
+
+            mSignalLevel = p0.gpsSignalLevel
+            mSatelliteCount = p0.satelliteCount
             mSeqNumber++
         }
 

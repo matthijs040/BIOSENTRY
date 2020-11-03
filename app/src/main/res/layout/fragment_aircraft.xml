@@ -240,7 +240,8 @@
         android:id="@+id/textView43"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="96dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="176dp"
         android:text="@string/TV_camera_label"
         app:layout_constraintStart_toStartOf="@+id/TV_aircraft_gps_label"
         app:layout_constraintTop_toBottomOf="@+id/TV_aircraft_gps_label" />
@@ -249,9 +250,59 @@
         android:id="@+id/IV_drone_camera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="12dp"
+        android:contentDescription="@string/IV_drone_camera"
         android:src="@drawable/ic_launcher_background"
         app:layout_constraintStart_toStartOf="@+id/textView43"
-        app:layout_constraintTop_toBottomOf="@+id/textView43"
-        android:contentDescription="@string/IV_drone_camera" />
+        app:layout_constraintTop_toBottomOf="@+id/textView43" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/satellite_count_label"
+        app:layout_constraintStart_toStartOf="@+id/textView11"
+        app:layout_constraintTop_toBottomOf="@+id/textView11" />
+
+    <TextView
+        android:id="@+id/TV_sat_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="@string/sat_count"
+        app:layout_constraintStart_toEndOf="@+id/textView4"
+        app:layout_constraintTop_toTopOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/signal_level_label"
+        app:layout_constraintStart_toStartOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/TV_signal_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="@string/TV_signal_level"
+        app:layout_constraintStart_toEndOf="@+id/textView9"
+        app:layout_constraintTop_toTopOf="@+id/textView9" />
+
+    <TextureView
+        android:id="@+id/TX_aircraft_camera"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.523"
+        app:layout_constraintStart_toEndOf="@+id/IV_drone_camera"
+        app:layout_constraintTop_toTopOf="@+id/IV_drone_camera" />
 </androidx.constraintlayout.widget.ConstraintLayout>

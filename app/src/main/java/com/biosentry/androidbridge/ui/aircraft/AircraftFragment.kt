@@ -1,7 +1,9 @@
 package com.biosentry.androidbridge.ui.aircraft
 
+import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -16,6 +18,7 @@ import java.util.*
 class AircraftFragment : Fragment() {
 
     private lateinit var aircraftViewModel: AircraftViewModel
+    private val mSurfaceTexture = SurfaceTexture(1)
 
     private val mTimer : Timer = Timer()
 
@@ -58,34 +61,43 @@ class AircraftFragment : Fragment() {
             if (act.mAircraftHandler != null && act.mAircraftHandler!!.mAircraftConnected)
             {
                 act.runOnUiThread()
-                { TV_aircraft_status.text = act.mLatestAircraftStatus }
+                { TV_aircraft_status?.text = act.mLatestAircraftStatus }
             }
             val prod = DJISDKManager.getInstance().product
             if (prod is Aircraft && prod.model != null) {
 
-                TV_aircraft_status.text = act.mLatestAircraftStatus
-                TV_aircraft_name.text = prod.toString()
-
+                act.runOnUiThread{
+                    TV_aircraft_status?.text = act.mLatestAircraftStatus
+                    TV_aircraft_name?.text = prod.toString()
+                }
 
                 prod.flightController?.state?.let {
                     act.runOnUiThread()
                     {
+                        TV_aircraft_latitude?.text = it.aircraftLocation.latitude.toString()
+                        TV_aircraft_longitude?.text = it.aircraftLocation.longitude.toString()
+                        TV_aircraft_altitude?.text = it.aircraftLocation.altitude.toString()
 
-                        TV_aircraft_latitude.text = it.aircraftLocation.latitude.toString()
-                        TV_aircraft_longitude.text = it.aircraftLocation.longitude.toString()
-                        TV_aircraft_altitude.text = it.aircraftLocation.altitude.toString()
+                        TV_aircraft_velocityX?.text = it.velocityX.toString()
+                        TV_aircraft_velocityY?.text = it.velocityY.toString()
+                        TV_aircraft_velocityZ?.text = it.velocityZ.toString()
 
-                        TV_aircraft_velocityX.text = it.velocityX.toString()
-                        TV_aircraft_velocityY.text = it.velocityY.toString()
-                        TV_aircraft_velocityZ.text = it.velocityZ.toString()
+                        TV_aircraft_roll?.text = it.attitude.roll.toString()
+                        TV_aircraft_pitch?.text = it.attitude.pitch.toString()
+                        TV_aircraft_yaw?.text = it.attitude.yaw.toString()
 
-                        TV_aircraft_roll.text = it.attitude.roll.toString()
-                        TV_aircraft_pitch.text = it.attitude.pitch.toString()
-                        TV_aircraft_yaw.text = it.attitude.yaw.toString()
+                        TV_signal_level?.text = it.gpsSignalLevel.toString()
+                        TV_sat_count?.text = it.satelliteCount.toString()
                     }
                 }
             }
+            // check if texture already has camera assigned to it.
+            if( TX_aircraft_camera?.surfaceTextureListener == null
+                && act.mAircraftCamera != null)
+            {
+                TX_aircraft_camera.surfaceTextureListener = act.mAircraftCamera
+                TX_aircraft_camera.setSurfaceTexture(mSurfaceTexture)
+            }
         }
     }
-
 }

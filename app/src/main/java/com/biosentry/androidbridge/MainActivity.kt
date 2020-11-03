@@ -14,10 +14,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.biosentry.androidbridge.aircraft.AircraftGPS
-import com.biosentry.androidbridge.aircraft.AircraftGyroscope
-import com.biosentry.androidbridge.aircraft.AircraftIMU
-import com.biosentry.androidbridge.aircraft.DJIAircraftHandler
+import com.biosentry.androidbridge.aircraft.*
 import com.biosentry.androidbridge.communication.ROSBridge
 import com.biosentry.androidbridge.communication.ROSMessageHandler
 import com.biosentry.androidbridge.phone.*
@@ -28,6 +25,8 @@ import com.google.android.material.snackbar.Snackbar
 import dji.sdk.products.Aircraft
 import kotlinx.android.synthetic.main.fragment_aircraft.*
 import kotlinx.android.synthetic.main.fragment_home.*
+import java.util.*
+import kotlin.concurrent.timerTask
 
 
 class MainActivity : AppCompatActivity() {
@@ -44,12 +43,13 @@ class MainActivity : AppCompatActivity() {
     private var mAircraftIMU : AircraftIMU? = null
     private var mAircraftGyro : AircraftGyroscope? = null
     private var mAircraftGPS : AircraftGPS? = null
+    var mAircraftCamera : AircraftCamera? = null
 
     var mAircraftHandler : DJIAircraftHandler? = null
     var mLatestAircraftStatus : String? = null
 
-    private var mHomeFragment : HomeFragment? = null
-    //private var
+    private val mTimer = Timer()
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -88,11 +88,24 @@ class MainActivity : AppCompatActivity() {
         mROSGPS             = ROSGPS(baseContext, this)
         //mROSCamera          = ROSCamera(this, this.baseContext)
 
-        runOnUiThread{
-            mAircraftHandler = DJIAircraftHandler(this, null)
-        }
+
+        mAircraftHandler = DJIAircraftHandler(this, null)
+
         mAircraftHandler?.mStatusHandler = ::droneWriteStatus
         mAircraftHandler?.mNameHandler = ::droneWriteName
+
+
+        mTimer.schedule(
+            timerTask {
+                if(mAircraftHandler?.mAircraftConnected!! &&
+                        mAircraftCamera == null)
+                {
+                    mAircraftCamera = AircraftCamera(this@MainActivity)
+                }
+            },1000, 1000 )
+
+
+
 
 
 

@@ -46,7 +46,6 @@ class ROSBridge(uri: String) {
     fun send(data : ROSMessage<*>)
     {
         val json = mGson.toJson(data)
-
         mWebSocket.sendFrame( WebSocketFrame.createTextFrame( json ) )
     }
 
