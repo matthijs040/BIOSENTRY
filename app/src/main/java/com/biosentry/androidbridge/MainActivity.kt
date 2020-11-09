@@ -3,6 +3,7 @@ package com.biosentry.androidbridge
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.widget.Toast
@@ -99,6 +100,7 @@ class MainActivity : AppCompatActivity() {
                 if(mAircraftHandler?.mAircraftConnected!! &&
                         mAircraftCamera == null)
                 {
+                    Looper.myLooper() ?: Looper.prepare()
                     mAircraftCamera = AircraftCamera(this@MainActivity)
                 }
             },1000, 1000 )
@@ -129,7 +131,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    fun connectClicked()
+    fun WebSocketConnectClicked()
     {
         mROSBridge = ROSBridge(TB_URL.text.toString())
 
@@ -165,23 +167,34 @@ class MainActivity : AppCompatActivity() {
         mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
 
         mAircraftIMU?.let {
-            TV_Debug?.text = "${TV_Debug.text}\nAircraft IMU is attached."
+            //TV_Debug?.text = "${TV_Debug.text}\nAircraft IMU is attached."
             mROSMessageHandler?.attachSensor(it, 0)
         }
         mAircraftGyro?.let {
-            TV_Debug?.text = "${TV_Debug.text}\nAircraft Gyro is attached."
+            //TV_Debug?.text = "${TV_Debug.text}\nAircraft Gyro is attached."
             mROSMessageHandler?.attachSensor(it, 0)
         }
         mAircraftGPS?.let {
-            TV_Debug?.text = "${TV_Debug.text}\nAircraft GPS is attached."
+            //TV_Debug?.text = "${TV_Debug.text}\nAircraft GPS is attached."
             mROSMessageHandler?.attachSensor(it, 0)
         }
     }
 
-    fun disconnectClicked() {
+    fun WebSocketDisconnectClicked() {
         mROSMessageHandler?.removeSensors()
         mROSBridge?.disconnect()
 
+    }
+
+    fun RTMPConnectClicked()
+    {
+        val ret = mAircraftCamera?.startStreaming(TB_RTMP_URL.text.toString())
+        this.runOnUiThread{ TV_RTMP_error.text = ret.toString()}
+    }
+
+    fun RTMPDisconnectClicked()
+    {
+        mAircraftCamera?.stopStreaming()
     }
 
     // FUNCTIONS THAT WRITE INFORMATION TO UI! -----------------------------

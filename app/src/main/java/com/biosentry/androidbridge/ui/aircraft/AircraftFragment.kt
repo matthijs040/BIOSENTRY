@@ -1,5 +1,6 @@
 package com.biosentry.androidbridge.ui.aircraft
 
+import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.view.*
@@ -95,7 +96,13 @@ class AircraftFragment : Fragment() {
                 tex.surfaceTextureListener = act.mAircraftCamera
                 if(tex.isAvailable)
                     act.mAircraftCamera!!.onSurfaceTextureAvailable(tex.surfaceTexture!!, tex.width, tex.height)
+                    act.mAircraftCamera!!.mCodecManager.getBitmap( ::setAircraftBitmap )
             }
         }
+    }
+
+    private fun setAircraftBitmap(p0 : Bitmap)
+    {
+        IV_aircraft_bitmap.setImageBitmap(p0)
     }
 }

@@ -32,8 +32,12 @@ class HomeFragment : Fragment() {
     {
         mActivity = activity as MainActivity
 
-        BT_Websocket_Connect.setOnClickListener     { mActivity!!.connectClicked() }
-        BT_Websocket_Disconnect.setOnClickListener  { mActivity!!.disconnectClicked() }
+        //Setup event handlers for buttons.
+        BT_Websocket_Connect.setOnClickListener     { mActivity!!.WebSocketConnectClicked() }
+        BT_Websocket_Disconnect.setOnClickListener  { mActivity!!.WebSocketDisconnectClicked() }
+
+        BT_RTMP_connect.setOnClickListener          { mActivity!!.RTMPConnectClicked() }
+        BT_RTMP_disconnect.setOnClickListener       { mActivity!!.RTMPDisconnectClicked() }
 
         super.onResume()
     }

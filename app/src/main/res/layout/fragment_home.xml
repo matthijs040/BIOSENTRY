@@ -8,41 +8,42 @@
 
     <EditText
         android:id="@+id/TB_URL"
-        android:layout_width="249dp"
+        android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
         android:autofillHints="URL"
         android:ems="10"
-        android:hint="@string/TB_URL"
+        android:hint="@string/TB_WebSocket_URL"
         android:inputType="textUri"
-        android:text="@string/TB_URL"
+        android:text="@string/TB_WebSocket_URL"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/TV_URL_label"
-        app:layout_constraintTop_toBottomOf="@+id/TV_websocket_label" />
+        app:layout_constraintTop_toTopOf="@+id/TV_URL_label" />
 
     <Button
         android:id="@+id/BT_Websocket_Disconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/BT_Websocket_Disconnect"
-        app:layout_constraintStart_toEndOf="@+id/BT_Websocket_Connect"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/BT_Websocket_Connect" />
 
     <TextView
         android:id="@+id/TV_status_label2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="4dp"
         android:text="@string/TV_error_label"
         app:layout_constraintStart_toStartOf="@+id/TV_URL_label"
-        app:layout_constraintTop_toBottomOf="@+id/TV_URL_label" />
+        app:layout_constraintTop_toBottomOf="@+id/TB_URL" />
 
     <TextView
         android:id="@+id/TV_status_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="@string/TV_status_label"
         app:layout_constraintStart_toStartOf="@+id/TV_status_label2"
         app:layout_constraintTop_toBottomOf="@+id/TV_status_label2" />
@@ -51,16 +52,15 @@
         android:id="@+id/TV_websocket_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:text="@string/TV_websocket_status"
-        app:layout_constraintStart_toEndOf="@+id/TV_status_label"
+        app:layout_constraintStart_toStartOf="@+id/TV_websocket_error"
         app:layout_constraintTop_toTopOf="@+id/TV_status_label" />
 
     <TextView
         android:id="@+id/TV_websocket_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:text="@string/TV_websocket_error"
         app:layout_constraintStart_toEndOf="@+id/TV_status_label2"
         app:layout_constraintTop_toTopOf="@+id/TV_status_label2" />
@@ -69,7 +69,7 @@
         android:id="@+id/TV_URL_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="@string/TV_URL_label"
         app:layout_constraintStart_toStartOf="@+id/TV_websocket_label"
         app:layout_constraintTop_toBottomOf="@+id/TV_websocket_label" />
@@ -78,16 +78,16 @@
         android:id="@+id/BT_Websocket_Connect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
         android:text="@string/BT_Websocket_Connect"
-        app:layout_constraintStart_toStartOf="@+id/TV_status_label"
-        app:layout_constraintTop_toBottomOf="@+id/TV_status_label" />
+        app:layout_constraintEnd_toStartOf="@+id/BT_Websocket_Disconnect"
+        app:layout_constraintTop_toTopOf="@+id/TV_status_label2" />
 
     <TextView
         android:id="@+id/TV_websocket_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="24dp"
         android:text="@string/TV_websocket_label"
         app:layout_constraintStart_toStartOf="parent"
@@ -100,13 +100,13 @@
         android:layout_marginTop="16dp"
         android:text="@string/aircraft_label"
         app:layout_constraintStart_toStartOf="@+id/TV_websocket_label"
-        app:layout_constraintTop_toBottomOf="@+id/BT_Websocket_Connect" />
+        app:layout_constraintTop_toBottomOf="@+id/TV_status_label" />
 
     <TextView
         android:id="@+id/TV_drone_status_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="@string/TV_status_label"
         app:layout_constraintStart_toStartOf="@+id/TV_aircraft_label"
         app:layout_constraintTop_toBottomOf="@+id/TV_aircraft_label" />
@@ -124,7 +124,7 @@
         android:id="@+id/TV_drone_name_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="@string/TV_sensor_name_label"
         app:layout_constraintStart_toStartOf="@+id/TV_drone_status_label"
         app:layout_constraintTop_toBottomOf="@+id/TV_drone_status_label" />
@@ -141,22 +141,110 @@
         android:id="@+id/BT_drone_reboot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/reboot_label"
-        app:layout_constraintStart_toStartOf="@+id/TV_drone_name_label"
-        app:layout_constraintTop_toBottomOf="@+id/TV_drone_name_label" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/TV_drone_status_label" />
 
     <TextView
         android:id="@+id/TV_Debug"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="-10dp"
-        android:layout_marginBottom="-10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="-8dp"
         android:text="@string/TV_Debug"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/BT_drone_reboot"
-        app:layout_constraintTop_toBottomOf="@+id/BT_drone_reboot" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TV_drone_name_label" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/TV_RTMP_label"
+        app:layout_constraintStart_toStartOf="@+id/TV_drone_name_label"
+        app:layout_constraintTop_toBottomOf="@+id/TV_drone_name_label" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/TV_URL_label"
+        app:layout_constraintStart_toStartOf="@+id/textView6"
+        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+    <EditText
+        android:id="@+id/TB_RTMP_URL"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:ems="10"
+        android:hint="@string/RTMP_hint"
+        android:inputType="textUri"
+        android:text="@string/TB_RTMP_URL"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView8"
+        app:layout_constraintTop_toTopOf="@+id/textView8"
+        android:autofillHints="." />
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/TV_error_label"
+        app:layout_constraintStart_toStartOf="@+id/textView8"
+        app:layout_constraintTop_toBottomOf="@+id/TB_RTMP_URL" />
+
+    <TextView
+        android:id="@+id/TV_RTMP_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/TV_websocket_error"
+        app:layout_constraintStart_toEndOf="@+id/textView13"
+        app:layout_constraintTop_toTopOf="@+id/textView13" />
+
+    <TextView
+        android:id="@+id/textView19"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/TV_status_label"
+        app:layout_constraintStart_toStartOf="@+id/textView13"
+        app:layout_constraintTop_toBottomOf="@+id/textView13" />
+
+    <TextView
+        android:id="@+id/TV_RTMP_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/TV_websocket_status"
+        app:layout_constraintStart_toStartOf="@+id/TV_RTMP_error"
+        app:layout_constraintTop_toTopOf="@+id/textView19" />
+
+    <Button
+        android:id="@+id/BT_RTMP_disconnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:text="@string/BT_Websocket_Disconnect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textView13" />
+
+    <Button
+        android:id="@+id/BT_RTMP_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:text="@string/BT_Websocket_Connect"
+        app:layout_constraintEnd_toStartOf="@+id/BT_RTMP_disconnect"
+        app:layout_constraintTop_toTopOf="@+id/BT_RTMP_disconnect" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
