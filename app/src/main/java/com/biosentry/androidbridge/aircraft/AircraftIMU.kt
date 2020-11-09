@@ -1,8 +1,8 @@
 package com.biosentry.androidbridge.aircraft
 
-import com.biosentry.androidbridge.IROSSensor
-import com.biosentry.androidbridge.ROSMessage
-import com.biosentry.androidbridge.Vector3
+import com.biosentry.androidbridge.communication.IROSSensor
+import com.biosentry.androidbridge.communication.ROSMessage
+import com.biosentry.androidbridge.communication.Vector3
 import dji.common.flightcontroller.FlightControllerState
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager

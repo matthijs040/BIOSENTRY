@@ -1,13 +1,11 @@
 package com.biosentry.androidbridge.aircraft
 
-import com.biosentry.androidbridge.*
+import com.biosentry.androidbridge.communication.*
 import dji.common.flightcontroller.FlightControllerState
 import dji.common.flightcontroller.GPSSignalLevel
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
 import java.lang.Exception
-import kotlin.time.ExperimentalTime
-import kotlin.time.nanoseconds
 
 class AircraftGPS : IROSSensor<NavSatFix> {
     override var mMessageTypeName: String = "sensor_msgs/NavSatFix"

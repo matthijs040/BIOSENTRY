@@ -6,9 +6,9 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
-import com.biosentry.androidbridge.IROSSensor
-import com.biosentry.androidbridge.ROSMessage
-import com.biosentry.androidbridge.Vector3
+import com.biosentry.androidbridge.communication.IROSSensor
+import com.biosentry.androidbridge.communication.ROSMessage
+import com.biosentry.androidbridge.communication.Vector3
 
 /**
  * Class containing logic to fetch accelerometer data from Android's native HAL.

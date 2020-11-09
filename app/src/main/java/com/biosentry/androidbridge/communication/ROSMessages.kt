@@ -1,4 +1,4 @@
-package com.biosentry.androidbridge
+package com.biosentry.androidbridge.communication
 
 /**
  * https://github.com/RobotWebTools/rosbridge_suite/blob/master/ROSBRIDGE_PROTOCOL.md#343-publish--publish-
@@ -15,12 +15,12 @@ open class ROSMessage<T>(val op : String = "publish"
  */
 data class time(val sec : Long, val nsec: Long)
 
-data class Header( val seq : Long, val stamp : time, val frame_id : String )
+data class Header(val seq : Long, val stamp : time, val frame_id : String )
 
-data class CameraInfo( val header: Header, val height: Long, val width: Long,
-                       val distortion_model : String, val D : DoubleArray, val K : DoubleArray,
-                       val R : DoubleArray, val P : DoubleArray,
-                       val binning_x : Long, val binning_y : Long )
+data class CameraInfo(val header: Header, val height: Long, val width: Long,
+                      val distortion_model : String, val D : DoubleArray, val K : DoubleArray,
+                      val R : DoubleArray, val P : DoubleArray,
+                      val binning_x : Long, val binning_y : Long )
 
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/Image.html
@@ -48,7 +48,7 @@ data class Quaternion( val x : Double, val y : Double, val z : Double, val w : D
 /**
  * http://docs.ros.org/noetic/api/geometry_msgs/html/msg/Pose.html
  */
-data class Pose( val position : Point, val orientation : Quaternion )
+data class Pose(val position : Point, val orientation : Quaternion)
 
 data class Twist(val linear : Vector3, val angular : Vector3)
 
@@ -75,7 +75,7 @@ data class NavSatStatus(val status : Int, val service : Int)
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/NavSatFix.html
  */
 data class NavSatFix(val header : Header, val status : NavSatStatus, val latitude : Double, val longitude : Double,
-                     val altitude : Double , val position_covariance : DoubleArray,
+                     val altitude : Double, val position_covariance : DoubleArray,
                      val position_covariance_type : Byte )
 {
 
@@ -105,4 +105,39 @@ data class NavSatFix(val header : Header, val status : NavSatStatus, val latitud
         result = 31 * result + position_covariance_type
         return result
     }
+}
+
+// Corresponding to the flight actions tab in the DJI documentation:
+// https://developer.dji.com/api-reference/android-api/Components/FlightController/DJIFlightController.html
+enum class FlightActions()
+{
+    TurnMotorsOn,
+    TurnMotorsOff,
+    SetUrgentStopModeEnabled,
+    SetUrgentStopModeDisabled,
+    SetESCBeepEnabled,
+    SetESCBeepDisabled,
+    StartTakeoff,
+    StartPrecisionTakeoff,
+    CancelTakeoff,
+    StartLanding,
+    CancelLanding,
+    ConfirmLanding,
+    Reboot;
+
+    // To convert from int to enum!
+    // from: https://stackoverflow.com/questions/53523948/how-do-i-create-an-enum-from-a-int-in-kotlin
+    companion object {
+        private val VALUES = values();
+        fun getByValue(value: Int) = VALUES.firstOrNull() { value == it.ordinal }
+    }
+}
+
+data class AircraftFlightActions(val flightActions: FlightActions)
+
+enum class HomeActions()
+{
+    StartGoHome,
+    CancelGoHome,
+    SetHomeLocationUsingCurrentAircraftLocation;
 }

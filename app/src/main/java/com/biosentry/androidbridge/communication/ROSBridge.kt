@@ -1,7 +1,6 @@
 package com.biosentry.androidbridge.communication
 
 import android.util.Log
-import com.biosentry.androidbridge.ROSMessage
 import com.google.gson.Gson
 import com.neovisionaries.ws.client.*
 

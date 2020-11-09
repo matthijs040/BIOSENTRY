@@ -12,10 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.requestPermissions
 
 import androidx.core.content.ContextCompat
-import com.biosentry.androidbridge.IROSSensor
 import com.biosentry.androidbridge.MainActivity
-import com.biosentry.androidbridge.ROSMessage
-import com.biosentry.androidbridge.Vector3
 
 import dji.common.error.DJIError
 import dji.common.error.DJISDKError

@@ -1,4 +1,5 @@
-package com.biosentry.androidbridge
+package com.biosentry.androidbridge.communication
+
 /**
  * Abstract interface for a ROS-bridge compliant sensor.
  * MessageType must be specialized into a message type defined in ROSMessages.kt.

@@ -1,6 +1,5 @@
 package com.biosentry.androidbridge.communication
 
-import com.biosentry.androidbridge.IROSSensor
 import java.util.*
 import kotlin.concurrent.timerTask
 

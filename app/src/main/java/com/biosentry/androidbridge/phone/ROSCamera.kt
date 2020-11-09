@@ -13,7 +13,7 @@ import co.infinum.goldeneye.GoldenEye
 import co.infinum.goldeneye.InitCallback
 import co.infinum.goldeneye.PictureCallback
 import co.infinum.goldeneye.models.Facing
-import com.biosentry.androidbridge.*
+import com.biosentry.androidbridge.communication.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream

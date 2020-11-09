@@ -16,13 +16,12 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.biosentry.androidbridge.aircraft.*
 import com.biosentry.androidbridge.communication.ROSBridge
+import com.biosentry.androidbridge.communication.ROSMessage
 import com.biosentry.androidbridge.communication.ROSMessageHandler
 import com.biosentry.androidbridge.phone.*
-import com.biosentry.androidbridge.ui.home.HomeFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import dji.sdk.products.Aircraft
 import kotlinx.android.synthetic.main.fragment_aircraft.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import java.util.*
