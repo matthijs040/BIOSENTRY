@@ -1,15 +1,42 @@
 package com.biosentry.androidbridge.communication
 
-/**
- * https://github.com/RobotWebTools/rosbridge_suite/blob/master/ROSBRIDGE_PROTOCOL.md#343-publish--publish-
- * By default publish to make data classes work as publish messages.
- * typename by default child classname. overridable for non-publish messages.
- */
-open class ROSMessage<T>(val op : String = "publish"
-                         , val type: String
-                         , var topic : String = "bridge/$type"
-                         , var msg : T)
+//////////////////////// ROSBridge data classes ////////////////////////
+// ROSBridge message specs are from: https://github.com/RobotWebTools/rosbridge_suite/blob/develop/ROSBRIDGE_PROTOCOL.md
 
+data class AdvertiseMessage(
+    val op : String = "advertise",
+    val topic : String,
+    val type : String,
+    val id : String? = null
+)
+
+data class UnadvertiseMessage(
+    val op : String = "unadvertise",
+    val topic : String,
+    val id : String? = null
+)
+
+open class PublishMessage<T>(val op : String = "publish",
+                             val type: String,
+                             var topic : String,
+                             var msg : T
+)
+
+data class SubscribeMessage(val op : String = "subscribe",
+                            val id : String? = null,
+                            val topic : String,
+                            val throttle_rate : Int? = null,
+                            val queue_length : Int? = null,
+                            val fragment_size : Int? = null,
+                            val compression : String? = null
+)
+
+data class UnsubscribeMessage( val op : String = "unsubscribe",
+                               val id : String? = null,
+                               val topic : String
+)
+
+//////////////////////// ROS MESSAGE DATA CLASSES ////////////////////////
 /**
  * http://docs.ros.org/noetic/api/std_msgs/html/msg/Header.html
  */
@@ -107,6 +134,8 @@ data class NavSatFix(val header : Header, val status : NavSatStatus, val latitud
     }
 }
 
+//////////////////////// Custom data class messages ////////////////////////
+
 // Corresponding to the flight actions tab in the DJI documentation:
 // https://developer.dji.com/api-reference/android-api/Components/FlightController/DJIFlightController.html
 enum class FlightActions()
@@ -128,7 +157,7 @@ enum class FlightActions()
     // To convert from int to enum!
     // from: https://stackoverflow.com/questions/53523948/how-do-i-create-an-enum-from-a-int-in-kotlin
     companion object {
-        private val VALUES = values();
+        private val VALUES = values()
         fun getByValue(value: Int) = VALUES.firstOrNull() { value == it.ordinal }
     }
 }

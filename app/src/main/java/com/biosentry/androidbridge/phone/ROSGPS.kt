@@ -23,7 +23,7 @@ class ROSGPS(context: Context, activity: Activity) : IROSSensor<NavSatFix>
     private var mLocationManager: LocationManager = context.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
     // Data that will be read from the outside.
-    override var mDataHandler :  ( (ROSMessage<NavSatFix>) -> Unit )? = null
+    override var mDataHandler :  ( (PublishMessage<NavSatFix>) -> Unit )? = null
 
     private var mStatus = NavSatStatus(
         STATUS_NO_FIX,
@@ -74,8 +74,8 @@ class ROSGPS(context: Context, activity: Activity) : IROSSensor<NavSatFix>
         override fun onProviderDisabled(provider: String) {}
     }
 
-    override fun read(): ROSMessage<NavSatFix> {
-            return ROSMessage(
+    override fun read(): PublishMessage<NavSatFix> {
+            return PublishMessage(
                 topic = mMessageTopicName,
                 type = mMessageTypeName,
                 msg = mReading

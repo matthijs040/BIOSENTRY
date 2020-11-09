@@ -11,8 +11,8 @@ interface IROSSensor< MessageType > {
     val mMessageTopicName : String
 
     // Push interface. Allows user to set function here to receive data as it comes in.
-    var mDataHandler :  ( (ROSMessage<MessageType>) -> Unit)?
+    var mDataHandler :  ( (PublishMessage<MessageType>) -> Unit)?
 
     // Pull interface. Allows user to request latest data when needed.
-    fun read() : ROSMessage<MessageType>
+    fun read() : PublishMessage<MessageType>
 }

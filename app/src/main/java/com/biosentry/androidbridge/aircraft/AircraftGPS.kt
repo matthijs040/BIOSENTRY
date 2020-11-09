@@ -24,7 +24,7 @@ class AircraftGPS : IROSSensor<NavSatFix> {
     var mSignalLevel : GPSSignalLevel = GPSSignalLevel.NONE
         private set
 
-    override var mDataHandler: ((ROSMessage<NavSatFix>) -> Unit)? = null
+    override var mDataHandler: ((PublishMessage<NavSatFix>) -> Unit)? = null
 
     private var mStatus = NavSatStatus(
         NavSatStatus.STATUS_NO_FIX,
@@ -36,7 +36,7 @@ class AircraftGPS : IROSSensor<NavSatFix> {
     // Frame ID: I.E. Euclidean distance from vehicle centre to GPS antenna is currently unknown.
     private var mHeader = Header(mSeqNumber, time(0,0), "N.A.")
 
-    private var  mReading = ROSMessage<NavSatFix> (
+    private var  mReading = PublishMessage<NavSatFix> (
         type = mMessageTypeName,
         topic = mMessageTopicName,
         msg = NavSatFix(
@@ -73,7 +73,7 @@ class AircraftGPS : IROSSensor<NavSatFix> {
 
     }
 
-    override fun read(): ROSMessage<NavSatFix> {
+    override fun read(): PublishMessage<NavSatFix> {
         return mReading
     }
 

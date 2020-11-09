@@ -31,7 +31,7 @@ class ROSCamera(
 ) : IROSSensor<CompressedImage>
 {
     // ===================================== IMPLEMENTATION OF ROS-SENSOR INTERFACE =====================================
-    override var mDataHandler :  ((ROSMessage<CompressedImage>) -> Unit )? = null
+    override var mDataHandler :  ((PublishMessage<CompressedImage>) -> Unit )? = null
     var mErrorHandler : ((String) -> Unit)? = null
 
     private var mSequenceNumber : Long = 0
@@ -50,8 +50,8 @@ class ROSCamera(
     override val mMessageTopicName: String
         get() = "android/phone/image_raw/compressed"
 
-    override fun read(): ROSMessage<CompressedImage> {
-        return ROSMessage(
+    override fun read(): PublishMessage<CompressedImage> {
+        return PublishMessage(
             type = mMessageTypeName,
             topic = mMessageTopicName,
             msg = mReading

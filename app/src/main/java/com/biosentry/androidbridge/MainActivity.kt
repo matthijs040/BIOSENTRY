@@ -17,7 +17,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.biosentry.androidbridge.aircraft.*
 import com.biosentry.androidbridge.communication.ROSBridge
-import com.biosentry.androidbridge.communication.ROSMessage
+import com.biosentry.androidbridge.communication.PublishMessage
 import com.biosentry.androidbridge.communication.ROSMessageHandler
 import com.biosentry.androidbridge.phone.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -202,7 +202,7 @@ class MainActivity : AppCompatActivity() {
     private fun webSocketWriteStatus(s: String) { runOnUiThread{ TV_websocket_status?.text = s } }
 
     // PLACEHOLDER
-    private fun receiveData(message: ROSMessage<Any>) { println(message.toString() ) }
+    private fun receiveData(message: PublishMessage<Any>) { println(message.toString() ) }
 
     private fun droneWriteName(s : String) { runOnUiThread{ TV_drone_name?.text = s
                                                             TV_aircraft_name?.text = s} }

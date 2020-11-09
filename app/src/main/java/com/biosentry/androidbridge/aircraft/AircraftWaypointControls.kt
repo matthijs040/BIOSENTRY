@@ -8,7 +8,7 @@ import java.lang.Exception
 class AircraftWaypointControls : IROSDevice
 {
 
-    fun doAircraftFlightAction(msg : ROSMessage<AircraftFlightActions>)
+    fun doAircraftFlightAction(msg : PublishMessage<AircraftFlightActions>)
     {
         val product = DJISDKManager.getInstance().product
         if(product is Aircraft && product.isConnected)
@@ -36,7 +36,7 @@ class AircraftWaypointControls : IROSDevice
 
 
     override val mControls: List<ROSControl<*>> = listOf(
-        ROSControl(ROSMessage(type = "DJIBridge/FlightActions", topic = "", msg = AircraftFlightActions(FlightActions.Reboot)), ::doAircraftFlightAction)
+        ROSControl(PublishMessage(type = "DJIBridge/FlightActions", topic = "", msg = AircraftFlightActions(FlightActions.Reboot)), ::doAircraftFlightAction)
     )
 
     init {

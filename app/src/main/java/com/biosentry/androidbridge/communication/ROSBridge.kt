@@ -12,7 +12,7 @@ class ROSBridge(uri: String) {
 
     var mErrorHandler  : ( (String) -> Unit )?      = null
     var mStatusHandler : ( (String) -> Unit )?      = null
-    var mDataHandler   : ( (ROSMessage<Any>) -> Unit)?   = null
+    var mDataHandler   : ( (PublishMessage<Any>) -> Unit)?   = null
 
     private val mWebSocketListener : WebSocketAdapter = object : WebSocketAdapter() {
         override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
@@ -22,7 +22,7 @@ class ROSBridge(uri: String) {
             /**
              * TODO : Parse string and create struct.
              */
-            mDataHandler?.invoke(ROSMessage(type = "Empty", msg = ""))
+            mDataHandler?.invoke(PublishMessage(type = "Empty", msg = "", topic = ""))
 
         }
 
@@ -42,30 +42,30 @@ class ROSBridge(uri: String) {
         mWebSocket.connectAsynchronously()
     }
 
-    fun send(data : ROSMessage<*>)
+    fun send(data : PublishMessage<*>)
     {
         val json = mGson.toJson(data)
         mWebSocket.sendFrame( WebSocketFrame.createTextFrame( json ) )
     }
 
-    fun advertise( typeName : String)
-    {
-        send( ROSMessage<Unit>(op = "advertise", type = typeName, msg = Unit))
-    }
-
     fun advertise( typeName: String, topicName : String)
     {
-
-            send( ROSMessage(op = "advertise", type = typeName, topic = topicName, msg = Unit) )
+        send( PublishMessage(op = "advertise", type = typeName, topic = topicName, msg = Unit) )
     }
 
-    fun unadvertise( typeName : String)
+    fun unadvertise( typeName : String, topicName: String)
     {
-        send( ROSMessage(op = "unadvertise", type = typeName, msg = Unit))
+        send( PublishMessage(op = "unadvertise", topic = topicName, type = typeName, msg = Unit))
     }
 
     fun disconnect()
     {
         mWebSocket.disconnect()
     }
+
+    fun subscribe(type: String, topic: String) {
+        send(PublishMessage(op="advertise", type = type, topic = topic, msg = Unit))
+    }
+
+
 }

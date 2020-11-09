@@ -2,7 +2,7 @@ package com.biosentry.androidbridge.aircraft
 
 import com.biosentry.androidbridge.communication.IROSSensor
 import com.biosentry.androidbridge.communication.Point
-import com.biosentry.androidbridge.communication.ROSMessage
+import com.biosentry.androidbridge.communication.PublishMessage
 import dji.common.flightcontroller.FlightControllerState
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
@@ -19,10 +19,10 @@ class AircraftGyroscope : IROSSensor<Point> {
             field = value
         }
 
-    override var mDataHandler: ((ROSMessage<Point>) -> Unit)? = null
+    override var mDataHandler: ((PublishMessage<Point>) -> Unit)? = null
 
-    private var mReading : ROSMessage<Point> =
-        ROSMessage(
+    private var mReading : PublishMessage<Point> =
+        PublishMessage(
             type = mMessageTypeName,
             topic = mMessageTopicName,
             msg = Point(
@@ -46,7 +46,7 @@ class AircraftGyroscope : IROSSensor<Point> {
 
     }
 
-    override fun read(): ROSMessage<Point> {
+    override fun read(): PublishMessage<Point> {
         return mReading
     }
 

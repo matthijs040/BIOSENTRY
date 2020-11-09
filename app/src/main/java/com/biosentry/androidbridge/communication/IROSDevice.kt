@@ -7,8 +7,8 @@ package com.biosentry.androidbridge.communication
  * This can be direct behavior (e.g. setting a motor's RPM with an int message)
  * or meta behavior (e.g. changing configuration of a sensor)
  */
-data class ROSControl<MessageType>(val message : ROSMessage<MessageType>,
-                                   val behavior : (ROSMessage<MessageType>) -> Unit)
+data class ROSControl<MessageType>(val message : PublishMessage<MessageType>,
+                                   val behavior : (PublishMessage<MessageType>) -> Unit)
 
 /**
  * Generic interface for a ROS controllable device.

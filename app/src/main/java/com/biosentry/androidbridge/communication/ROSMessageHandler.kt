@@ -25,6 +25,17 @@ class ROSMessageHandler(private val bridge : ROSBridge) {
         return true
     }
 
+    fun attachDevice(device : IROSDevice)
+    {
+        device.mControls.forEach{
+            when(it.message.op)
+            {
+                "advertise" -> bridge.advertise(it.message.type, it.message.topic)
+                "subscribe" -> bridge.subscribe(it.message.type, it.message.topic)
+            }
+        }
+    }
+
     fun removeSensors()
     {
         mTimer.cancel()

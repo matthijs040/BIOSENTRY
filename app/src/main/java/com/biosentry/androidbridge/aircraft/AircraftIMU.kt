@@ -1,7 +1,7 @@
 package com.biosentry.androidbridge.aircraft
 
 import com.biosentry.androidbridge.communication.IROSSensor
-import com.biosentry.androidbridge.communication.ROSMessage
+import com.biosentry.androidbridge.communication.PublishMessage
 import com.biosentry.androidbridge.communication.Vector3
 import dji.common.flightcontroller.FlightControllerState
 import dji.sdk.products.Aircraft
@@ -20,10 +20,10 @@ class AircraftIMU() : IROSSensor<Vector3>
             field = value
         }
 
-    override var mDataHandler: ((ROSMessage<Vector3>) -> Unit)? = null
+    override var mDataHandler: ((PublishMessage<Vector3>) -> Unit)? = null
 
-    private var mReading : ROSMessage<Vector3> =
-        ROSMessage(
+    private var mReading : PublishMessage<Vector3> =
+        PublishMessage(
             type = mMessageTypeName,
             topic = mMessageTopicName,
             msg = Vector3(
@@ -47,7 +47,7 @@ class AircraftIMU() : IROSSensor<Vector3>
 
     }
 
-    override fun read(): ROSMessage<Vector3> {
+    override fun read(): PublishMessage<Vector3> {
             return mReading
     }
 
