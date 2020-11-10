@@ -1,5 +1,6 @@
 package com.biosentry.androidbridge.aircraft
 
+import com.biosentry.androidbridge.communication.AdvertiseMessage
 import com.biosentry.androidbridge.communication.IROSSensor
 import com.biosentry.androidbridge.communication.Point
 import com.biosentry.androidbridge.communication.PublishMessage
@@ -49,6 +50,11 @@ class AircraftGyroscope : IROSSensor<Point> {
     override fun read(): PublishMessage<Point> {
         return mReading
     }
+
+    override val mAdvertiseMessage = AdvertiseMessage(
+        type = mMessageTypeName,
+        topic = mMessageTopicName
+    )
 
     init {
         val product = DJISDKManager.getInstance().product

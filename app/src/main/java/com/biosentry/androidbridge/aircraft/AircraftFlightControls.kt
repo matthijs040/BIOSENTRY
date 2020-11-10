@@ -1,14 +1,36 @@
 package com.biosentry.androidbridge.aircraft
 
 import com.biosentry.androidbridge.communication.*
+import dji.common.flightcontroller.virtualstick.FlightControlData
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
 import java.lang.Exception
+import kotlin.reflect.KClass
 
-class AircraftWaypointControls : IROSDevice
+class AircraftFlightControls : IROSDevice
 {
+    // Cached instance of FlightControlData to remove need for reconstructing.
+    private var mFlightControlData = FlightControlData(0.0F, 0.0F, 0.0F, 0.0F)
 
-    fun doAircraftFlightAction(msg : PublishMessage<AircraftFlightActions>)
+    private fun doWriteFlightControlData(msg : PublishMessage<AircraftFlightControlData> )
+    {
+        val product = DJISDKManager.getInstance().product
+        if(product is Aircraft && product.isConnected)
+        {
+            product.flightController.run {
+
+                mFlightControlData.roll = msg.msg.roll
+                mFlightControlData.pitch = msg.msg.pitch
+                mFlightControlData.yaw = msg.msg.yaw
+                mFlightControlData.verticalThrottle = msg.msg.VThrottle
+
+                sendVirtualStickFlightControlData(mFlightControlData, null)
+                // MIGHT NEED A CALLBACK TO RESPOND TO STATUS FROM DRONE.
+            }
+        }
+    }
+
+    private fun doAircraftFlightAction(msg : PublishMessage<AircraftFlightActions>)
     {
         val product = DJISDKManager.getInstance().product
         if(product is Aircraft && product.isConnected)
@@ -34,9 +56,9 @@ class AircraftWaypointControls : IROSDevice
         }
     }
 
-
     override val mControls: List<ROSControl<*>> = listOf(
-        ROSControl(PublishMessage(type = "DJIBridge/FlightActions", topic = "", msg = AircraftFlightActions(FlightActions.Reboot)), ::doAircraftFlightAction)
+        ROSControl(type = AircraftFlightActions::class,     SubscribeMessage(type = "DJIBridge/FlightActions", topic = ""),     ::doAircraftFlightAction),
+        ROSControl(type = AircraftFlightControlData::class, SubscribeMessage(type = "DJIBridge/FlightControlData", topic = ""), ::doWriteFlightControlData)
     )
 
     init {

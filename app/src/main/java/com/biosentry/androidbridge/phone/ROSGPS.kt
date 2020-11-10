@@ -74,6 +74,11 @@ class ROSGPS(context: Context, activity: Activity) : IROSSensor<NavSatFix>
         override fun onProviderDisabled(provider: String) {}
     }
 
+    override val mAdvertiseMessage = AdvertiseMessage(
+        type = mMessageTypeName,
+        topic = mMessageTopicName
+    )
+
     override fun read(): PublishMessage<NavSatFix> {
             return PublishMessage(
                 topic = mMessageTopicName,

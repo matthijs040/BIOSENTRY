@@ -25,6 +25,7 @@ open class PublishMessage<T>(val op : String = "publish",
 data class SubscribeMessage(val op : String = "subscribe",
                             val id : String? = null,
                             val topic : String,
+                            val type : String? = null,
                             val throttle_rate : Int? = null,
                             val queue_length : Int? = null,
                             val fragment_size : Int? = null,
@@ -170,3 +171,6 @@ enum class HomeActions()
     CancelGoHome,
     SetHomeLocationUsingCurrentAircraftLocation;
 }
+
+// https://developer.dji.com/api-reference/android-api/Components/FlightController/DJIFlightController_DJIVirtualStickFlightControlData.html#djiflightcontroller_djivirtualstickflightcontroldata_constructor_inline
+data class AircraftFlightControlData(val roll : Float, val pitch : Float, val yaw : Float, val VThrottle : Float)

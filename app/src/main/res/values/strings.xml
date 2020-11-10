@@ -87,7 +87,7 @@
     <string name="BT_websocket_send">Send data</string>
     <string name="TV_websocket_status">Not Connected</string>
     <string name="TV_websocket_error">None</string>
-    <string name="TB_WebSocket_URL">ws://192.168.178.36:9090</string>
+    <string name="TB_WebSocket_URL">ws://DESKTOP-Matthijs:9090</string>
 
     //Camera fields:
     <string name="TV_camera_label">Camera:</string>
@@ -120,7 +120,7 @@
 
     // RTMP
     <string name="TV_RTMP_label">RTMP Server:</string>
-    <string name="TB_RTMP_URL">rtmp://192.168.178.23:8080</string>
+    <string name="TB_RTMP_URL">rtmp://DESKTOP-Matthijs:8080</string>
     <string name="RTMP_hint">Put URI for an RTMP server here.</string>
 
 

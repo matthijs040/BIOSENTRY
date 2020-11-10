@@ -19,6 +19,7 @@ import com.biosentry.androidbridge.aircraft.*
 import com.biosentry.androidbridge.communication.ROSBridge
 import com.biosentry.androidbridge.communication.PublishMessage
 import com.biosentry.androidbridge.communication.ROSMessageHandler
+import com.biosentry.androidbridge.communication.SubscribeMessage
 import com.biosentry.androidbridge.phone.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
@@ -105,11 +106,6 @@ class MainActivity : AppCompatActivity() {
                 }
             },1000, 1000 )
 
-
-
-
-
-
         super.onResume()
     }
 
@@ -127,39 +123,12 @@ class MainActivity : AppCompatActivity() {
     fun printDroneStatus(message : String)
     {
         Toast.makeText(this.baseContext, message, Toast.LENGTH_LONG).show()
+
         println(message)
     }
 
-    @SuppressLint("SetTextI18n")
-    fun WebSocketConnectClicked()
+    private fun attachDevices()
     {
-        mROSBridge = ROSBridge(TB_URL.text.toString())
-
-        mROSBridge!!.mErrorHandler  = ::webSocketWriteError
-        mROSBridge!!.mStatusHandler = ::webSocketWriteStatus
-        mROSBridge!!.mDataHandler   = ::receiveData
-
-
-
-        try {
-            mROSMessageHandler = ROSMessageHandler(mROSBridge!!)
-        }
-        catch (e: Exception)
-        {
-            Log.println(Log.ERROR, "MainActivity", e.toString())
-            return
-        }
-
-        if(mAircraftHandler?.mAircraftConnected!!)
-        {
-            mAircraftIMU = AircraftIMU()
-            mAircraftGyro = AircraftGyroscope()
-            mAircraftGPS = AircraftGPS()
-            TV_Debug?.text = "${TV_Debug.text}\nConstructing Aircraft sensors."
-        }
-
-
-
         // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html
         mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
@@ -178,12 +147,45 @@ class MainActivity : AppCompatActivity() {
             //TV_Debug?.text = "${TV_Debug.text}\nAircraft GPS is attached."
             mROSMessageHandler?.attachSensor(it, 0)
         }
+
+        mROSMessageHandler?.sub(SubscribeMessage(topic = "/test/point"))
+    }
+
+    private fun detachDevices()
+    {
+        mROSMessageHandler?.removeSensors()
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun WebSocketConnectClicked()
+    {
+        mROSBridge = ROSBridge(TB_URL.text.toString())
+
+        mROSBridge!!.mErrorHandler  = ::webSocketWriteError
+        mROSBridge!!.mStatusHandler = ::webSocketWriteStatus
+        mROSBridge!!.mDataHandler   = ::receiveData
+
+        try {
+            mROSMessageHandler = ROSMessageHandler(mROSBridge!!)
+        }
+        catch (e: Exception)
+        {
+            Log.println(Log.ERROR, "MainActivity", e.toString())
+            return
+        }
+
+        if(mAircraftHandler?.mAircraftConnected!!)
+        {
+            mAircraftIMU = AircraftIMU()
+            mAircraftGyro = AircraftGyroscope()
+            mAircraftGPS = AircraftGPS()
+            TV_Debug?.text = "${TV_Debug.text}\nConstructing Aircraft sensors."
+        }
     }
 
     fun WebSocketDisconnectClicked() {
-        mROSMessageHandler?.removeSensors()
-        mROSBridge?.disconnect()
 
+        mROSBridge?.disconnect()
     }
 
     fun RTMPConnectClicked()
@@ -198,11 +200,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     // FUNCTIONS THAT WRITE INFORMATION TO UI! -----------------------------
-    private fun webSocketWriteError(s: String) { runOnUiThread{ TV_websocket_error?.text = s } }
-    private fun webSocketWriteStatus(s: String) { runOnUiThread{ TV_websocket_status?.text = s } }
+    private fun webSocketWriteError(s: String) {
+        runOnUiThread{ TV_websocket_error?.text = s }
+    }
+    private fun webSocketWriteStatus(s: String) {
+        when(s)
+        {
+            "OPEN" -> attachDevices()
+            "CLOSED" -> detachDevices()
+        }
+        runOnUiThread{ TV_websocket_status?.text = s }
+    }
 
     // PLACEHOLDER
-    private fun receiveData(message: PublishMessage<Any>) { println(message.toString() ) }
+    private fun receiveData(message: Any) {
+        println(message.toString() )
+    }
 
     private fun droneWriteName(s : String) { runOnUiThread{ TV_drone_name?.text = s
                                                             TV_aircraft_name?.text = s} }

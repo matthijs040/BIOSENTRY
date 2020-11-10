@@ -46,18 +46,13 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
         startSDKRegistration()
     }
 
-    private fun initComponents()
-    {
-        if(mAircraftConnected)
-        {
+    private fun initComponents() {
+        if (mAircraftConnected) {
             val product = DJISDKManager.getInstance().product
-            if(product is Aircraft)
-            {
+            if (product is Aircraft) {
                 mNameHandler?.invoke(product.model.displayName)
             }
         }
-
-
     }
 
     private fun deinitComponents()
@@ -95,7 +90,6 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
 
     private fun startSDKRegistration()
     {
-
             if (isRegistrationInProgress.compareAndSet(false, true)) {
                 AsyncTask.execute {
                     mStatusHandler?.invoke("registering, please wait...")

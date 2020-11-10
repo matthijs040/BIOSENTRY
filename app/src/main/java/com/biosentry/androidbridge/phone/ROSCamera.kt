@@ -63,6 +63,10 @@ class ROSCamera(
     private val mGoldenEye = GoldenEye.Builder(activity).build() // Main wrapper object.
     private var mTextureView : TextureView = TextureView(context)  // UI element to show output on.
 
+    override val mAdvertiseMessage = AdvertiseMessage(
+        type = mMessageTypeName,
+        topic = mMessageTopicName
+    )
 
     private val mInitCallback = object : InitCallback()  // Callback to show error through.
     {

@@ -1,5 +1,6 @@
 package com.biosentry.androidbridge.aircraft
 
+import com.biosentry.androidbridge.communication.AdvertiseMessage
 import com.biosentry.androidbridge.communication.IROSSensor
 import com.biosentry.androidbridge.communication.PublishMessage
 import com.biosentry.androidbridge.communication.Vector3
@@ -31,6 +32,11 @@ class AircraftIMU() : IROSSensor<Vector3>
                 Double.NaN,
                 Double.NaN
             )
+    )
+
+    override val mAdvertiseMessage = AdvertiseMessage(
+        type = mMessageTypeName,
+        topic = mMessageTopicName
     )
 
     private val mIMUCallback = FlightControllerState.Callback { p0 ->

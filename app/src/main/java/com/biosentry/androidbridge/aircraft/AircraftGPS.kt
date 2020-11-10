@@ -88,4 +88,9 @@ class AircraftGPS : IROSSensor<NavSatFix> {
         }
 
     }
+
+    override val mAdvertiseMessage = AdvertiseMessage(
+        type = mMessageTypeName,
+        topic = mMessageTopicName
+    )
 }

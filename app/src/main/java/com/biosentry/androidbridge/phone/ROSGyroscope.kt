@@ -6,6 +6,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
+import com.biosentry.androidbridge.communication.AdvertiseMessage
 import com.biosentry.androidbridge.communication.IROSSensor
 import com.biosentry.androidbridge.communication.PublishMessage
 import com.biosentry.androidbridge.communication.Vector3
@@ -50,6 +51,11 @@ class ROSGyroscope(context: Context,
             SensorManager.SENSOR_DELAY_NORMAL
         )
     }
+
+    override val mAdvertiseMessage = AdvertiseMessage(
+        type = mMessageTypeName,
+        topic = mMessageTopicName
+    )
 
     override fun read(): PublishMessage<Vector3> {
         return PublishMessage( type = mMessageTypeName,

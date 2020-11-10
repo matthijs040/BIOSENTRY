@@ -6,10 +6,22 @@ import kotlin.concurrent.timerTask
 class ROSMessageHandler(private val bridge : ROSBridge) {
 
     private val mTimer : Timer = Timer()
+    private val mControls = mutableListOf<ROSControl<*>>()
+
+    private fun handleData(msg : Any )
+    {
+        println(msg.toString())
+    }
 
     fun attachSensor(sensor: IROSSensor<*>, rateInMs: Long ) : Boolean
     {
-        bridge.advertise( sensor.mMessageTypeName, sensor.mMessageTopicName)
+        bridge.send(sensor.mAdvertiseMessage)
+        mTimer.schedule(
+            timerTask {
+                bridge.send(sensor.mAdvertiseMessage) // send second time in case of bad reception.
+            }, 500
+        )
+
         if(rateInMs <= 0L)
         {
             sensor.mDataHandler = bridge::send
@@ -18,7 +30,7 @@ class ROSMessageHandler(private val bridge : ROSBridge) {
         {
             mTimer.schedule(
                 timerTask {
-                        bridge.send( sensor.read() )
+                    bridge.send( sensor.read() )
                 },1000, rateInMs )
         }
 
@@ -28,11 +40,8 @@ class ROSMessageHandler(private val bridge : ROSBridge) {
     fun attachDevice(device : IROSDevice)
     {
         device.mControls.forEach{
-            when(it.message.op)
-            {
-                "advertise" -> bridge.advertise(it.message.type, it.message.topic)
-                "subscribe" -> bridge.subscribe(it.message.type, it.message.topic)
-            }
+            bridge.send(it.message)
+            mControls.add(it)
         }
     }
 
@@ -42,10 +51,22 @@ class ROSMessageHandler(private val bridge : ROSBridge) {
         mTimer.purge()
     }
 
+    fun sub(msg : SubscribeMessage)
+    {
+        bridge.send(msg)
+        mTimer.schedule(
+            timerTask {
+                bridge.send(msg)
+            }, 500
+        )
+    }
+
     init {
         // Dummy first advertise to make connecting sensors work.
         // First connect always failed.
-        bridge.advertise("std_msgs/Empty", "/android/phone/empty")
-        Thread.sleep(1000)
+        //bridge.send(AdvertiseMessage(type = "", topic = ""))
+        //Thread.sleep(1000)
+
+        bridge.mDataHandler = ::handleData
     }
 }
