@@ -5,20 +5,21 @@ import com.google.gson.Gson
 import com.neovisionaries.ws.client.*
 import kotlin.reflect.typeOf
 
-class ROSBridge(uri: String) {
+class ROSBridge(uri: String) : IJSONTranceiver {
     // Class for conversion between Data classes and JSON formatted strings.
-    private val mGson : Gson = Gson()
 
     private val mWebSocket : WebSocket = WebSocketFactory().createSocket(uri)
 
     var mErrorHandler  : ( (String) -> Unit )?      = null
-    var mStatusHandler : ( (String) -> Unit )?      = null
-    var mDataHandler   : ( (Any) -> Unit)?   = null
+    override var mReceiver: ((String) -> Unit)? = null
+    override var mStateHandler: ((STATE) -> Unit)? = null
+
+    private var mLastMessage : String = ""
 
     private val mWebSocketListener : WebSocketAdapter = object : WebSocketAdapter() {
         override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
             super.onFrame(websocket, frame)
-            mDataHandler?.invoke(mGson.fromJson(frame?.payloadText, Any::class.java))
+            frame?.let {  mReceiver?.invoke(it.payloadText) }
         }
 
         override fun onError(websocket: WebSocket?, cause: WebSocketException?) {
@@ -27,8 +28,10 @@ class ROSBridge(uri: String) {
         }
 
         override fun onStateChanged(websocket: WebSocket?, newState: WebSocketState?) {
-            mStatusHandler?.invoke( newState.toString() )
-
+            if(newState == WebSocketState.OPEN)
+                mStateHandler?.invoke(STATE.CONNECTED)
+            else
+                mStateHandler?.invoke(STATE.NOT_CONNECTED)
 
             Log.println(Log.INFO, "WebSocket",  newState.toString() )
         }
@@ -39,10 +42,14 @@ class ROSBridge(uri: String) {
         mWebSocket.connectAsynchronously()
     }
 
-    fun<T> send(data : T)
+
+    override fun send(data : String)
     {
-        val json = mGson.toJson(data)
-        mWebSocket.sendFrame( WebSocketFrame.createTextFrame( json ) )
+        mWebSocket.sendFrame( WebSocketFrame.createTextFrame( data ) )
+    }
+
+    override fun recv(): String {
+        return mLastMessage
     }
 
     fun disconnect()

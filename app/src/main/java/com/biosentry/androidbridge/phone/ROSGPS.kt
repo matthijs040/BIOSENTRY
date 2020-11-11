@@ -20,6 +20,11 @@ import com.biosentry.androidbridge.communication.NavSatStatus.Companion.STATUS_N
 
 class ROSGPS(context: Context, activity: Activity) : IROSSensor<NavSatFix>
 {
+    override val mMessageTypeName: String
+        get() = "sensor_msgs/NavSatFix"
+    override val mMessageTopicName: String
+        get() = "android/phone/gps"
+
     private var mLocationManager: LocationManager = context.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
     // Data that will be read from the outside.
@@ -40,13 +45,10 @@ class ROSGPS(context: Context, activity: Activity) : IROSSensor<NavSatFix>
                                                     Double.NaN,
                                                     Double.NaN,
                                                     Double.NaN,
-                                                    DoubleArray(0),
+                                                    DoubleArray(9),
                                                     0 )
 
-    override val mMessageTypeName: String
-        get() = "sensor_msgs/NavSatFix"
-    override val mMessageTopicName: String
-        get() = "android/phone/gps"
+
 
     private val mLocationListener: LocationListener = object : LocationListener {
 

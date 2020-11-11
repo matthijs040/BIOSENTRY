@@ -3,26 +3,30 @@ package com.biosentry.androidbridge.communication
 //////////////////////// ROSBridge data classes ////////////////////////
 // ROSBridge message specs are from: https://github.com/RobotWebTools/rosbridge_suite/blob/develop/ROSBRIDGE_PROTOCOL.md
 
+open class BridgeMessage(
+    //open val op: String
+)
+
 data class AdvertiseMessage(
     val op : String = "advertise",
     val topic : String,
     val type : String,
     val id : String? = null
-)
+) : BridgeMessage()
 
-data class UnadvertiseMessage(
+data class UnadvertiseMessage (
     val op : String = "unadvertise",
     val topic : String,
     val id : String? = null
-)
+) : BridgeMessage()
 
 open class PublishMessage<T>(val op : String = "publish",
                              val type: String,
                              var topic : String,
                              var msg : T
-)
+) : BridgeMessage()
 
-data class SubscribeMessage(val op : String = "subscribe",
+data class SubscribeMessage( val op : String = "subscribe",
                             val id : String? = null,
                             val topic : String,
                             val type : String? = null,
@@ -30,12 +34,12 @@ data class SubscribeMessage(val op : String = "subscribe",
                             val queue_length : Int? = null,
                             val fragment_size : Int? = null,
                             val compression : String? = null
-)
+): BridgeMessage()
 
 data class UnsubscribeMessage( val op : String = "unsubscribe",
                                val id : String? = null,
                                val topic : String
-)
+): BridgeMessage()
 
 //////////////////////// ROS MESSAGE DATA CLASSES ////////////////////////
 /**

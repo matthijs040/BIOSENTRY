@@ -16,10 +16,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.biosentry.androidbridge.aircraft.*
-import com.biosentry.androidbridge.communication.ROSBridge
-import com.biosentry.androidbridge.communication.PublishMessage
-import com.biosentry.androidbridge.communication.ROSMessageHandler
-import com.biosentry.androidbridge.communication.SubscribeMessage
+import com.biosentry.androidbridge.communication.*
 import com.biosentry.androidbridge.phone.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
@@ -148,7 +145,7 @@ class MainActivity : AppCompatActivity() {
             mROSMessageHandler?.attachSensor(it, 0)
         }
 
-        mROSMessageHandler?.sub(SubscribeMessage(topic = "/test/point"))
+        //mROSMessageHandler?.sub(SubscribeMessage(topic = "/test/point"))
     }
 
     private fun detachDevices()
@@ -162,8 +159,8 @@ class MainActivity : AppCompatActivity() {
         mROSBridge = ROSBridge(TB_URL.text.toString())
 
         mROSBridge!!.mErrorHandler  = ::webSocketWriteError
-        mROSBridge!!.mStatusHandler = ::webSocketWriteStatus
-        mROSBridge!!.mDataHandler   = ::receiveData
+        mROSBridge!!.mStateHandler = ::webSocketWriteStatus
+        mROSBridge!!.mReceiver   = ::receiveData
 
         try {
             mROSMessageHandler = ROSMessageHandler(mROSBridge!!)
@@ -203,13 +200,13 @@ class MainActivity : AppCompatActivity() {
     private fun webSocketWriteError(s: String) {
         runOnUiThread{ TV_websocket_error?.text = s }
     }
-    private fun webSocketWriteStatus(s: String) {
+    private fun webSocketWriteStatus(s: STATE) {
         when(s)
         {
-            "OPEN" -> attachDevices()
-            "CLOSED" -> detachDevices()
+            STATE.CONNECTED -> attachDevices()
+            STATE.NOT_CONNECTED -> detachDevices()
         }
-        runOnUiThread{ TV_websocket_status?.text = s }
+        runOnUiThread{ TV_websocket_status!!.text = s.name }
     }
 
     // PLACEHOLDER
