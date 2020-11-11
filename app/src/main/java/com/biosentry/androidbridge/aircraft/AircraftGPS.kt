@@ -7,7 +7,7 @@ import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
 import java.lang.Exception
 
-class AircraftGPS : IROSSensor<NavSatFix> {
+class AircraftGPS : IROSSensor {
     override var mMessageTypeName: String = "sensor_msgs/NavSatFix"
 
     // Can be renamed in case of different drone connected to phone at run time.
@@ -24,7 +24,7 @@ class AircraftGPS : IROSSensor<NavSatFix> {
     var mSignalLevel : GPSSignalLevel = GPSSignalLevel.NONE
         private set
 
-    override var mDataHandler: ((PublishMessage<NavSatFix>) -> Unit)? = null
+    override var mDataHandler: ((PublishMessage) -> Unit)? = null
 
     private var mStatus = NavSatStatus(
         NavSatStatus.STATUS_NO_FIX,
@@ -36,7 +36,7 @@ class AircraftGPS : IROSSensor<NavSatFix> {
     // Frame ID: I.E. Euclidean distance from vehicle centre to GPS antenna is currently unknown.
     private var mHeader = Header(mSeqNumber, time(0,0), "N.A.")
 
-    private var  mReading = PublishMessage<NavSatFix> (
+    private var  mReading = PublishMessage (
         type = mMessageTypeName,
         topic = mMessageTopicName,
         msg = NavSatFix(
@@ -73,7 +73,7 @@ class AircraftGPS : IROSSensor<NavSatFix> {
 
     }
 
-    override fun read(): PublishMessage<NavSatFix> {
+    override fun read(): PublishMessage {
         return mReading
     }
 

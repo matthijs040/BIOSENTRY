@@ -17,7 +17,7 @@ import com.biosentry.androidbridge.communication.Vector3
 class ROSGyroscope(context: Context,
                    override val mMessageTypeName: String = "geometry_msgs/Vector3",
                    override val mMessageTopicName: String = "android/phone/gyroscope"
-) : IROSSensor<Vector3>
+) : IROSSensor
 {
 
     // Android HAL objects exposing the phone's sensors.
@@ -25,7 +25,7 @@ class ROSGyroscope(context: Context,
     private var mGyroscope: Sensor? = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
     // Data that will be read from the outside.
-    override var mDataHandler :  ( (PublishMessage<Vector3>) -> Unit )? = null
+    override var mDataHandler :  ( (PublishMessage) -> Unit )? = null
     private var mReading = Vector3(Double.NaN,Double.NaN,Double.NaN)
 
     // Android's listener interface for sensors.
@@ -57,7 +57,7 @@ class ROSGyroscope(context: Context,
         topic = mMessageTopicName
     )
 
-    override fun read(): PublishMessage<Vector3> {
+    override fun read(): PublishMessage {
         return PublishMessage( type = mMessageTypeName,
                            topic = mMessageTopicName,
                            msg = mReading )

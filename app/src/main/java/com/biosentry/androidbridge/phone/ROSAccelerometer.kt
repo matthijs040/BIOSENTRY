@@ -16,7 +16,7 @@ import com.biosentry.androidbridge.communication.Vector3
  */
 class ROSAccelerometer(context: Context,
                        messageTypeName : String = "geometry_msgs/Vector3",
-                       topicName : String = "android/phone/accelerometer" ) : IROSSensor<Vector3>
+                       topicName : String = "android/phone/accelerometer" ) : IROSSensor
 {
     override val mMessageTypeName: String = messageTypeName
     override val mMessageTopicName: String = topicName
@@ -32,7 +32,7 @@ class ROSAccelerometer(context: Context,
     private var mAccelerometer: Sensor? = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
     // Data that will be read from the outside.
-    override var mDataHandler :  ( (PublishMessage<Vector3>) -> Unit )? = null
+    override var mDataHandler :  ( (PublishMessage) -> Unit )? = null
     private var mReading = Vector3(Double.NaN,Double.NaN,Double.NaN)
 
 
@@ -63,7 +63,7 @@ class ROSAccelerometer(context: Context,
         )
     }
 
-    override fun read(): PublishMessage<Vector3> {
+    override fun read(): PublishMessage {
         return PublishMessage(
             type = mMessageTypeName,
             topic = mMessageTopicName,

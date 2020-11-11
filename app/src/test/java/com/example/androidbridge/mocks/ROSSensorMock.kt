@@ -1,4 +1,4 @@
-package com.example.androidbridge
+package com.example.androidbridge.mocks
 
 import com.biosentry.androidbridge.communication.*
 import java.util.*
@@ -8,7 +8,7 @@ import kotlin.concurrent.timerTask
  * Mock that sends a const NavSatFix message on request or once per timer instance.
  * If the datahandler is used.
  */
-class ROSSensorMock() : IROSSensor<NavSatFix>
+class ROSSensorMock() : IROSSensor
 {
     override val mMessageTypeName: String = "sensor_msgs/NavSatFix"
     override val mMessageTopicName: String = "android/mock/GPS"
@@ -17,7 +17,7 @@ class ROSSensorMock() : IROSSensor<NavSatFix>
 
     private val mTimer = Timer()
 
-    override var mDataHandler: ((PublishMessage<NavSatFix>) -> Unit)? = null
+    override var mDataHandler: ((PublishMessage) -> Unit)? = null
     set(value){
         if(value != null)
             mTimer.schedule( timerTask{
@@ -43,7 +43,7 @@ class ROSSensorMock() : IROSSensor<NavSatFix>
         DoubleArray(9),
         0 )
 
-    override fun read(): PublishMessage<NavSatFix> {
+    override fun read(): PublishMessage {
         return PublishMessage(type =  mMessageTypeName, topic = mMessageTopicName, msg = mReading)
     }
 

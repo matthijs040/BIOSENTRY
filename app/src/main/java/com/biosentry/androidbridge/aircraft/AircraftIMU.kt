@@ -9,7 +9,7 @@ import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
 import java.lang.Exception
 
-class AircraftIMU() : IROSSensor<Vector3>
+class AircraftIMU() : IROSSensor
 {
     override var mMessageTypeName: String = "geometry_msgs/Vector3"
 
@@ -21,9 +21,9 @@ class AircraftIMU() : IROSSensor<Vector3>
             field = value
         }
 
-    override var mDataHandler: ((PublishMessage<Vector3>) -> Unit)? = null
+    override var mDataHandler: ((PublishMessage) -> Unit)? = null
 
-    private var mReading : PublishMessage<Vector3> =
+    private var mReading : PublishMessage =
         PublishMessage(
             type = mMessageTypeName,
             topic = mMessageTopicName,
@@ -53,7 +53,7 @@ class AircraftIMU() : IROSSensor<Vector3>
 
     }
 
-    override fun read(): PublishMessage<Vector3> {
+    override fun read(): PublishMessage {
             return mReading
     }
 

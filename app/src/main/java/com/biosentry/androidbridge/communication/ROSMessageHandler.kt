@@ -14,7 +14,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 {
 
     private val mTimer : Timer = Timer()
-    private val mControls = mutableListOf<ROSControl<*>>()
+    val mControls = mutableListOf<ROSControl>()
 
 
     fun send(data : BridgeMessage)
@@ -24,31 +24,27 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     private fun recv(jsonData : String)
     {
-        println(jsonData)
         val msg = mSerializer.fromJson(jsonData)
 
         // If it is a message for one of the devices to receive.
-        if(msg is PublishMessage<*>)
+        if(msg is PublishMessage)
         {
             // Iterate over all receivers.
             mControls.forEach{
 
                 // If the receiver's msg-data type matches the message
-                if(msg.msg!!::class.java == it.type)
+                if(msg.topic == it.message.topic &&
+                        msg.type == it.message.type)
                 {
-
-                    // Try to send the data to it.
-                    it.tryCall( PublishMessage(
-                        type = msg.type,
-                        topic = msg.topic,
-                        msg = msg.msg!!)
-                    )
+                    it.behavior.invoke(msg.msg)
                 }
+
+
             }
         }
     }
 
-    fun attachSensor(sensor: IROSSensor<*>, rateInMs: Long ) : Boolean
+    fun attachSensor(sensor: IROSSensor, rateInMs: Long ) : Boolean
     {
         send(sensor.mAdvertiseMessage)
         mTimer.schedule(
@@ -66,7 +62,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
             mTimer.schedule(
                 timerTask {
                     send( sensor.read() )
-                },1000, rateInMs )
+                },600, rateInMs )
         }
 
         return true

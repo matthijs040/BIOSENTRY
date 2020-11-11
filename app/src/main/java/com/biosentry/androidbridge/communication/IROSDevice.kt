@@ -12,18 +12,9 @@ import kotlin.reflect.KTypeParameter
  * or meta behavior (e.g. changing configuration of a sensor)
  * Requires the type to know with what data to call behavior at runtime.
  */
-data class ROSControl<T : Any>( val type : KClass<T>,
-                                val message : SubscribeMessage,
-                                val behavior : (PublishMessage<T>) -> Unit)
-{
-    @Suppress("UNCHECKED_CAST")
-    inline fun<reified T> tryCall(msg : PublishMessage<T>)
-    {
-        if(type is T)
-            ( behavior as (PublishMessage<T>) -> Unit ).invoke(msg)
-    }
+data class ROSControl( val message : SubscribeMessage,
+                       val behavior : (ROSMessage) -> Unit)
 
-}
 
 
 
@@ -34,5 +25,5 @@ data class ROSControl<T : Any>( val type : KClass<T>,
  * Accepting a commands that changes the device's behavior.
  */
 interface IROSDevice {
-    val mControls : List<ROSControl<*>>
+    val mControls : List<ROSControl>
 }

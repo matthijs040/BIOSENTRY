@@ -9,7 +9,7 @@ import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
 import java.lang.Exception
 
-class AircraftGyroscope : IROSSensor<Point> {
+class AircraftGyroscope : IROSSensor {
     override var mMessageTypeName: String = "geometry_msgs/Point"
 
     // Can be renamed in case of different drone connected to phone at run time.
@@ -20,9 +20,9 @@ class AircraftGyroscope : IROSSensor<Point> {
             field = value
         }
 
-    override var mDataHandler: ((PublishMessage<Point>) -> Unit)? = null
+    override var mDataHandler: ((PublishMessage) -> Unit)? = null
 
-    private var mReading : PublishMessage<Point> =
+    private var mReading : PublishMessage =
         PublishMessage(
             type = mMessageTypeName,
             topic = mMessageTopicName,
@@ -47,7 +47,7 @@ class AircraftGyroscope : IROSSensor<Point> {
 
     }
 
-    override fun read(): PublishMessage<Point> {
+    override fun read(): PublishMessage {
         return mReading
     }
 
