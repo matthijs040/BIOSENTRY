@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import com.neovisionaries.ws.client.*
 import kotlin.reflect.typeOf
 
-class ROSBridge(uri: String) : IJSONTranceiver {
+class WebSocketClient(uri: String) : IJSONTranceiver {
     // Class for conversion between Data classes and JSON formatted strings.
 
     private val mWebSocket : WebSocket = WebSocketFactory().createSocket(uri)

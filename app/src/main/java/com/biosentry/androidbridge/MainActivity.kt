@@ -18,6 +18,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.biosentry.androidbridge.aircraft.*
 import com.biosentry.androidbridge.communication.*
 import com.biosentry.androidbridge.phone.*
+import com.biosentry.androidbridge.serialization.GsonSerializer
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -30,8 +31,9 @@ import kotlin.concurrent.timerTask
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    var mROSBridge : ROSBridge? = null
+    var mWebSocketClient : WebSocketClient? = null
     private var mROSMessageHandler : ROSMessageHandler? = null
+    private val mMessageSerializer = GsonSerializer()
 
     private var mROSAccelerometer : ROSAccelerometer? = null
     private var mROSGyroscope : ROSGyroscope? = null
@@ -145,7 +147,12 @@ class MainActivity : AppCompatActivity() {
             mROSMessageHandler?.attachSensor(it, 0)
         }
 
-        //mROSMessageHandler?.sub(SubscribeMessage(topic = "/test/point"))
+        mTimer.schedule(
+            timerTask {
+                mROSMessageHandler?.send(SubscribeMessage(topic = "/test/point"))
+            }, 1000, 1000
+        )
+
     }
 
     private fun detachDevices()
@@ -156,14 +163,14 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     fun WebSocketConnectClicked()
     {
-        mROSBridge = ROSBridge(TB_URL.text.toString())
+        mWebSocketClient = WebSocketClient(TB_URL.text.toString())
 
-        mROSBridge!!.mErrorHandler  = ::webSocketWriteError
-        mROSBridge!!.mStateHandler = ::webSocketWriteStatus
-        mROSBridge!!.mReceiver   = ::receiveData
+        mWebSocketClient!!.mErrorHandler  = ::webSocketWriteError
+        mWebSocketClient!!.mStateHandler = ::webSocketWriteStatus
+        mWebSocketClient!!.mReceiver   = ::receiveData
 
         try {
-            mROSMessageHandler = ROSMessageHandler(mROSBridge!!)
+            mROSMessageHandler = ROSMessageHandler(mWebSocketClient!!, mMessageSerializer)
         }
         catch (e: Exception)
         {
@@ -182,7 +189,7 @@ class MainActivity : AppCompatActivity() {
 
     fun WebSocketDisconnectClicked() {
 
-        mROSBridge?.disconnect()
+        mWebSocketClient?.disconnect()
     }
 
     fun RTMPConnectClicked()

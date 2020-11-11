@@ -1,63 +1,43 @@
 package com.biosentry.androidbridge.communication
 
+import com.biosentry.androidbridge.serialization.IBridgeMessageSerializer
 import com.google.gson.*
 import java.lang.reflect.Type
 import java.util.*
 import kotlin.concurrent.timerTask
 
-/**
- * Deserializer for all Bridge messages defined in ROSMessages.kt
- * From: https://stackoverflow.com/questions/21767485/gson-deserialization-to-specific-object-type-based-on-field-value
- * First answer and first comment.
- */
-class BridgeMessageDeserializer : JsonDeserializer<BridgeMessage?>
+
+
+
+class ROSMessageHandler(private val bridge : IJSONTranceiver,
+                        private val mSerializer : IBridgeMessageSerializer)
 {
-    override fun deserialize(
-        json: JsonElement?,
-        typeOfT: Type?,
-        context: JsonDeserializationContext? ): BridgeMessage? {
-
-        var ret : BridgeMessage? = null
-
-        if (json != null && context != null) {
-
-            val obj = json.asJsonObject
-            val bridgeOp = obj.get("op")
-
-            ret = when (bridgeOp.asString) {
-                "advertise" ->      context.deserialize<AdvertiseMessage>(json, AdvertiseMessage::class.java)
-                "unadvertise" ->    context.deserialize<UnadvertiseMessage>(json, UnadvertiseMessage::class.java)
-                "publish" ->        context.deserialize<PublishMessage<*>>(json, PublishMessage::class.java)
-                "subscribe" ->      context.deserialize<SubscribeMessage>(json, SubscribeMessage::class.java)
-                "unsubscribe" ->    context.deserialize<UnsubscribeMessage>(json, UnsubscribeMessage::class.java)
-                else -> null
-            }
-        }
-        return ret
-    }
-}
-
-
-class ROSMessageHandler(private val bridge : ROSBridge) {
 
     private val mTimer : Timer = Timer()
     private val mControls = mutableListOf<ROSControl<*>>()
-    private var mGson : Gson
 
-    private fun<T> send(data : T)
+
+    fun send(data : BridgeMessage)
     {
-        bridge.send(mGson.toJson(data))
+        bridge.send(mSerializer.toJson(data))
     }
 
     private fun recv(jsonData : String)
     {
         println(jsonData)
-        val msg = mGson.fromJson(jsonData, BridgeMessage::class.java)
+        val msg = mSerializer.fromJson(jsonData)
+
+        // If it is a message for one of the devices to receive.
         if(msg is PublishMessage<*>)
         {
+            // Iterate over all receivers.
             mControls.forEach{
+
+                // If the receiver's msg-data type matches the message
                 if(msg.msg!!::class.java == it.type)
                 {
+
+                    // Try to send the data to it.
                     it.tryCall( PublishMessage(
                         type = msg.type,
                         topic = msg.topic,
@@ -106,21 +86,8 @@ class ROSMessageHandler(private val bridge : ROSBridge) {
         mTimer.purge()
     }
 
-    fun sub(msg : SubscribeMessage)
-    {
-        send(msg)
-        mTimer.schedule(
-            timerTask {
-                send(msg)
-            }, 500
-        )
-    }
-
     init
     {
         bridge.mReceiver = ::recv
-        val builder = GsonBuilder()
-        builder.registerTypeAdapter(BridgeMessage::class.java, BridgeMessageDeserializer())
-        mGson = builder.create()
     }
 }

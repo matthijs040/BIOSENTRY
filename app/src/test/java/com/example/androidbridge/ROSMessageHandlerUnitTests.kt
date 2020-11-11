@@ -1,9 +1,9 @@
 package com.example.androidbridge
 
-import com.biosentry.androidbridge.communication.ROSBridge
+import com.biosentry.androidbridge.communication.WebSocketClient
 import com.biosentry.androidbridge.communication.ROSMessageHandler
-import com.neovisionaries.ws.client.WebSocket
-import com.neovisionaries.ws.client.WebSocketFactory
+import com.biosentry.androidbridge.serialization.GsonSerializer
+import com.google.gson.Gson
 import org.junit.Test
 
 /**
@@ -13,8 +13,8 @@ class ROSMessageHandlerUnitTests {
 
     //https://www.websocket.org/echo.html
     private val mURI : String = "ws://demos.kaazing.com/echo"
-    private val mROSBridge = ROSBridge(mURI)
-    private val mROSMessageHandler = ROSMessageHandler(mROSBridge)
+    private val mROSBridge = WebSocketClient(mURI)
+    private val mROSMessageHandler = ROSMessageHandler(mROSBridge, GsonSerializer())
     private val mMockSensor = ROSSensorMock()
 
     @Test
