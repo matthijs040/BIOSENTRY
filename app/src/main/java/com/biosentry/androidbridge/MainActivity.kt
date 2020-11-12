@@ -129,6 +129,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun attachDevices()
     {
+        Thread.sleep(100) // sleep to make the server properly register the client before sending event driven publishes to it.
         // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html
         mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }

@@ -9,6 +9,7 @@ class ROSAircraftActionsDeviceMock : IROSDevice {
     {
         if(msg is AircraftFlightActions)
             latestData = msg
+
     }
 
     override val mControls: List<ROSControl> =

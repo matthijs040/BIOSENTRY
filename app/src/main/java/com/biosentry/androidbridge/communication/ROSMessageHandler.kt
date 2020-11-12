@@ -16,11 +16,41 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     private val mTimer : Timer = Timer()
     val mControls = mutableListOf<ROSControl>()
+    private val retransmitDelay : Long = 20
 
 
     fun send(data : BridgeMessage)
     {
         bridge.send(mSerializer.toJson(data))
+    }
+
+    /**
+     * Function that sends out a subscribe message while no publisher is yet registered.
+     */
+    private fun resubscribe(msg : SubscribeMessage)
+    {
+        mTimer.schedule(
+            timerTask {
+                while(true)
+                {
+                    send(msg)
+                    Thread.sleep(retransmitDelay * 100) // Waiting for some arbitrary process might take long. This should be a non-performance affecting routine.
+                }
+            }, retransmitDelay
+        )
+    }
+
+    private fun retransmit(msg : BridgeMessage, times : Int)
+    {
+        mTimer.schedule(
+            timerTask {
+                for( x in 0 .. times)
+                {
+                    send(msg) // send second time in case of bad reception.
+                    Thread.sleep(retransmitDelay)
+                }
+            }, retransmitDelay
+        )
     }
 
     private fun recv(jsonData : String)
@@ -44,13 +74,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     fun attachSensor(sensor: IROSSensor, rateInMs: Long ) : Boolean
     {
-        send(sensor.mAdvertiseMessage)
-        //mTimer.schedule(
-        //    timerTask {
-        //        send(sensor.mAdvertiseMessage) // send second time in case of bad reception.
-        //    }, 500
-        //)
-
+        retransmit(sensor.mAdvertiseMessage, 5 )
         if(rateInMs <= 0L)
         {
             sensor.mDataHandler = ::send
@@ -71,16 +95,10 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
     fun attachDevice(device : IROSDevice)
     {
         device.mControls.forEach{
-            send(it.message)
-
-           // mTimer.schedule(
-           //     timerTask {
-           //         send(it.message) // send second time in case of bad reception.
-           //     }, 500
-           // )
-            Log.d(this.javaClass.simpleName, "attached control: $it")
+            resubscribe(it.message)
 
             mControls.add(it)
+            Log.d(this.javaClass.simpleName, "attached control: $it")
         }
     }
 
