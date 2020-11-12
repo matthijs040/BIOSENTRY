@@ -58,7 +58,7 @@ class ROSGyroscope(context: Context,
     )
 
     override fun read(): PublishMessage {
-        return PublishMessage( type = mMessageTypeName,
+        return PublishMessage( //type = mMessageTypeName,
                            topic = mMessageTopicName,
                            msg = mReading )
     }

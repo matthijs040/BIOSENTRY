@@ -52,7 +52,7 @@ class ROSCamera(
 
     override fun read(): PublishMessage {
         return PublishMessage(
-            type = mMessageTypeName,
+            //type = mMessageTypeName,
             topic = mMessageTopicName,
             msg = mReading
         )

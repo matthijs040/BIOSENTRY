@@ -84,7 +84,7 @@ class ROSGPS(context: Context, activity: Activity) : IROSSensor
     override fun read(): PublishMessage {
             return PublishMessage(
                 topic = mMessageTopicName,
-                type = mMessageTypeName,
+                //type = mMessageTypeName,
                 msg = mReading
             )
     }

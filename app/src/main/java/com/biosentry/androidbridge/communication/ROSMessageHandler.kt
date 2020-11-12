@@ -1,5 +1,6 @@
 package com.biosentry.androidbridge.communication
 
+import android.util.Log
 import com.biosentry.androidbridge.serialization.IBridgeMessageSerializer
 import com.google.gson.*
 import java.lang.reflect.Type
@@ -33,13 +34,10 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
             mControls.forEach{
 
                 // If the receiver's msg-data type matches the message
-                if(msg.topic == it.message.topic &&
-                        msg.type == it.message.type)
+                if(msg.topic == it.message.topic)
                 {
                     it.behavior.invoke(msg.msg)
                 }
-
-
             }
         }
     }
@@ -47,11 +45,11 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
     fun attachSensor(sensor: IROSSensor, rateInMs: Long ) : Boolean
     {
         send(sensor.mAdvertiseMessage)
-        mTimer.schedule(
-            timerTask {
-                send(sensor.mAdvertiseMessage) // send second time in case of bad reception.
-            }, 500
-        )
+        //mTimer.schedule(
+        //    timerTask {
+        //        send(sensor.mAdvertiseMessage) // send second time in case of bad reception.
+        //    }, 500
+        //)
 
         if(rateInMs <= 0L)
         {
@@ -59,11 +57,13 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
         }
         else
         {
-            mTimer.schedule(
-                timerTask {
-                    send( sensor.read() )
-                },600, rateInMs )
+           mTimer.schedule(
+               timerTask {
+                   send( sensor.read() )
+               },600, rateInMs )
         }
+
+        Log.d(this.javaClass.simpleName, "attached sensor: $sensor")
 
         return true
     }
@@ -72,6 +72,14 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
     {
         device.mControls.forEach{
             send(it.message)
+
+           // mTimer.schedule(
+           //     timerTask {
+           //         send(it.message) // send second time in case of bad reception.
+           //     }, 500
+           // )
+            Log.d(this.javaClass.simpleName, "attached control: $it")
+
             mControls.add(it)
         }
     }

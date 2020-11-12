@@ -25,7 +25,7 @@ class AircraftIMU() : IROSSensor
 
     private var mReading : PublishMessage =
         PublishMessage(
-            type = mMessageTypeName,
+            //type = mMessageTypeName,
             topic = mMessageTopicName,
             msg = Vector3(
                 Double.NaN,

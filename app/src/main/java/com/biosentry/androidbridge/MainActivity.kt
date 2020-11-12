@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     private var mAircraftGyro : AircraftGyroscope? = null
     private var mAircraftGPS : AircraftGPS? = null
     var mAircraftCamera : AircraftCamera? = null
+    private val mAircraftFlightControls = AircraftFlightControls()
 
     var mAircraftHandler : DJIAircraftHandler? = null
     var mLatestAircraftStatus : String? = null
@@ -147,11 +148,12 @@ class MainActivity : AppCompatActivity() {
             mROSMessageHandler?.attachSensor(it, 0)
         }
 
-        mTimer.schedule(
-            timerTask {
-                mROSMessageHandler?.send(SubscribeMessage(topic = "/test/point"))
-            }, 1000, 1000
-        )
+        if(mAircraftHandler != null && mAircraftHandler!!.mAircraftConnected)
+        {
+            mROSMessageHandler?.attachDevice(mAircraftFlightControls)
+        }
+
+
 
     }
 

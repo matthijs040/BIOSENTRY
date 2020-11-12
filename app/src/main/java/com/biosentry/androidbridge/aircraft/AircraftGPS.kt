@@ -37,7 +37,7 @@ class AircraftGPS : IROSSensor {
     private var mHeader = Header(mSeqNumber, time(0,0), "N.A.")
 
     private var  mReading = PublishMessage (
-        type = mMessageTypeName,
+        //type = mMessageTypeName,
         topic = mMessageTopicName,
         msg = NavSatFix(
         mHeader,

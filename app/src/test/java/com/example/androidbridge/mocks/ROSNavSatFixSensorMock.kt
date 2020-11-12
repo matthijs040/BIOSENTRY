@@ -8,7 +8,7 @@ import kotlin.concurrent.timerTask
  * Mock that sends a const NavSatFix message on request or once per timer instance.
  * If the datahandler is used.
  */
-class ROSSensorMock() : IROSSensor
+class ROSNavSatFixSensorMock() : IROSSensor
 {
     override val mMessageTypeName: String = "sensor_msgs/NavSatFix"
     override val mMessageTopicName: String = "android/mock/GPS"
@@ -44,7 +44,10 @@ class ROSSensorMock() : IROSSensor
         0 )
 
     override fun read(): PublishMessage {
-        return PublishMessage(type =  mMessageTypeName, topic = mMessageTopicName, msg = mReading)
+        return PublishMessage(
+            //type =  mMessageTypeName,
+            topic = mMessageTopicName,
+            msg = mReading)
     }
 
 }

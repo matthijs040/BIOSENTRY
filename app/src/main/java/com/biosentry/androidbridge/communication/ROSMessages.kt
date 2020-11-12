@@ -19,7 +19,7 @@ data class UnadvertiseMessage (
 ) : BridgeMessage
 
 open class PublishMessage(val op : String = "publish",
-                             val type: String,
+                             // val type: String,
                              var topic : String,
                              var msg : ROSMessage
 ) : BridgeMessage
@@ -83,6 +83,10 @@ data class Quaternion( val x : Double, val y : Double, val z : Double, val w : D
  */
 data class Pose(val position : Point, val orientation : Quaternion): ROSMessage
 
+/**
+ * Is also converted to the drone flight controller input.
+ * https://developer.dji.com/api-reference/android-api/Components/FlightController/DJIFlightController_DJIVirtualStickFlightControlData.html#djiflightcontroller_djivirtualstickflightcontroldata_constructor_inline
+ */
 data class Twist(val linear : Vector3, val angular : Vector3): ROSMessage
 
 /**
@@ -169,11 +173,11 @@ enum class FlightActions()
     companion object {
         private val VALUES = values()
         fun getByValue(value: Int) = VALUES.firstOrNull() { value == it.ordinal }
+        fun valueByGet(value: FlightActions) : Int { return value.ordinal }
     }
 }
 
 //type: "dji_msgs/AircraftFlightActions"
 data class AircraftFlightActions(val flightActions: FlightActions): ROSMessage
 
-// https://developer.dji.com/api-reference/android-api/Components/FlightController/DJIFlightController_DJIVirtualStickFlightControlData.html#djiflightcontroller_djivirtualstickflightcontroldata_constructor_inline
-data class AircraftFlightControlData(val roll : Float, val pitch : Float, val yaw : Float, val VThrottle : Float): ROSMessage
+data class AircraftFlightActionsInt(val flightActions: Int ) : ROSMessage

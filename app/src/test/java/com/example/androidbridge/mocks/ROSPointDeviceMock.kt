@@ -14,6 +14,6 @@ class ROSPointDeviceMock : IROSDevice {
 
     override val mControls: List<ROSControl> =
         listOf(
-            ROSControl(SubscribeMessage(type = "/geometry_msgs/Point", topic = "/mock/Point"), ::doStoreData),
+            ROSControl(SubscribeMessage(type = "/geometry_msgs/Point", topic = "/geometry_msgs/Point"), ::doStoreData),
         )
 }

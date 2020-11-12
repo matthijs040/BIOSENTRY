@@ -7,7 +7,7 @@ import com.biosentry.androidbridge.communication.PublishMessage
 
 class ROSPointSensorMock : IROSSensor {
     override val mMessageTypeName: String = "/geometry_msgs/Point"
-    override val mMessageTopicName: String = "/mock/Point"
+    override val mMessageTopicName: String = "/geometry_msgs/Point"
     override val mAdvertiseMessage: AdvertiseMessage =
         AdvertiseMessage(type =  mMessageTypeName, topic =  mMessageTopicName)
 
@@ -15,7 +15,6 @@ class ROSPointSensorMock : IROSSensor {
 
     val mReading = PublishMessage(
         topic = mMessageTopicName,
-        type =  mMessageTypeName,
         msg = Point( 1.0,2.0,3.0)
     )
 

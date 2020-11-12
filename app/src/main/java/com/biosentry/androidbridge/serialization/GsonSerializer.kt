@@ -26,10 +26,8 @@ class PublishMessageDeserializer : JsonDeserializer<PublishMessage?>
             val obj = json.asJsonObject
 
             val topicString = obj.get("topic").asString
-            val typeString = obj.get("type").asString
 
-
-            val msg = when (typeString)
+            val msg = when (topicString)
             {
                 //Accessing nested JSON data. data is:
                 // {"op":"publish","type":"/geometry_msgs/Point","topic":"/mock/Point","msg":{"x":1.0,"y":2.0,"z":3.0}}
@@ -40,10 +38,10 @@ class PublishMessageDeserializer : JsonDeserializer<PublishMessage?>
                     z = obj.get("msg").asJsonObject.get("z").asDouble )
 
                 // Takes enum int value to be compatible with C,C++ / Python(?) enums.
-                "dji_msgs/AircraftFlightActions" -> ( FlightActions.getByValue(obj.get("msg").asJsonObject.get("action").asInt) )?.let {
+                "/biosentry/AircraftFlightActions" -> ( FlightActions.getByValue(obj.get("msg").asJsonObject.get("flightActions").asInt) )?.let {
                     AircraftFlightActions( flightActions = it) }
 
-                "geometry_msgs/Twist" -> Twist(
+                "/geometry_msgs/Twist" -> Twist(
                     Vector3(
                         obj.get("msg").asJsonObject.get("linear").asJsonObject.get("x").asDouble,
                         obj.get("msg").asJsonObject.get("linear").asJsonObject.get("y").asDouble,
@@ -60,7 +58,6 @@ class PublishMessageDeserializer : JsonDeserializer<PublishMessage?>
 
             if(msg != null)
                 ret = PublishMessage(
-                    type = typeString,
                     topic = topicString,
                     msg = msg
                 )

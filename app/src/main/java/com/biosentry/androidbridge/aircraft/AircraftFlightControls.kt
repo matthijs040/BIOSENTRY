@@ -1,7 +1,11 @@
 package com.biosentry.androidbridge.aircraft
 
+import android.util.Log
+import android.util.Log.WARN
 import com.biosentry.androidbridge.communication.*
+import dji.common.error.DJIError
 import dji.common.flightcontroller.virtualstick.FlightControlData
+import dji.common.util.CommonCallbacks
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
 import java.lang.Exception
@@ -34,40 +38,40 @@ class AircraftFlightControls : IROSDevice
         }
     }
 
+    private val mCallback = CommonCallbacks.CompletionCallback<DJIError> { p0 -> println(p0) }
+
     private fun doAircraftFlightAction(msg : ROSMessage)
     {
         if(msg is AircraftFlightActions) {
-
-
 
             val product = DJISDKManager.getInstance().product
             if (product is Aircraft && product.isConnected) {
 
                 product.flightController.let {
                     when (msg.flightActions) {
-                        FlightActions.TurnMotorsOn -> it.turnOnMotors { }
-                        FlightActions.TurnMotorsOff -> it.turnOffMotors { }
+                        FlightActions.TurnMotorsOn -> it.turnOnMotors { mCallback }
+                        FlightActions.TurnMotorsOff -> it.turnOffMotors { mCallback }
                         FlightActions.SetUrgentStopModeEnabled -> it.setUrgentStopModeEnabled(
                             true,
-                            null
+                            mCallback
                         )
                         FlightActions.SetUrgentStopModeDisabled -> it.setUrgentStopModeEnabled(
                             false,
-                            null
+                            mCallback
                         )
-                        FlightActions.SetESCBeepEnabled -> it.setESCBeepEnabled(true, null)
-                        FlightActions.SetESCBeepDisabled -> it.setESCBeepEnabled(false, null)
-                        FlightActions.StartTakeoff -> it.startTakeoff { }
-                        FlightActions.StartPrecisionTakeoff -> it.startPrecisionTakeoff { }
-                        FlightActions.CancelTakeoff -> it.cancelTakeoff { }
-                        FlightActions.StartLanding -> it.startLanding { }
-                        FlightActions.CancelLanding -> it.cancelLanding { }
-                        FlightActions.ConfirmLanding -> it.confirmLanding { }
-                        FlightActions.Reboot -> it.reboot { }
+                        FlightActions.SetESCBeepEnabled -> it.setESCBeepEnabled(true, mCallback)
+                        FlightActions.SetESCBeepDisabled -> it.setESCBeepEnabled(false, mCallback)
+                        FlightActions.StartTakeoff -> it.startTakeoff { mCallback }
+                        FlightActions.StartPrecisionTakeoff -> it.startPrecisionTakeoff { mCallback }
+                        FlightActions.CancelTakeoff -> it.cancelTakeoff { mCallback }
+                        FlightActions.StartLanding -> it.startLanding { mCallback }
+                        FlightActions.CancelLanding -> it.cancelLanding { mCallback }
+                        FlightActions.ConfirmLanding -> it.confirmLanding { mCallback }
+                        FlightActions.Reboot -> it.reboot { mCallback }
 
-                        FlightActions.StartGoHome -> it.startGoHome {  }
-                        FlightActions.CancelGoHome -> it.cancelGoHome {  }
-                        FlightActions.SetHomeLocationUsingCurrentAircraftLocation -> it.setHomeLocationUsingAircraftCurrentLocation {  }
+                        FlightActions.StartGoHome -> it.startGoHome { mCallback }
+                        FlightActions.CancelGoHome -> it.cancelGoHome { mCallback }
+                        FlightActions.SetHomeLocationUsingCurrentAircraftLocation -> it.setHomeLocationUsingAircraftCurrentLocation { mCallback }
                     }
                 }
             }
@@ -75,13 +79,13 @@ class AircraftFlightControls : IROSDevice
     }
 
     override val mControls: List<ROSControl> = listOf(
-        ROSControl(SubscribeMessage(type = "DJIBridge/FlightActions", topic = ""),     ::doAircraftFlightAction),
-        ROSControl(SubscribeMessage(type = "DJIBridge/FlightControlData", topic = ""), ::doWriteFlightControlData)
+        ROSControl(SubscribeMessage(type = "/biosentry/AircraftFlightActions", topic = "/biosentry/AircraftFlightActions"),     ::doAircraftFlightAction),
+        ROSControl(SubscribeMessage(type = "/geometry_msgs/Twist", topic = "/geometry_msgs/Twist"), ::doWriteFlightControlData)
     )
 
     init {
         val product = DJISDKManager.getInstance().product
         if(product !is Aircraft || !product.isConnected)
-            throw Exception("Valid Aircraft required for initialization")
+            Log.w(this.javaClass.simpleName, "A valid aircraft must be connected for this class to handle commands." )
     }
 }

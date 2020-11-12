@@ -24,7 +24,7 @@ class AircraftGyroscope : IROSSensor {
 
     private var mReading : PublishMessage =
         PublishMessage(
-            type = mMessageTypeName,
+            //type = mMessageTypeName,
             topic = mMessageTopicName,
             msg = Point(
                 Double.NaN,

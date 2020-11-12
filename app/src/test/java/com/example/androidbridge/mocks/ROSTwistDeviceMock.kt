@@ -6,7 +6,7 @@ class ROSTwistDeviceMock : IROSDevice {
 
     var latestData : Twist? = null
 
-    fun doStoreData(msg : ROSMessage)
+    private fun doStoreData(msg : ROSMessage)
     {
         if(msg is Twist)
             latestData = msg
@@ -14,6 +14,6 @@ class ROSTwistDeviceMock : IROSDevice {
 
     override val mControls: List<ROSControl> =
         listOf(
-            ROSControl(SubscribeMessage(type = "geometry_msgs/Twist", topic = "/mock/Twist"), ::doStoreData),
+            ROSControl(SubscribeMessage(type = "/geometry_msgs/Twist", topic = "/geometry_msgs/Twist"), ::doStoreData),
         )
 }

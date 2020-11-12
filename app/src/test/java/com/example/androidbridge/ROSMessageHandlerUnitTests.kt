@@ -1,13 +1,8 @@
 package com.example.androidbridge
 
-import com.biosentry.androidbridge.communication.Point
-import com.biosentry.androidbridge.communication.ROSMessageHandler
-import com.biosentry.androidbridge.communication.Twist
+import com.biosentry.androidbridge.communication.*
 import com.biosentry.androidbridge.serialization.GsonSerializer
-import com.example.androidbridge.mocks.JsonTranceiverMock
-import com.example.androidbridge.mocks.ROSPointDeviceMock
-import com.example.androidbridge.mocks.ROSPointSensorMock
-import com.example.androidbridge.mocks.ROSTwistSensorMock
+import com.example.androidbridge.mocks.*
 import org.junit.Test
 
 /**
@@ -78,13 +73,9 @@ class ROSMessageHandlerUnitTests {
         val mockDevice = ROSPointDeviceMock()
 
         val expected : Point = mockSensor.mReading.msg as Point
-        mROSMessageHandler.attachSensor(mockSensor, 10)
-        mROSMessageHandler.attachDevice(mockDevice)
 
-        while ( mockDevice.latestData == null )
-        {
-            Thread.sleep(100)
-        }
+        mROSMessageHandler.attachDevice(mockDevice)
+        mTranceiver.send( mSerializer.toJson(mockSensor.mReading ))
 
         println("Expected: $expected")
         println("Actual: " + mockDevice.latestData)
@@ -96,9 +87,36 @@ class ROSMessageHandlerUnitTests {
     fun messageHandler_test_subscribe_twist_device()
     {
         val mockSensor = ROSTwistSensorMock()
+        val mockDevice = ROSTwistDeviceMock()
         val expected = mockSensor.mReading.msg as Twist
 
-        mROSMessageHandler.attachSensor(mockSensor, 10)
+        mROSMessageHandler.attachDevice(mockDevice)
+        mTranceiver.send( mSerializer.toJson(mockSensor.mReading ))
+
+        println("Expected: $expected")
+        println("Actual: " + mockDevice.latestData)
+
+        assert(expected == mockDevice.latestData )
+    }
+
+    @Test
+    fun messageHandler_test_subscribe_aircraftActions_device()
+    {
+        val mockDevice = ROSAircraftActionsDeviceMock()
+        val msg = PublishMessage(
+            topic = "/biosentry/AircraftFlightActions",
+            msg = AircraftFlightActionsInt(1)
+        )
+        val expected = FlightActions.TurnMotorsOff
+
+        mROSMessageHandler.attachDevice(mockDevice)
+        mTranceiver.send( mSerializer.toJson(msg))
+
+        println("Expected: $expected")
+        println("Actual: " + mockDevice.latestData?.flightActions)
+
+        assert( expected == mockDevice.latestData?.flightActions)
+
     }
 
 

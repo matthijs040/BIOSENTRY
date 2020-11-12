@@ -28,12 +28,14 @@ class WebSocketClient(uri: String) : IJSONTranceiver {
         }
 
         override fun onStateChanged(websocket: WebSocket?, newState: WebSocketState?) {
-            if(newState == WebSocketState.OPEN)
-                mStateHandler?.invoke(STATE.CONNECTED)
-            else
-                mStateHandler?.invoke(STATE.NOT_CONNECTED)
 
             Log.println(Log.INFO, "WebSocket",  newState.toString() )
+            if(newState == WebSocketState.OPEN)
+            {
+                mStateHandler?.invoke(STATE.CONNECTED)
+            }
+            else
+                mStateHandler?.invoke(STATE.NOT_CONNECTED)
         }
     }
 
