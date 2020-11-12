@@ -1,5 +1,6 @@
 package com.biosentry.androidbridge.communication
 
+import android.app.Application
 import android.util.Log
 import com.biosentry.androidbridge.serialization.IBridgeMessageSerializer
 import com.google.gson.*
@@ -14,10 +15,10 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
                         private val mSerializer : IBridgeMessageSerializer)
 {
 
-    private val mTimer : Timer = Timer()
+    private val messagingTimer = Timer()
+    private val devicePollingTimer = Timer()
     val mControls = mutableListOf<ROSControl>()
-    private val retransmitDelay : Long = 20
-
+    private val retransmitDelay : Long = 10
 
     fun send(data : BridgeMessage)
     {
@@ -29,12 +30,12 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
      */
     private fun resubscribe(msg : SubscribeMessage)
     {
-        mTimer.schedule(
+        messagingTimer.schedule(
             timerTask {
                 while(true)
                 {
                     send(msg)
-                    Thread.sleep(retransmitDelay * 100) // Waiting for some arbitrary process might take long. This should be a non-performance affecting routine.
+                    Thread.sleep(retransmitDelay * 200) // Waiting for some arbitrary process might take long. This should be a non-performance affecting routine.
                 }
             }, retransmitDelay
         )
@@ -42,7 +43,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     private fun retransmit(msg : BridgeMessage, times : Int)
     {
-        mTimer.schedule(
+        messagingTimer.schedule(
             timerTask {
                 for( x in 0 .. times)
                 {
@@ -74,14 +75,14 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     fun attachSensor(sensor: IROSSensor, rateInMs: Long ) : Boolean
     {
-        retransmit(sensor.mAdvertiseMessage, 5 )
+        retransmit(sensor.mAdvertiseMessage, 3 )
         if(rateInMs <= 0L)
         {
             sensor.mDataHandler = ::send
         }
         else
         {
-           mTimer.schedule(
+           devicePollingTimer.schedule(
                timerTask {
                    send( sensor.read() )
                },600, rateInMs )
@@ -104,8 +105,8 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     fun removeSensors()
     {
-        mTimer.cancel()
-        mTimer.purge()
+        devicePollingTimer.cancel()
+        devicePollingTimer.purge()
     }
 
     init

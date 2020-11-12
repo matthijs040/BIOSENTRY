@@ -18,57 +18,24 @@ import com.biosentry.androidbridge.communication.NavSatStatus.Companion.SERVICE_
 import com.biosentry.androidbridge.communication.NavSatStatus.Companion.STATUS_FIX
 import com.biosentry.androidbridge.communication.NavSatStatus.Companion.STATUS_NO_FIX
 
-class ROSGPS(context: Context, activity: Activity) : IROSSensor
+class PhoneGPS(context: Context, activity: Activity) : ROSGPS("/android/phone/GPS")
 {
-    override val mMessageTypeName: String
-        get() = "/sensor_msgs/NavSatFix"
-    override val mMessageTopicName: String
-        get() = "/android/phone/gps"
-
     private var mLocationManager: LocationManager = context.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
-
-    // Data that will be read from the outside.
-    override var mDataHandler :  ( (PublishMessage) -> Unit )? = null
-
-    private var mStatus = NavSatStatus(
-        STATUS_NO_FIX,
-        SERVICE_GLONASS + SERVICE_GPS
-    )
-
-    private var mSeqNumber : Long = 0
-
-    // Frame ID: I.E. Euclidean distance from vehicle centre to GPS antenna is currently unknown.
-    private var mHeader = Header(0, time(0,0), "N.A.")
-
-    private var  mReading : NavSatFix = NavSatFix ( mHeader,
-                                                    mStatus,
-                                                    Double.NaN,
-                                                    Double.NaN,
-                                                    Double.NaN,
-                                                    DoubleArray(9),
-                                                    0 )
-
-
 
     private val mLocationListener: LocationListener = object : LocationListener {
 
         override fun onLocationChanged(location: Location) {
-            mStatus = NavSatStatus(status = STATUS_FIX, service = SERVICE_GLONASS + SERVICE_GPS)
 
-            mHeader = Header(seq = mSeqNumber, stamp = time(location.time, location.elapsedRealtimeNanos), frame_id = "N.A.")
-
-            mReading = NavSatFix(
-                mHeader,
-                mStatus,
+             updateData( NavSatFix(
+                this@PhoneGPS.mHeader,
+                this@PhoneGPS.mStatus,
                 latitude = location.latitude,
                 longitude = location.longitude,
                 altitude = location.altitude,
                 position_covariance = DoubleArray(9),
                 position_covariance_type = 0
-            )
-
-            mDataHandler?.invoke( read() )
-            mSeqNumber++
+                )
+             )
         }
 
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
@@ -76,18 +43,8 @@ class ROSGPS(context: Context, activity: Activity) : IROSSensor
         override fun onProviderDisabled(provider: String) {}
     }
 
-    override val mAdvertiseMessage = AdvertiseMessage(
-        type = mMessageTypeName,
-        topic = mMessageTopicName
-    )
 
-    override fun read(): PublishMessage {
-            return PublishMessage(
-                topic = mMessageTopicName,
-                //type = mMessageTypeName,
-                msg = mReading
-            )
-    }
+
 
     private fun askForPermissions(context: Context, activity: Activity) {
         // Ask nicely for permissions to use the GPS.

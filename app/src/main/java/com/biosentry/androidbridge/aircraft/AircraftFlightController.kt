@@ -4,6 +4,7 @@ import android.util.Log
 import android.util.Log.WARN
 import com.biosentry.androidbridge.communication.*
 import dji.common.error.DJIError
+import dji.common.flightcontroller.FlightControllerState
 import dji.common.flightcontroller.virtualstick.FlightControlData
 import dji.common.util.CommonCallbacks
 import dji.sdk.products.Aircraft
@@ -12,10 +13,40 @@ import java.lang.Exception
 import kotlin.reflect.KClass
 import kotlin.reflect.jvm.javaMethod
 
-class AircraftFlightControls : IROSDevice
+class AircraftFlightController : IROSDevice
 {
     // Cached instance of FlightControlData to remove need for reconstructing.
     private var mFlightControlData = FlightControlData(0.0F, 0.0F, 0.0F, 0.0F)
+    val mAccelerometer = ROSAccelerometer("/android/drone/accelerometer")
+    val mGyroscope = ROSGyroscope("/android/drone/gyroscope")
+    val mGPS = ROSGPS("/android/drone/GPS")
+
+    private val mStateCallback = FlightControllerState.Callback { p0 ->
+        p0?.let {
+
+            mAccelerometer.updateData(Vector3(
+                it.velocityX.toDouble(),
+                it.velocityY.toDouble(),
+                it.velocityZ.toDouble()
+            ))
+
+            mGyroscope.updateData( Point(
+                it.attitude.roll,
+                it.attitude.pitch,
+                it.attitude.yaw
+            ))
+
+            mGPS.updateData(NavSatFix(
+                mGPS.mHeader,
+                mGPS.mStatus,
+                if(it.aircraftLocation.latitude.isNaN()) 0.0 else it.aircraftLocation.latitude,
+                if(it.aircraftLocation.longitude.isNaN()) 0.0 else it.aircraftLocation.longitude,
+                if(it.aircraftLocation.altitude.isNaN()) 0.0 else it.aircraftLocation.altitude.toDouble(),
+                DoubleArray(9),
+                0
+            ))
+        }
+    }
 
     private fun doWriteFlightControlData(msg : ROSMessage )
     {
@@ -87,5 +118,7 @@ class AircraftFlightControls : IROSDevice
         val product = DJISDKManager.getInstance().product
         if(product !is Aircraft || !product.isConnected)
             Log.w(this.javaClass.simpleName, "A valid aircraft must be connected for this class to handle commands." )
+        else
+            product.flightController.setStateCallback(mStateCallback)
     }
 }

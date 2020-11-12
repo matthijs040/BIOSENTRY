@@ -28,10 +28,10 @@ class ROSCamera(
     activity: Activity,
     private val context: Context,
     private val FPS: Int = 10
-) : IROSSensor
+)
 {
     // ===================================== IMPLEMENTATION OF ROS-SENSOR INTERFACE =====================================
-    override var mDataHandler :  ((PublishMessage) -> Unit )? = null
+    var mDataHandler :  ((PublishMessage) -> Unit )? = null
     var mErrorHandler : ((String) -> Unit)? = null
 
     private var mSequenceNumber : Long = 0
@@ -45,12 +45,12 @@ class ROSCamera(
         ""
     )
 
-    override val mMessageTypeName: String
+    val mMessageTypeName: String
         get() = "/sensor_msgs/CompressedImage"
-    override val mMessageTopicName: String
+    val mMessageTopicName: String
         get() = "/android/phone/image_raw/compressed"
 
-    override fun read(): PublishMessage {
+    fun read(): PublishMessage {
         return PublishMessage(
             //type = mMessageTypeName,
             topic = mMessageTopicName,
@@ -63,7 +63,8 @@ class ROSCamera(
     private val mGoldenEye = GoldenEye.Builder(activity).build() // Main wrapper object.
     private var mTextureView : TextureView = TextureView(context)  // UI element to show output on.
 
-    override val mAdvertiseMessage = AdvertiseMessage(
+
+    val mAdvertiseMessage = AdvertiseMessage(
         type = mMessageTypeName,
         topic = mMessageTopicName
     )

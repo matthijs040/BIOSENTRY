@@ -14,6 +14,9 @@ interface IROSSensor {
     // Push interface. Allows user to set function here to receive data as it comes in.
     var mDataHandler :  ( (PublishMessage) -> Unit)?
 
+    // Function that allows external introduction of correct data.
+    fun updateData( data : ROSMessage)
+
     // Pull interface. Allows user to request latest data when needed.
     fun read() : PublishMessage
 }

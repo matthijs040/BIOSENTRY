@@ -35,16 +35,14 @@ class MainActivity : AppCompatActivity() {
     private var mROSMessageHandler : ROSMessageHandler? = null
     private val mMessageSerializer = GsonSerializer()
 
-    private var mROSAccelerometer : ROSAccelerometer? = null
-    private var mROSGyroscope : ROSGyroscope? = null
-    private var mROSGPS : ROSGPS? = null
+
+    private var mPhoneAccelerometer : PhoneAccelerometer? = null
+    private var mPhoneGyroscope : PhoneGyroscope? = null
+    private var mPhoneGPS : PhoneGPS? = null
     var mROSCamera : ROSCamera? = null
     
-    private var mAircraftIMU : AircraftIMU? = null
-    private var mAircraftGyro : AircraftGyroscope? = null
-    private var mAircraftGPS : AircraftGPS? = null
     var mAircraftCamera : AircraftCamera? = null
-    private val mAircraftFlightControls = AircraftFlightControls()
+    private var mAircraftFlightController : AircraftFlightController? = null
 
     var mAircraftHandler : DJIAircraftHandler? = null
     var mLatestAircraftStatus : String? = null
@@ -84,9 +82,9 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
 
         // Setup "ROS" hardware classes
-        mROSAccelerometer   = ROSAccelerometer(baseContext)
-        mROSGyroscope       = ROSGyroscope(baseContext)
-        mROSGPS             = ROSGPS(baseContext, this)
+         mPhoneAccelerometer   = PhoneAccelerometer(baseContext)
+         mPhoneGyroscope       = PhoneGyroscope(baseContext)
+         mPhoneGPS             = PhoneGPS(baseContext, this)
         //mROSCamera          = ROSCamera(this, this.baseContext)
 
 
@@ -129,37 +127,24 @@ class MainActivity : AppCompatActivity() {
 
     private fun attachDevices()
     {
-        Thread.sleep(100) // sleep to make the server properly register the client before sending event driven publishes to it.
         // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html
-        mROSAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
-        mROSGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
-        mROSGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
-        mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
-
-
-        mAircraftGPS?.let {
-            //TV_Debug?.text = "${TV_Debug.text}\nAircraft GPS is attached."
-            mROSMessageHandler?.attachSensor(it, 0)
-        }
-
-        mAircraftIMU?.let {
-            //TV_Debug?.text = "${TV_Debug.text}\nAircraft IMU is attached."
-            mROSMessageHandler?.attachSensor(it, 0)
-        }
-
-        mAircraftGyro?.let {
-            //TV_Debug?.text = "${TV_Debug.text}\nAircraft Gyro is attached."
-            mROSMessageHandler?.attachSensor(it, 0)
-        }
+        mPhoneAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
+        mPhoneGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
+        mPhoneGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
+       //mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
 
 
         if(mAircraftHandler != null && mAircraftHandler!!.mAircraftConnected)
         {
-            mROSMessageHandler?.attachDevice(mAircraftFlightControls)
+            mAircraftFlightController?.let {
+                mROSMessageHandler?.attachDevice(it)
+                mROSMessageHandler?.attachSensor(it.mAccelerometer, 0)
+                Thread.sleep(1000)
+                mROSMessageHandler?.attachSensor(it.mGyroscope, 0)
+                Thread.sleep(1000)
+                mROSMessageHandler?.attachSensor(it.mGPS, 0)
+            }
         }
-
-
-
     }
 
     private fun detachDevices()
@@ -187,9 +172,7 @@ class MainActivity : AppCompatActivity() {
 
         if(mAircraftHandler?.mAircraftConnected!!)
         {
-            mAircraftIMU = AircraftIMU()
-            mAircraftGPS = AircraftGPS()
-            mAircraftGyro = AircraftGyroscope()
+            mAircraftFlightController = AircraftFlightController()
             TV_Debug?.text = "${TV_Debug.text}\nConstructing Aircraft sensors."
         }
     }
