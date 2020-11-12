@@ -87,7 +87,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
                },600, rateInMs )
         }
 
-        Log.d(this.javaClass.simpleName, "attached sensor: $sensor")
+        Log.d(this.javaClass.simpleName, "attached sensor: " + sensor.javaClass.simpleName)
 
         return true
     }
@@ -98,7 +98,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
             resubscribe(it.message)
 
             mControls.add(it)
-            Log.d(this.javaClass.simpleName, "attached control: $it")
+            Log.d(this.javaClass.simpleName, "attached control: " + it.javaClass.simpleName)
         }
     }
 

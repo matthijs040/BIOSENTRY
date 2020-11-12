@@ -15,8 +15,8 @@ import com.biosentry.androidbridge.communication.Vector3
  * Class containing logic to fetch accelerometer data from Android's native HAL.
  */
 class ROSAccelerometer(context: Context,
-                       messageTypeName : String = "geometry_msgs/Vector3",
-                       topicName : String = "android/phone/accelerometer" ) : IROSSensor
+                       messageTypeName : String = "/geometry_msgs/Vector3",
+                       topicName : String = "/android/phone/accelerometer" ) : IROSSensor
 {
     override val mMessageTypeName: String = messageTypeName
     override val mMessageTopicName: String = topicName

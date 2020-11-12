@@ -15,8 +15,8 @@ import com.biosentry.androidbridge.communication.Vector3
  * Class containing logic to fetch gyroscope data from Android's native HAL.
  */
 class ROSGyroscope(context: Context,
-                   override val mMessageTypeName: String = "geometry_msgs/Vector3",
-                   override val mMessageTopicName: String = "android/phone/gyroscope"
+                   override val mMessageTypeName: String = "/geometry_msgs/Vector3",
+                   override val mMessageTopicName: String = "/android/phone/gyroscope"
 ) : IROSSensor
 {
 

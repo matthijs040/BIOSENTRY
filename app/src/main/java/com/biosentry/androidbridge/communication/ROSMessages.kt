@@ -177,7 +177,7 @@ enum class FlightActions()
     }
 }
 
-//type: "dji_msgs/AircraftFlightActions"
+//type: "biosentry/AircraftFlightActions"
 data class AircraftFlightActions(val flightActions: FlightActions): ROSMessage
 
 data class AircraftFlightActionsInt(val flightActions: Int ) : ROSMessage

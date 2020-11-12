@@ -11,15 +11,13 @@ import java.lang.Exception
 
 class AircraftIMU() : IROSSensor
 {
-    override var mMessageTypeName: String = "geometry_msgs/Vector3"
+    override val mMessageTypeName = "geometry_msgs/Vector3"
+    override val mMessageTopicName = "/android/drone/IMU"
+    override val mAdvertiseMessage = AdvertiseMessage(
+        type = mMessageTypeName,
+        topic = mMessageTopicName
+    )
 
-    // Can be renamed in case of different drone connected to phone at run time.
-    override var mMessageTopicName: String = ""
-        set(value)
-        {
-            mReading.topic = value
-            field = value
-        }
 
     override var mDataHandler: ((PublishMessage) -> Unit)? = null
 
@@ -34,10 +32,6 @@ class AircraftIMU() : IROSSensor
             )
     )
 
-    override val mAdvertiseMessage = AdvertiseMessage(
-        type = mMessageTypeName,
-        topic = mMessageTopicName
-    )
 
     private val mIMUCallback = FlightControllerState.Callback { p0 ->
         if(p0 != null)
@@ -47,8 +41,7 @@ class AircraftIMU() : IROSSensor
                 p0.velocityY.toDouble(),
                 p0.velocityZ.toDouble()
             )
-            if(mDataHandler != null)
-                mDataHandler!!.invoke(read())
+            mDataHandler?.invoke(read())
         }
 
     }
@@ -63,8 +56,7 @@ class AircraftIMU() : IROSSensor
             throw Exception("Valid Aircraft required for initialization")
         else
         {
-            mMessageTopicName = String.format("android/%s/IMU", product.model.name)
-            product.flightController?.setStateCallback(mIMUCallback)
+            product.flightController!!.setStateCallback(mIMUCallback)
         }
 
     }

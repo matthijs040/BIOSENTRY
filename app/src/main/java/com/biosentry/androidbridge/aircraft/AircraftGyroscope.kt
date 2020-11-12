@@ -10,15 +10,13 @@ import dji.sdk.sdkmanager.DJISDKManager
 import java.lang.Exception
 
 class AircraftGyroscope : IROSSensor {
-    override var mMessageTypeName: String = "geometry_msgs/Point"
 
-    // Can be renamed in case of different drone connected to phone at run time.
-    override var mMessageTopicName: String = ""
-        set(value)
-        {
-            mReading.topic = value
-            field = value
-        }
+    override val mMessageTypeName: String = "/geometry_msgs/Point"
+    override val mMessageTopicName = "/android/drone/Gyro"
+    override val mAdvertiseMessage = AdvertiseMessage(
+        type = mMessageTypeName,
+        topic = mMessageTopicName
+    )
 
     override var mDataHandler: ((PublishMessage) -> Unit)? = null
 
@@ -51,18 +49,14 @@ class AircraftGyroscope : IROSSensor {
         return mReading
     }
 
-    override val mAdvertiseMessage = AdvertiseMessage(
-        type = mMessageTypeName,
-        topic = mMessageTopicName
-    )
+
 
     init {
         val product = DJISDKManager.getInstance().product
-        if(product !is Aircraft || product.model == null)
+        if(product !is Aircraft || !product.isConnected)
             throw Exception("Valid Aircraft required for initialization")
         else
         {
-            mMessageTopicName = String.format("android/%s/Gyro", product.model.name)
             product.flightController?.setStateCallback(mGyroCallback)
         }
     }

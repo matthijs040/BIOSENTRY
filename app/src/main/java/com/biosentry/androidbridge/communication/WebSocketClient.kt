@@ -56,6 +56,7 @@ class WebSocketClient(uri: String) : IJSONTranceiver {
 
     fun disconnect()
     {
+        mWebSocket.sendClose()
         mWebSocket.disconnect()
     }
 }

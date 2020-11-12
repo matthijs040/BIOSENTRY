@@ -46,9 +46,9 @@ class ROSCamera(
     )
 
     override val mMessageTypeName: String
-        get() = "sensor_msgs/CompressedImage"
+        get() = "/sensor_msgs/CompressedImage"
     override val mMessageTopicName: String
-        get() = "android/phone/image_raw/compressed"
+        get() = "/android/phone/image_raw/compressed"
 
     override fun read(): PublishMessage {
         return PublishMessage(

@@ -136,18 +136,22 @@ class MainActivity : AppCompatActivity() {
         mROSGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
 
-        mAircraftIMU?.let {
-            //TV_Debug?.text = "${TV_Debug.text}\nAircraft IMU is attached."
-            mROSMessageHandler?.attachSensor(it, 0)
-        }
-        mAircraftGyro?.let {
-            //TV_Debug?.text = "${TV_Debug.text}\nAircraft Gyro is attached."
-            mROSMessageHandler?.attachSensor(it, 0)
-        }
+
         mAircraftGPS?.let {
             //TV_Debug?.text = "${TV_Debug.text}\nAircraft GPS is attached."
             mROSMessageHandler?.attachSensor(it, 0)
         }
+
+        mAircraftIMU?.let {
+            //TV_Debug?.text = "${TV_Debug.text}\nAircraft IMU is attached."
+            mROSMessageHandler?.attachSensor(it, 0)
+        }
+
+        mAircraftGyro?.let {
+            //TV_Debug?.text = "${TV_Debug.text}\nAircraft Gyro is attached."
+            mROSMessageHandler?.attachSensor(it, 0)
+        }
+
 
         if(mAircraftHandler != null && mAircraftHandler!!.mAircraftConnected)
         {
@@ -184,8 +188,8 @@ class MainActivity : AppCompatActivity() {
         if(mAircraftHandler?.mAircraftConnected!!)
         {
             mAircraftIMU = AircraftIMU()
-            mAircraftGyro = AircraftGyroscope()
             mAircraftGPS = AircraftGPS()
+            mAircraftGyro = AircraftGyroscope()
             TV_Debug?.text = "${TV_Debug.text}\nConstructing Aircraft sensors."
         }
     }
@@ -193,6 +197,7 @@ class MainActivity : AppCompatActivity() {
     fun WebSocketDisconnectClicked() {
 
         mWebSocketClient?.disconnect()
+
     }
 
     fun RTMPConnectClicked()

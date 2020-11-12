@@ -21,9 +21,9 @@ import com.biosentry.androidbridge.communication.NavSatStatus.Companion.STATUS_N
 class ROSGPS(context: Context, activity: Activity) : IROSSensor
 {
     override val mMessageTypeName: String
-        get() = "sensor_msgs/NavSatFix"
+        get() = "/sensor_msgs/NavSatFix"
     override val mMessageTopicName: String
-        get() = "android/phone/gps"
+        get() = "/android/phone/gps"
 
     private var mLocationManager: LocationManager = context.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 

@@ -7,16 +7,14 @@ import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
 import java.lang.Exception
 
-class AircraftGPS : IROSSensor {
-    override var mMessageTypeName: String = "sensor_msgs/NavSatFix"
-
-    // Can be renamed in case of different drone connected to phone at run time.
-    override var mMessageTopicName: String = ""
-        set(value)
-        {
-            mReading.topic = value
-            field = value
-        }
+class AircraftGPS : IROSSensor
+{
+    override val mMessageTypeName = "/sensor_msgs/NavSatFix"
+    override val mMessageTopicName = "/android/drone/GPS"
+    override val mAdvertiseMessage = AdvertiseMessage(
+        type = mMessageTypeName,
+        topic = mMessageTopicName
+    )
 
     var mSatelliteCount : Int = 0
         private set
@@ -83,14 +81,10 @@ class AircraftGPS : IROSSensor {
             throw Exception("Valid Aircraft required for initialization")
         else
         {
-            mMessageTopicName = String.format("android/%s/GPS", product.model.name)
             product.flightController?.setStateCallback(mGPSCallback)
         }
 
     }
 
-    override val mAdvertiseMessage = AdvertiseMessage(
-        type = mMessageTypeName,
-        topic = mMessageTopicName
-    )
+
 }
