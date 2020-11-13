@@ -12,6 +12,7 @@ data class AdvertiseMessage(
     val id : String? = null
 ) : BridgeMessage
 
+
 data class UnadvertiseMessage (
     val op : String = "unadvertise",
     val topic : String,
@@ -74,6 +75,7 @@ data class RegionOfInterest( val x_offset : Long, val y_offset : Long,
  */
 data class Vector3( val x : Double, val y : Double, val z : Double): ROSMessage
 
+//geometry_msgs/Point
 data class Point( val x : Double, val y : Double, val z : Double): ROSMessage
 
 data class Quaternion( val x : Double, val y : Double, val z : Double, val w : Double): ROSMessage

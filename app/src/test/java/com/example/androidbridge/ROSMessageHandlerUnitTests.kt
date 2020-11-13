@@ -119,6 +119,37 @@ class ROSMessageHandlerUnitTests {
 
     }
 
+    @Test
+    fun messageHandler_test_attach_multi_control_device()
+    {
+        val mockDevice = MultiControlDeviceMock()
+
+        val msg1 = PublishMessage(
+            topic = "/biosentry/AircraftFlightActions",
+            msg = AircraftFlightActionsInt(1)
+        )
+
+        val msg2 = PublishMessage(
+            topic = "/geometry_msgs/Twist",
+            msg = Twist(
+                Vector3( 1.0,2.0,3.0),
+                Vector3(1.0,2.0,3.0)
+            )
+        )
+
+        mROSMessageHandler.attachDevice(mockDevice)
+        mTranceiver.send( mSerializer.toJson(msg1))
+        mTranceiver.send( mSerializer.toJson(msg2))
+
+        println("Actual1: " + mockDevice.mFActions)
+        println("Actual2: " + mockDevice.mTwist)
+
+        assert(mROSMessageHandler.mControls.size == 2)
+
+        assert( mockDevice.mFActions != null ) //msg cannot be compared as conversion between types is done.
+        assert( mockDevice.mTwist == msg2.msg)
+    }
+
 
 
 

@@ -1,7 +1,6 @@
 package com.biosentry.androidbridge.aircraft
 
 import android.util.Log
-import android.util.Log.WARN
 import com.biosentry.androidbridge.communication.*
 import dji.common.error.DJIError
 import dji.common.flightcontroller.FlightControllerState
@@ -9,9 +8,6 @@ import dji.common.flightcontroller.virtualstick.FlightControlData
 import dji.common.util.CommonCallbacks
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
-import java.lang.Exception
-import kotlin.reflect.KClass
-import kotlin.reflect.jvm.javaMethod
 
 class AircraftFlightController : IROSDevice
 {
@@ -46,6 +42,11 @@ class AircraftFlightController : IROSDevice
                 0
             ))
         }
+    }
+
+    private fun doNothing() /* no-op */
+    {
+
     }
 
     private fun doWriteFlightControlData(msg : ROSMessage )
@@ -110,8 +111,8 @@ class AircraftFlightController : IROSDevice
     }
 
     override val mControls: List<ROSControl> = listOf(
+        ROSControl(SubscribeMessage(type = "/geometry_msgs/Twist", topic = "/geometry_msgs/Twist"), ::doWriteFlightControlData),
         ROSControl(SubscribeMessage(type = "/biosentry/AircraftFlightActions", topic = "/biosentry/AircraftFlightActions"),     ::doAircraftFlightAction),
-        ROSControl(SubscribeMessage(type = "/geometry_msgs/Twist", topic = "/geometry_msgs/Twist"), ::doWriteFlightControlData)
     )
 
     init {

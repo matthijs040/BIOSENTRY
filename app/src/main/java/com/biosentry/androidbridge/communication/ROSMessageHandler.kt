@@ -11,10 +11,10 @@ import kotlin.concurrent.timerTask
 
 
 
+
 class ROSMessageHandler(private val bridge : IJSONTranceiver,
                         private val mSerializer : IBridgeMessageSerializer)
 {
-
     private val messagingTimer = Timer()
     private val devicePollingTimer = Timer()
     val mControls = mutableListOf<ROSControl>()
@@ -37,21 +37,17 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
                     send(msg)
                     Thread.sleep(retransmitDelay * 200) // Waiting for some arbitrary process might take long. This should be a non-performance affecting routine.
                 }
-            }, retransmitDelay
+            }, 20
         )
     }
 
     private fun retransmit(msg : BridgeMessage, times : Int)
     {
-        messagingTimer.schedule(
-            timerTask {
-                for( x in 0 .. times)
-                {
-                    send(msg) // send second time in case of bad reception.
-                    Thread.sleep(retransmitDelay)
-                }
-            }, retransmitDelay
-        )
+        for( x in 0 .. times)
+        {
+            send(msg) // send second time in case of bad reception.
+            Thread.sleep(retransmitDelay)
+        }
     }
 
     private fun recv(jsonData : String)
@@ -75,32 +71,39 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     fun attachSensor(sensor: IROSSensor, rateInMs: Long ) : Boolean
     {
-        retransmit(sensor.mAdvertiseMessage, 3 )
+        retransmit(sensor.mAdvertiseMessage, 5 )
         if(rateInMs <= 0L)
         {
             sensor.mDataHandler = ::send
+            Log.println(Log.INFO, this.javaClass.simpleName, "attached sensor: " + sensor.javaClass.simpleName)
         }
         else
         {
            devicePollingTimer.schedule(
                timerTask {
                    send( sensor.read() )
-               },600, rateInMs )
+               },1000, rateInMs
+
+           )
+            Log.println(Log.INFO, this.javaClass.simpleName, "attached sensor: " + sensor.javaClass.simpleName)
         }
-
-        Log.d(this.javaClass.simpleName, "attached sensor: " + sensor.javaClass.simpleName)
-
         return true
     }
 
     fun attachDevice(device : IROSDevice)
     {
         device.mControls.forEach{
-            resubscribe(it.message)
-
-            mControls.add(it)
-            Log.d(this.javaClass.simpleName, "attached control: " + it.javaClass.simpleName)
+            attachControl(it)
         }
+    }
+
+    fun attachControl(control : ROSControl)
+    {
+        retransmit(control.message, 3) // Quick bursts of advertisements for initial connection.
+        Thread.sleep(50)
+        resubscribe(control.message) // Resubscribe for long term connection maintenance.
+        mControls.add(control)
+        //Log.println(Log.INFO, this.javaClass.simpleName, "attached control: " + control.javaClass.simpleName)
     }
 
     fun removeSensors()

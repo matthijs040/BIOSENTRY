@@ -9,6 +9,9 @@ class ROSTwistSensorMock : IROSSensor{
         AdvertiseMessage(type =  mMessageTypeName, topic =  mMessageTopicName)
 
     override var mDataHandler: ((PublishMessage) -> Unit)? = null
+    override fun updateData(data: ROSMessage) {
+        /* no-op */
+    }
 
     val mReading = PublishMessage(
         topic = mMessageTopicName,

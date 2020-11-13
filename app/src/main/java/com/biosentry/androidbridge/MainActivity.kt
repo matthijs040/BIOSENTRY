@@ -137,12 +137,11 @@ class MainActivity : AppCompatActivity() {
         if(mAircraftHandler != null && mAircraftHandler!!.mAircraftConnected)
         {
             mAircraftFlightController?.let {
-                mROSMessageHandler?.attachDevice(it)
                 mROSMessageHandler?.attachSensor(it.mAccelerometer, 0)
-                Thread.sleep(1000)
                 mROSMessageHandler?.attachSensor(it.mGyroscope, 0)
-                Thread.sleep(1000)
                 mROSMessageHandler?.attachSensor(it.mGPS, 0)
+
+                mROSMessageHandler?.attachDevice(it)
             }
         }
     }

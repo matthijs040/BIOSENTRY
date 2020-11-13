@@ -30,6 +30,10 @@ class ROSNavSatFixSensorMock() : IROSSensor
         field = value
     }
 
+    override fun updateData(data: ROSMessage) {
+
+    }
+
     private val mHeader = Header(1, time(2,3), "N.A.")
     private val mStatus = NavSatStatus(
         NavSatStatus.STATUS_NO_FIX,

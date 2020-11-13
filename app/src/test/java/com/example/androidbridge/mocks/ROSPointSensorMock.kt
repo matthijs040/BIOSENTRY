@@ -1,9 +1,6 @@
 package com.example.androidbridge.mocks
 
-import com.biosentry.androidbridge.communication.AdvertiseMessage
-import com.biosentry.androidbridge.communication.IROSSensor
-import com.biosentry.androidbridge.communication.Point
-import com.biosentry.androidbridge.communication.PublishMessage
+import com.biosentry.androidbridge.communication.*
 
 class ROSPointSensorMock : IROSSensor {
     override val mMessageTypeName: String = "/geometry_msgs/Point"
@@ -12,6 +9,9 @@ class ROSPointSensorMock : IROSSensor {
         AdvertiseMessage(type =  mMessageTypeName, topic =  mMessageTopicName)
 
     override var mDataHandler: ((PublishMessage) -> Unit)? = null
+    override fun updateData(data: ROSMessage) {
+        /* no-op */
+    }
 
     val mReading = PublishMessage(
         topic = mMessageTopicName,
