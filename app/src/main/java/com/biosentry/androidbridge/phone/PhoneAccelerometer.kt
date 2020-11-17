@@ -11,7 +11,7 @@ import com.biosentry.androidbridge.communication.*
 /**
  * Class containing logic to fetch accelerometer data from Android's native HAL.
  */
-class PhoneAccelerometer(context: Context) : ROSAccelerometer("/accelerometer")
+class PhoneAccelerometer(context: Context) : ROSAccelerometer("/android/phone/accelerometer")
 {
 
     // Android HAL objects exposing the phone's sensors.

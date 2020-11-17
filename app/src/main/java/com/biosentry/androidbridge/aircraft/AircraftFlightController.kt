@@ -13,9 +13,9 @@ class AircraftFlightController : IROSDevice
 {
     // Cached instance of FlightControlData to remove need for reconstructing.
     private var mFlightControlData = FlightControlData(0.0F, 0.0F, 0.0F, 0.0F)
-    var mAccelerometer : ROSAccelerometer? = null
-    var mGyroscope : ROSGyroscope? = null
-    var mGPS : ROSGPS? = null
+    val mAccelerometer : ROSAccelerometer = ROSAccelerometer( mMessageTopicName = "/android/drone/accelerometer")
+    val mGyroscope : ROSGyroscope = ROSGyroscope( mMessageTopicName = "/android/drone/gyroscope")
+    val mGPS : ROSGPS = ROSGPS( mMessageTopicName = "/android/drone/gps")
 
     private val mStateCallback = FlightControllerState.Callback { p0 ->
         p0?.let {
@@ -121,9 +121,6 @@ class AircraftFlightController : IROSDevice
             Log.w(this.javaClass.simpleName, "A valid aircraft must be connected for this class to handle commands." )
         else
         {
-            mAccelerometer =  ROSAccelerometer( mMessageTopicName = "/android/drone/accelerometer")
-            mGyroscope =  ROSGyroscope(         mMessageTopicName = "/android/drone/gyroscope")
-            mGPS =  ROSGPS(                     mMessageTopicName = "/android/drone/gps")
             product.flightController.setStateCallback(mStateCallback)
         }
 

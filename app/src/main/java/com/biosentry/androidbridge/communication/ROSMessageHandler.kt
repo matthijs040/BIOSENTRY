@@ -71,14 +71,28 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     fun attachSensor(sensor: IROSSensor, rateInMs: Long ) : Boolean
     {
-        retransmit(sensor.mAdvertiseMessage, 3 )
+        retransmit(sensor.mAdvertiseMessage, 2)
+        messagingTimer.schedule(
+            timerTask {
+                retransmit(sensor.mAdvertiseMessage, 2 )
+            }, 500
+        )
+
+        messagingTimer.schedule(
+            timerTask {
+                retransmit(sensor.mAdvertiseMessage, 4 )
+            }, 1000
+        )
+
+        messagingTimer.schedule(
+            timerTask {
+                retransmit(sensor.mAdvertiseMessage, 4 )
+            }, 1500
+        )
+
         if(rateInMs <= 0L)
         {
-            devicePollingTimer.schedule(
-                timerTask {
-                    sensor.mDataHandler = ::send
-                }, 2000
-            )
+            sensor.mDataHandler = ::send
 
             println(this.javaClass.simpleName + " | attached sensor: " + sensor.javaClass.simpleName)
         }
@@ -123,8 +137,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
         bridge.attachHandler {
             mCanSend = it == STATE.CONNECTED
-            send( SetStatusLevelMessage( level = "error" ) )
-            send(AdvertiseMessage(topic = "/android/dummy", type = "std_msgs/Empty"))
+            send( SetStatusLevelMessage( level = "info" ) )
         }
     }
 }
