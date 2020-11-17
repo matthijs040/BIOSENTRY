@@ -1,16 +1,14 @@
 package com.biosentry.androidbridge.communication
 
+import android.app.ActivityManager
 import android.app.Application
 import android.util.Log
+import com.biosentry.androidbridge.MApplication
 import com.biosentry.androidbridge.serialization.IBridgeMessageSerializer
 import com.google.gson.*
 import java.lang.reflect.Type
 import java.util.*
 import kotlin.concurrent.timerTask
-
-
-
-
 
 class ROSMessageHandler(private val bridge : IJSONTranceiver,
                         private val mSerializer : IBridgeMessageSerializer)
@@ -18,11 +16,13 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
     private val messagingTimer = Timer()
     private val devicePollingTimer = Timer()
     val mControls = mutableListOf<ROSControl>()
-    private val retransmitDelay : Long = 10
+    private val retransmitDelay : Long = 50
+    private var mCanSend : Boolean = true
 
     fun send(data : BridgeMessage)
     {
-        bridge.send(mSerializer.toJson(data))
+        if(mCanSend)
+            bridge.send(mSerializer.toJson(data))
     }
 
     /**
@@ -71,11 +71,16 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     fun attachSensor(sensor: IROSSensor, rateInMs: Long ) : Boolean
     {
-        retransmit(sensor.mAdvertiseMessage, 5 )
+        retransmit(sensor.mAdvertiseMessage, 3 )
         if(rateInMs <= 0L)
         {
-            sensor.mDataHandler = ::send
-            Log.println(Log.INFO, this.javaClass.simpleName, "attached sensor: " + sensor.javaClass.simpleName)
+            devicePollingTimer.schedule(
+                timerTask {
+                    sensor.mDataHandler = ::send
+                }, 2000
+            )
+
+            println(this.javaClass.simpleName + " | attached sensor: " + sensor.javaClass.simpleName)
         }
         else
         {
@@ -85,7 +90,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
                },1000, rateInMs
 
            )
-            Log.println(Log.INFO, this.javaClass.simpleName, "attached sensor: " + sensor.javaClass.simpleName)
+            println(this.javaClass.simpleName + " | attached sensor: " + sensor.javaClass.simpleName)
         }
         return true
     }
@@ -103,7 +108,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
         Thread.sleep(50)
         resubscribe(control.message) // Resubscribe for long term connection maintenance.
         mControls.add(control)
-        //Log.println(Log.INFO, this.javaClass.simpleName, "attached control: " + control.javaClass.simpleName)
+        println(this.javaClass.simpleName + " | attached control: " + control.javaClass.simpleName)
     }
 
     fun removeSensors()
@@ -114,6 +119,12 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     init
     {
-        bridge.mReceiver = ::recv
+        bridge.attachReceiver(::recv)
+
+        bridge.attachHandler {
+            mCanSend = it == STATE.CONNECTED
+            send( SetStatusLevelMessage( level = "error" ) )
+            send(AdvertiseMessage(topic = "/android/dummy", type = "std_msgs/Empty"))
+        }
     }
 }

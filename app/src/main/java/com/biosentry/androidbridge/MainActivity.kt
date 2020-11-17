@@ -137,9 +137,9 @@ class MainActivity : AppCompatActivity() {
         if(mAircraftHandler != null && mAircraftHandler!!.mAircraftConnected)
         {
             mAircraftFlightController?.let {
-                mROSMessageHandler?.attachSensor(it.mAccelerometer, 0)
-                mROSMessageHandler?.attachSensor(it.mGyroscope, 0)
-                mROSMessageHandler?.attachSensor(it.mGPS, 0)
+                it.mAccelerometer?.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
+                it.mGyroscope?.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
+                it.mGPS?.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
 
                 mROSMessageHandler?.attachDevice(it)
             }
@@ -157,8 +157,7 @@ class MainActivity : AppCompatActivity() {
         mWebSocketClient = WebSocketClient(TB_URL.text.toString())
 
         mWebSocketClient!!.mErrorHandler  = ::webSocketWriteError
-        mWebSocketClient!!.mStateHandler = ::webSocketWriteStatus
-        mWebSocketClient!!.mReceiver   = ::receiveData
+        mWebSocketClient!!.attachHandler(::webSocketWriteStatus)
 
         try {
             mROSMessageHandler = ROSMessageHandler(mWebSocketClient!!, mMessageSerializer)

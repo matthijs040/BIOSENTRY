@@ -3,6 +3,7 @@ package com.example.androidbridge
 import com.biosentry.androidbridge.communication.*
 import com.biosentry.androidbridge.serialization.GsonSerializer
 import com.example.androidbridge.mocks.*
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 /**
@@ -44,16 +45,27 @@ class ROSMessageHandlerUnitTests {
     {
         val mockSensor = ROSPointSensorMock()
         val expected = mSerializer.toJson(mockSensor.mReading)
-
+        val actual = mutableListOf<String>()
+        mTranceiver.attachReceiver {
+            actual.add(it)
+        }
         // Rate 100. messageHandler takes mock message every 100ms.
         mROSMessageHandler.attachSensor(mockSensor, 10)
 
-        Thread.sleep(650) // Sleep until after advertise re-broadcast and publish startup delay.
+        runBlocking {
+            while ( actual.size < 10) // once the sensor is done with advertising and is sending data.
+                Thread.sleep(50)
+        }
+
 
         println("Expected: $expected")
-        println("Actual: " + mTranceiver.recv())
 
-        assert(expected == mTranceiver.recv() )
+        print("Actual: ")
+        actual.forEach {
+            println(it)
+        }
+
+        assert(actual.last() == expected)
     }
 
     @Test
@@ -120,7 +132,7 @@ class ROSMessageHandlerUnitTests {
     }
 
     @Test
-    fun messageHandler_test_attach_multi_control_device()
+    fun messageHandler_test_attach_recv_multi_control_device()
     {
         val mockDevice = MultiControlDeviceMock()
 
@@ -148,6 +160,21 @@ class ROSMessageHandlerUnitTests {
 
         assert( mockDevice.mFActions != null ) //msg cannot be compared as conversion between types is done.
         assert( mockDevice.mTwist == msg2.msg)
+    }
+
+    @Test
+    fun messageHandler_test_attach_subscribe_multi_control_device()
+    {
+        val mockDevice = MultiControlDeviceMock()
+        val actual = mutableListOf<BridgeMessage>()
+        mTranceiver.attachReceiver {
+            actual.add(mSerializer.fromJson(it))
+        }
+        mROSMessageHandler.attachDevice(mockDevice)
+
+        mockDevice.mControls.forEach{
+            assert( actual.contains(it.message))
+        }
     }
 
 

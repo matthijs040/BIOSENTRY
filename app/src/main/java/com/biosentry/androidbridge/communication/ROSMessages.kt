@@ -40,6 +40,31 @@ data class UnsubscribeMessage( val op : String = "unsubscribe",
                                val topic : String
 ): BridgeMessage
 
+/**
+ * To construct a PNG compressed message, take the JSON string of the original message and read the bytes of the string into a PNG image.
+ * Then, ASCII-encode the image. This string is now used as the data field.
+ * If fragmentation is necessary, then fragment the data and set the ID, num and total fields to the appropriate values in the fragments.
+ * Otherwise these fields can be left out.
+ */
+data class PngMessage(
+    val op : String = "png",
+    val id : String? = null,
+    val data : String,
+    val num : Int? = null,
+    val total :  Int? = null
+) : BridgeMessage
+
+// level – one of 'info', 'warning', 'error', or 'none'
+// Could become string enum maybe?
+data class SetStatusLevelMessage( val op : String = "set_level",
+                                  val id : String? = null,
+                                  val level : String ) : BridgeMessage
+
+data class StatusMessage( val op : String = "status",
+                          val id : String? = null,
+                          val level : String,
+                          val msg : String ) : BridgeMessage
+
 //////////////////////// ROS MESSAGE DATA CLASSES ////////////////////////
 /**
  * http://docs.ros.org/noetic/api/std_msgs/html/msg/Header.html

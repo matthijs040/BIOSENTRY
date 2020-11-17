@@ -13,28 +13,28 @@ class AircraftFlightController : IROSDevice
 {
     // Cached instance of FlightControlData to remove need for reconstructing.
     private var mFlightControlData = FlightControlData(0.0F, 0.0F, 0.0F, 0.0F)
-    val mAccelerometer = ROSAccelerometer("/android/drone/accelerometer")
-    val mGyroscope = ROSGyroscope("/android/drone/gyroscope")
-    val mGPS = ROSGPS("/android/drone/GPS")
+    var mAccelerometer : ROSAccelerometer? = null
+    var mGyroscope : ROSGyroscope? = null
+    var mGPS : ROSGPS? = null
 
     private val mStateCallback = FlightControllerState.Callback { p0 ->
         p0?.let {
 
-            mAccelerometer.updateData(Vector3(
+            mAccelerometer!!.updateData(Vector3(
                 it.velocityX.toDouble(),
                 it.velocityY.toDouble(),
                 it.velocityZ.toDouble()
             ))
 
-            mGyroscope.updateData( Point(
+            mGyroscope!!.updateData( Point(
                 it.attitude.roll,
                 it.attitude.pitch,
                 it.attitude.yaw
             ))
 
-            mGPS.updateData(NavSatFix(
-                mGPS.mHeader,
-                mGPS.mStatus,
+            mGPS!!.updateData(NavSatFix(
+                mGPS!!.mHeader,
+                mGPS!!.mStatus,
                 if(it.aircraftLocation.latitude.isNaN()) 0.0 else it.aircraftLocation.latitude,
                 if(it.aircraftLocation.longitude.isNaN()) 0.0 else it.aircraftLocation.longitude,
                 if(it.aircraftLocation.altitude.isNaN()) 0.0 else it.aircraftLocation.altitude.toDouble(),
@@ -120,6 +120,13 @@ class AircraftFlightController : IROSDevice
         if(product !is Aircraft || !product.isConnected)
             Log.w(this.javaClass.simpleName, "A valid aircraft must be connected for this class to handle commands." )
         else
+        {
+            mAccelerometer =  ROSAccelerometer( mMessageTopicName = "/android/drone/accelerometer")
+            mGyroscope =  ROSGyroscope(         mMessageTopicName = "/android/drone/gyroscope")
+            mGPS =  ROSGPS(                     mMessageTopicName = "/android/drone/gps")
             product.flightController.setStateCallback(mStateCallback)
+        }
+
+
     }
 }

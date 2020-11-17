@@ -11,15 +11,30 @@ class WebSocketClient(uri: String) : IJSONTranceiver {
     private val mWebSocket : WebSocket = WebSocketFactory().createSocket(uri)
 
     var mErrorHandler  : ( (String) -> Unit )?      = null
-    override var mReceiver: ((String) -> Unit)? = null
-    override var mStateHandler: ((STATE) -> Unit)? = null
+    override val mStateHandlers: MutableList<(STATE) -> Unit> = mutableListOf()
+    override val mReceivers: MutableList<(String) -> Unit> = mutableListOf()
+
 
     private var mLastMessage : String = ""
 
     private val mWebSocketListener : WebSocketAdapter = object : WebSocketAdapter() {
         override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
             super.onFrame(websocket, frame)
-            frame?.let {  mReceiver?.invoke(it.payloadText) }
+
+            frame?.let {
+                invokeReceivers(it.payloadText)
+                Log.i("WebSocket", it.payloadText)
+            }
+        }
+
+        override fun onFrameUnsent(websocket: WebSocket?, frame: WebSocketFrame?) {
+            Log.e("WebSocket", "Unsent: " + frame?.payloadText)
+            super.onFrameUnsent(websocket, frame)
+        }
+
+        override fun onBinaryMessage(websocket: WebSocket?, binary: ByteArray?) {
+            Log.i("WebSocket", "BinFrame: " + binary.toString())
+            super.onBinaryMessage(websocket, binary)
         }
 
         override fun onError(websocket: WebSocket?, cause: WebSocketException?) {
@@ -32,10 +47,10 @@ class WebSocketClient(uri: String) : IJSONTranceiver {
             Log.println(Log.INFO, "WebSocket",  newState.toString() )
             if(newState == WebSocketState.OPEN)
             {
-                mStateHandler?.invoke(STATE.CONNECTED)
+                invokeHandlers(STATE.CONNECTED)
             }
             else
-                mStateHandler?.invoke(STATE.NOT_CONNECTED)
+                invokeHandlers(STATE.NOT_CONNECTED)
         }
     }
 
@@ -44,9 +59,9 @@ class WebSocketClient(uri: String) : IJSONTranceiver {
         mWebSocket.connectAsynchronously()
     }
 
-
     override fun send(data : String)
     {
+        Log.i("WebSocket", data)
         mWebSocket.sendFrame( WebSocketFrame.createTextFrame( data ) )
     }
 
