@@ -32,12 +32,8 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
     {
         messagingTimer.schedule(
             timerTask {
-                while(true)
-                {
-                    send(msg)
-                    Thread.sleep(retransmitDelay * 200) // Waiting for some arbitrary process might take long. This should be a non-performance affecting routine.
-                }
-            }, 20
+                    retransmit(msg, 3)
+            }, 20, retransmitDelay * 100
         )
     }
 
@@ -75,19 +71,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
         messagingTimer.schedule(
             timerTask {
                 retransmit(sensor.mAdvertiseMessage, 2 )
-            }, 500
-        )
-
-        messagingTimer.schedule(
-            timerTask {
-                retransmit(sensor.mAdvertiseMessage, 4 )
-            }, 1000
-        )
-
-        messagingTimer.schedule(
-            timerTask {
-                retransmit(sensor.mAdvertiseMessage, 4 )
-            }, 1500
+            }, 500, retransmitDelay * 10
         )
 
         if(rateInMs <= 0L)
@@ -118,8 +102,6 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
 
     fun attachControl(control : ROSControl)
     {
-        retransmit(control.message, 3) // Quick bursts of advertisements for initial connection.
-        Thread.sleep(50)
         resubscribe(control.message) // Resubscribe for long term connection maintenance.
         mControls.add(control)
         println(this.javaClass.simpleName + " | attached control: " + control.javaClass.simpleName)
@@ -134,7 +116,6 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
     init
     {
         bridge.attachReceiver(::recv)
-
         bridge.attachHandler {
             mCanSend = it == STATE.CONNECTED
             send( SetStatusLevelMessage( level = "info" ) )

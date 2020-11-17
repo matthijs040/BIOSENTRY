@@ -1,6 +1,7 @@
 package com.biosentry.androidbridge.aircraft
 
 import android.app.Activity
+import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
 import android.os.Looper
 import android.util.Log
@@ -21,7 +22,12 @@ class AircraftCamera(private val act: Activity) : TextureView.SurfaceTextureList
     var mCodecManager : DJICodecManager = DJICodecManager(act.baseContext, dummyTexture , 1280, 720 )
 
     private val mVideoDataListener = VideoFeeder.VideoDataListener { p0, p1 ->
+
+
         mCodecManager.sendDataToDecoder(p0, p1)
+        //mCodecManager.getBitmap {
+        //    println("bitmap | config: " + it.config.name + " | width: " + it.width + " | height: " + it.height)
+        //}
 
     }
 
