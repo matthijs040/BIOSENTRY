@@ -235,7 +235,8 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.READ_PHONE_STATE
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.RECORD_AUDIO
 
         )
         private const val REQUEST_PERMISSION_CODE = 12345

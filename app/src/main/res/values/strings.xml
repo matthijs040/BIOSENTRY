@@ -120,8 +120,6 @@
 
     // RTMP
     <string name="TV_RTMP_label">RTMP Server:</string>
-    <string name="TB_RTMP_URL">rtmp://DESKTOP-Matthijs:8080</string>
+    <string name="TB_RTMP_URL">rtmp://DESKTOP-Matthijs/LiveApp/689735772164177438895045</string>
     <string name="RTMP_hint">Put URI for an RTMP server here.</string>
-
-
 </resources>

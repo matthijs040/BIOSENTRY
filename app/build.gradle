@@ -111,4 +111,7 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.4.10"
+
+    // https://github.com/ant-media/LibRtmp-Client-for-Android For testing a different rtmp stream than the native DJI one.
+    implementation 'net.butterflytv.utils:rtmp-client:3.1.0'
 }

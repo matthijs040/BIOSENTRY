@@ -1,5 +1,6 @@
 package com.biosentry.androidbridge.phone
 
+/**
 import android.Manifest
 import android.app.Activity
 import android.content.Context
@@ -12,68 +13,42 @@ import androidx.core.content.ContextCompat
 import co.infinum.goldeneye.GoldenEye
 import co.infinum.goldeneye.InitCallback
 import co.infinum.goldeneye.PictureCallback
+import co.infinum.goldeneye.VideoCallback
 import co.infinum.goldeneye.models.Facing
 import com.biosentry.androidbridge.communication.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.lang.Exception
 import java.util.*
 import kotlin.concurrent.timerTask
 
 
 
-@Suppress("EXPERIMENTAL_API_USAGE")
+
 class ROSCamera(
     activity: Activity,
     private val context: Context,
     private val FPS: Int = 10
 )
 {
-    // ===================================== IMPLEMENTATION OF ROS-SENSOR INTERFACE =====================================
-    var mDataHandler :  ((PublishMessage) -> Unit )? = null
-    var mErrorHandler : ((String) -> Unit)? = null
-
-    private var mSequenceNumber : Long = 0
-    private var mReading : CompressedImage = CompressedImage(
-        Header(
-            mSequenceNumber,
-            time(0, 0),
-            ""
-        ),
-        "jpeg",
-        ""
-    )
-
-    val mMessageTypeName: String
-        get() = "/sensor_msgs/CompressedImage"
-    val mMessageTopicName: String
-        get() = "/android/phone/image_raw/compressed"
-
-    fun read(): PublishMessage {
-        return PublishMessage(
-            //type = mMessageTypeName,
-            topic = mMessageTopicName,
-            msg = mReading
-        )
-    }
-
-    // ===================================== /IMPLEMENTATION OF ROS-SENSOR INTERFACE =====================================
 
     private val mGoldenEye = GoldenEye.Builder(activity).build() // Main wrapper object.
     private var mTextureView : TextureView = TextureView(context)  // UI element to show output on.
 
 
-    val mAdvertiseMessage = AdvertiseMessage(
-        type = mMessageTypeName,
-        topic = mMessageTopicName
-    )
+    private val mVideoCallback = object : VideoCallback()
+    {
+
+
+    }
 
     private val mInitCallback = object : InitCallback()  // Callback to show error through.
     {
         override fun onError(t: Throwable) {
-            Log.println(Log.ERROR, "Camera", t.toString())
-            mErrorHandler?.invoke("InitCallback error: $t")
+            Log.e(this.javaClass.simpleName, t.toString())
+
         }
 
         override fun onActive() {
@@ -106,47 +81,20 @@ class ROSCamera(
     private val mPictureCallback = object : PictureCallback()
     {
         override fun onError(t: Throwable) {
-            Log.println(Log.ERROR, "ROSCamera picture", t.toString() )
-            mErrorHandler?.invoke("PictureCallback error: $t")
+            Log.e(this.javaClass.simpleName, t.toString() )
             mTextureView = TextureView(context)
 
     }
 
 
         override fun onPictureTaken(picture: Bitmap) {
-            mBitmapHandler?.invoke(picture)
-
             GlobalScope.launch {
 
-                // https://stackoverflow.com/questions/20329090/how-to-convert-a-bitmap-to-a-jpeg-file-in-android
-                val stream = ByteArrayOutputStream()
-                picture.compress(Bitmap.CompressFormat.JPEG, 0, stream)
-                val arr = stream.toByteArray().toUByteArray()
-
-
-
-                mReading = CompressedImage(
-                    Header(
-                        mSequenceNumber,
-                        time( Calendar.getInstance().time.time, 0 ),
-                        "Corresponding Camera Info"
-                    ),
-                    "jpeg",
-                    arr.contentToString()
-                )
-
-                mSequenceNumber++
             }
-
-
-            mDataHandler?.invoke( read() )
-
-            //picture.recycle()
         }
     }
 
     private val mTimer : Timer = Timer()
-    var mBitmapHandler : ( (Bitmap) -> Unit)? = null
 
     init {
         mTextureView.setSurfaceTexture(SurfaceTexture(1))
@@ -169,3 +117,4 @@ class ROSCamera(
         mGoldenEye.takePicture(mPictureCallback)
     }
 }
+**/

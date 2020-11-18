@@ -27,9 +27,9 @@ class CameraFragment : Fragment() {
     override fun onResume() {
 
         mOutput = requireActivity().findViewById(R.id.camera_image_view)
-        btn_takepicture?.setOnClickListener{ (activity as MainActivity?)?.mROSCamera?.takePicture() }
+        //btn_takepicture?.setOnClickListener{ (activity as MainActivity?)?.mROSCamera?.takePicture() }
 
-        (activity as MainActivity?)?.mROSCamera?.mBitmapHandler = ::showBitmap
+        //(activity as MainActivity?)?.mROSCamera?.mBitmapHandler = ::showBitmap
 
         super.onResume()
     }

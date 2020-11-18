@@ -2,11 +2,13 @@ package com.biosentry.androidbridge
 
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -27,7 +29,7 @@ import kotlinx.android.synthetic.main.fragment_home.*
 import java.util.*
 import kotlin.concurrent.timerTask
 
-
+@RequiresApi(Build.VERSION_CODES.M)
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -39,7 +41,7 @@ class MainActivity : AppCompatActivity() {
     private var mPhoneAccelerometer : PhoneAccelerometer? = null
     private var mPhoneGyroscope : PhoneGyroscope? = null
     private var mPhoneGPS : PhoneGPS? = null
-    var mROSCamera : ROSCamera? = null
+    //var mROSCamera : ROSCamera? = null
     
     var mAircraftCamera : AircraftCamera? = null
     private var mAircraftFlightController : AircraftFlightController? = null
@@ -183,13 +185,14 @@ class MainActivity : AppCompatActivity() {
 
     fun RTMPConnectClicked()
     {
-        val ret = mAircraftCamera?.startStreaming(TB_RTMP_URL.text.toString())
+        val ret = mAircraftCamera?.startDJIStream(TB_RTMP_URL.text.toString())
         this.runOnUiThread{ TV_RTMP_error.text = ret.toString()}
     }
 
+
     fun RTMPDisconnectClicked()
     {
-        mAircraftCamera?.stopStreaming()
+        mAircraftCamera?.stopDJIStream()
     }
 
     // FUNCTIONS THAT WRITE INFORMATION TO UI! -----------------------------
