@@ -246,5 +246,15 @@
         app:layout_constraintEnd_toStartOf="@+id/BT_RTMP_disconnect"
         app:layout_constraintTop_toTopOf="@+id/BT_RTMP_disconnect" />
 
+    <Button
+        android:id="@+id/BT_app_reboot"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/BT_app_reboot"
+        app:layout_constraintEnd_toEndOf="@+id/BT_RTMP_disconnect"
+        app:layout_constraintStart_toStartOf="@+id/BT_RTMP_disconnect"
+        app:layout_constraintTop_toBottomOf="@+id/BT_RTMP_disconnect" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

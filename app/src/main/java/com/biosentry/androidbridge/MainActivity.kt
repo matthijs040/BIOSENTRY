@@ -109,6 +109,15 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
     }
 
+
+    override fun onDestroy()
+    {
+        // From: https://stackoverflow.com/questions/2092951/how-to-close-android-application
+        android.os.Process.killProcess(android.os.Process.myPid())
+
+        super.onDestroy()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
@@ -139,9 +148,9 @@ class MainActivity : AppCompatActivity() {
         if(mAircraftHandler != null && mAircraftHandler!!.mAircraftConnected)
         {
             mAircraftFlightController?.let {
-                it.mAccelerometer?.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
-                it.mGyroscope?.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
-                it.mGPS?.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
+                it.mAccelerometer.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
+                it.mGyroscope.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
+                it.mGPS.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
 
                 mROSMessageHandler?.attachDevice(it)
             }
@@ -223,7 +232,4 @@ class MainActivity : AppCompatActivity() {
             TV_drone_status?.text = s
             TV_aircraft_status?.text = s}
     }
-
-
-
 }

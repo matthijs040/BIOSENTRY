@@ -113,5 +113,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.4.10"
 
     // https://github.com/ant-media/LibRtmp-Client-for-Android For testing a different rtmp stream than the native DJI one.
-    implementation 'net.butterflytv.utils:rtmp-client:3.1.0'
+    // DJI RTMP API TURNED OUT FINE WHEN AUDIO PERMISSIONS WERE FIXED. 3 - 5 SECOND LATENCY
+    // implementation 'net.butterflytv.utils:rtmp-client:3.1.0'
 }

@@ -1,18 +1,10 @@
 package com.biosentry.androidbridge.aircraft
 
 import android.app.Activity
-import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
-import android.media.MediaCodec
-import android.media.MediaCodecList
-import android.media.MediaFormat
-import android.media.MediaRecorder
 import android.os.Build
 import android.os.Looper
-import android.provider.MediaStore
 import android.util.Log
-import android.view.Surface
-import android.view.SurfaceHolder
 import android.view.TextureView
 import androidx.annotation.RequiresApi
 import dji.sdk.camera.Camera
@@ -20,10 +12,9 @@ import dji.sdk.camera.VideoFeeder
 import dji.sdk.codec.DJICodecManager
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
-import dji.sdk.sdkmanager.LiveStreamManager
 import dji.sdk.sdkmanager.LiveStreamManager.LiveStreamVideoSource.Primary
-import net.butterflytv.rtmp_client.RTMPMuxer
-import net.butterflytv.rtmp_client.RtmpClient
+import java.util.*
+import kotlin.concurrent.timerTask
 
 
 @RequiresApi(Build.VERSION_CODES.M)
@@ -31,35 +22,13 @@ class AircraftCamera(private val act: Activity) : TextureView.SurfaceTextureList
 
 
     private var dummyTexture : SurfaceTexture = SurfaceTexture(0)
-   // private val mSurface : Surface = Surface(dummyTexture)
-
-
-   // private val mMediaCodec = MediaCodecList(MediaCodecList.ALL_CODECS).findEncoderForFormat(
-   //     MediaFormat.createVideoFormat())
-
-
     var mCodecManager : DJICodecManager = DJICodecManager(act.baseContext, dummyTexture , 640, 480 )
-    private val mRtmpClient : RTMPMuxer = RTMPMuxer()
-
-private fun sendData( data : ByteArray, size : Int)
-{
-    if( mRtmpClient.writeVideo(data, 0, size, System.currentTimeMillis()) == 1)
-        Log.w(this.javaClass.simpleName, "Transmission failed")
-}
+    private val mTimer = Timer()
 
     // THIS BYTE BUFFER IS H264 ENCODED
     private val mVideoDataListener = VideoFeeder.VideoDataListener { p0, p1 ->
 
-
-        if(mRtmpClient.isConnected)
-        {
-            println("raw data array size: " + p0.size)
-            sendData(p0, p1)
-        }
-
-
         mCodecManager.sendDataToDecoder(p0, p1)
-
 
     }
 
@@ -73,19 +42,6 @@ private fun sendData( data : ByteArray, size : Int)
         }
     }
 
-    fun startAntStream(rtmpURL: String) : Int
-    {
-        if(!mRtmpClient.isConnected)
-            return mRtmpClient.open(rtmpURL, 640, 480 )
-        return 0 //Already connected. report success?
-    }
-
-    fun stopAntStream()
-    {
-        if(mRtmpClient.isConnected)
-            mRtmpClient.close()
-    }
-
     // from: https://stackoverflow.com/questions/55731431/getting-livestreammanager-error-3-in-dji-mobile-sdk-when-trying-to-stream-to-cu
     fun startDJIStream(rtmpURL: String) : Int
     {
@@ -95,14 +51,23 @@ private fun sendData( data : ByteArray, size : Int)
         liveStreamManager.liveUrl = rtmpURL
         liveStreamManager.setAudioStreamingEnabled(true)
 
+        val ret = liveStreamManager.startStream()
+        if(ret == 0)
+            mTimer.schedule(
+                timerTask {
+                    Log.i( this.javaClass.simpleName, "video bitrate: " + liveStreamManager.liveVideoBitRate)
+                    Log.i( this.javaClass.simpleName, "video frame-rate" + liveStreamManager.liveVideoFps)
+                }, 1000, 1000
+            )
 
-
-        return liveStreamManager.startStream()
+        return ret
     }
 
     fun stopDJIStream()
     {
         DJISDKManager.getInstance().liveStreamManager.stopStream()
+        mTimer.cancel()
+        mTimer.purge()
     }
 
     private fun startRecording()
@@ -139,13 +104,10 @@ private fun sendData( data : ByteArray, size : Int)
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int)
     {
         mCodecManager = DJICodecManager(act.applicationContext, surface, width, height)
-        //mCodecManager?.getBitmap(mBitmapListener)
-
-        Log.e("AircraftCamera", "onSurfaceTextureSizeChanged")
+        Log.w(this.javaClass.simpleName, "onSurfaceTextureSizeChanged")
     }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-        //stopRecording()
         mCodecManager.cleanSurface()
         dummyTexture = SurfaceTexture(1) // re-init texture
         mCodecManager = DJICodecManager(act.baseContext, dummyTexture , 1280, 720 )

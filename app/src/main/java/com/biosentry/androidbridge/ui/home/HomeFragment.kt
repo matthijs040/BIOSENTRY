@@ -1,9 +1,11 @@
 package com.biosentry.androidbridge.ui.home
 
 
+import android.os.Build
 import android.os.Bundle
 
 import android.view.*
+import androidx.annotation.RequiresApi
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -12,6 +14,7 @@ import com.biosentry.androidbridge.R
 
 import kotlinx.android.synthetic.main.fragment_home.*
 
+@RequiresApi(Build.VERSION_CODES.M)
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
@@ -27,6 +30,7 @@ class HomeFragment : Fragment() {
         return  inflater.inflate(R.layout.fragment_home, container, false)
 
     }
+
 
     override fun onResume()
     {
