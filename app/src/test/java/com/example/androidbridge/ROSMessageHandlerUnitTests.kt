@@ -172,6 +172,8 @@ class ROSMessageHandlerUnitTests {
         }
         mROSMessageHandler.attachDevice(mockDevice)
 
+        Thread.sleep(500)
+
         mockDevice.mControls.forEach{
             assert( actual.contains(it.message))
         }

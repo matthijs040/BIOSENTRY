@@ -13,6 +13,18 @@ import java.util.*
  */
 class PublishMessageDeserializer : JsonDeserializer<PublishMessage?>
 {
+    // From: https://programming.guide/java/nth-occurrence-in-string.html
+    private fun reverseOrdinalIndexOf( str : String, substring : String, n : Int) : Int
+    {
+        var iter = n
+        var pos : Int = str.lastIndexOf(substring) // Find 0th occurance at the end.
+
+        while (--iter > 0 && pos != -1)
+            pos = str.lastIndexOf(substring, pos - 1)
+
+        return pos
+    }
+
     override fun deserialize(
         json: JsonElement?,
         typeOfT: Type?,
@@ -26,8 +38,12 @@ class PublishMessageDeserializer : JsonDeserializer<PublishMessage?>
             val obj = json.asJsonObject
 
             val topicString = obj.get("topic").asString
+            val typeString = topicString.substring(
+                reverseOrdinalIndexOf(topicString, "/", 2 ),
+                topicString.length
+            )
 
-            val msg = when (topicString)
+            val msg = when (typeString)
             {
                 //Accessing nested JSON data. data is:
                 // {"op":"publish","type":"/geometry_msgs/Point","topic":"/mock/Point","msg":{"x":1.0,"y":2.0,"z":3.0}}

@@ -13,28 +13,35 @@ class AircraftFlightController : IROSDevice
 {
     // Cached instance of FlightControlData to remove need for reconstructing.
     private var mFlightControlData = FlightControlData(0.0F, 0.0F, 0.0F, 0.0F)
-    val mAccelerometer : ROSAccelerometer = ROSAccelerometer( mMessageTopicName = "/android/drone/accelerometer")
-    val mGyroscope : ROSGyroscope = ROSGyroscope( mMessageTopicName = "/android/drone/gyroscope")
-    val mGPS : ROSGPS = ROSGPS( mMessageTopicName = "/android/drone/gps")
+    private val topicPrefix = "/android/drone"
+
+    val mAccelerometer : ROSAccelerometer = ROSAccelerometer( mMessageTopicName = "$topicPrefix/accelerometer")
+    val mGyroscope : ROSGyroscope = ROSGyroscope( mMessageTopicName = "$topicPrefix/gyroscope")
+    val mGPS : ROSGPS = ROSGPS( mMessageTopicName = "$topicPrefix/gps")
+
+    override val mControls: List<ROSControl> = listOf(
+        ROSControl(SubscribeMessage(type = "$topicPrefix/geometry_msgs/Twist", topic = "/geometry_msgs/Twist"), ::doWriteFlightControlData),
+        ROSControl(SubscribeMessage(type = "$topicPrefix/biosentry/AircraftFlightActions", topic = "/biosentry/AircraftFlightActions"),     ::doAircraftFlightAction),
+    )
 
     private val mStateCallback = FlightControllerState.Callback { p0 ->
         p0?.let {
 
-            mAccelerometer!!.updateData(Vector3(
+            mAccelerometer.updateData(Vector3(
                 it.velocityX.toDouble(),
                 it.velocityY.toDouble(),
                 it.velocityZ.toDouble()
             ))
 
-            mGyroscope!!.updateData( Point(
+            mGyroscope.updateData( Point(
                 it.attitude.roll,
                 it.attitude.pitch,
                 it.attitude.yaw
             ))
 
-            mGPS!!.updateData(NavSatFix(
-                mGPS!!.mHeader,
-                mGPS!!.mStatus,
+            mGPS.updateData(NavSatFix(
+                mGPS.mHeader,
+                mGPS.mStatus,
                 if(it.aircraftLocation.latitude.isNaN()) 0.0 else it.aircraftLocation.latitude,
                 if(it.aircraftLocation.longitude.isNaN()) 0.0 else it.aircraftLocation.longitude,
                 if(it.aircraftLocation.altitude.isNaN()) 0.0 else it.aircraftLocation.altitude.toDouble(),
@@ -110,10 +117,7 @@ class AircraftFlightController : IROSDevice
         }
     }
 
-    override val mControls: List<ROSControl> = listOf(
-        ROSControl(SubscribeMessage(type = "/geometry_msgs/Twist", topic = "/geometry_msgs/Twist"), ::doWriteFlightControlData),
-        ROSControl(SubscribeMessage(type = "/biosentry/AircraftFlightActions", topic = "/biosentry/AircraftFlightActions"),     ::doAircraftFlightAction),
-    )
+
 
     init {
         val product = DJISDKManager.getInstance().product
