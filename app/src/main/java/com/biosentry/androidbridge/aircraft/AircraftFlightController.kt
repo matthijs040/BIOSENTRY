@@ -20,8 +20,8 @@ class AircraftFlightController : IROSDevice
     val mGPS : ROSGPS = ROSGPS( mMessageTopicName = "$topicPrefix/gps")
 
     override val mControls: List<ROSControl> = listOf(
-        ROSControl(SubscribeMessage(type = "$topicPrefix/geometry_msgs/Twist", topic = "/geometry_msgs/Twist"), ::doWriteFlightControlData),
-        ROSControl(SubscribeMessage(type = "$topicPrefix/biosentry/AircraftFlightActions", topic = "/biosentry/AircraftFlightActions"),     ::doAircraftFlightAction),
+        ROSControl(SubscribeMessage(type = "/geometry_msgs/Twist", topic = "$topicPrefix/geometry_msgs/Twist"), ::doWriteFlightControlData),
+        ROSControl(SubscribeMessage(type = "/biosentry/AircraftFlightActions", topic = "$topicPrefix/biosentry/AircraftFlightActions"),     ::doAircraftFlightAction),
     )
 
     private val mStateCallback = FlightControllerState.Callback { p0 ->

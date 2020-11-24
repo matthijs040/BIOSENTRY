@@ -87,7 +87,7 @@
     <string name="BT_websocket_send">Send data</string>
     <string name="TV_websocket_status">Not Connected</string>
     <string name="TV_websocket_error">None</string>
-    <string name="TB_WebSocket_URL">ws://DESKTOP-Matthijs:9090</string>
+    <string name="TB_WebSocket_URL">ws://matthijs-MS-7A38:9090</string>
 
     //Camera fields:
     <string name="TV_camera_label">Camera:</string>
@@ -120,7 +120,12 @@
 
     // RTMP
     <string name="TV_RTMP_label">RTMP Server:</string>
-    <string name="TB_RTMP_URL">rtmp://DESKTOP-Matthijs/LiveApp/520333396909939906468448</string>
+    <string name="TB_RTMP_URL">rtmp://matthijs-MS-7A38/LiveApp/250110064316771014427498</string>
     <string name="RTMP_hint">Put URI for an RTMP server here.</string>
     <string name="BT_app_reboot">Reboot App</string>
+    <string name="some_description">Some description</string>
+    <string name="TV_gyroscope_label">Gyroscope:</string>
+    <string name="TV_gps_sensor_label">GPS sensor:</string>
+    <string name="BT_send_data_label">send</string>
+    <string name="BT_send_once_label">send once</string>
 </resources>

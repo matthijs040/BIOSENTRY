@@ -1,9 +1,7 @@
 package com.biosentry.androidbridge.communication
 
 import android.util.Log
-import com.google.gson.Gson
 import com.neovisionaries.ws.client.*
-import kotlin.reflect.typeOf
 
 class WebSocketClient(uri: String) : IJSONTranceiver {
     // Class for conversion between Data classes and JSON formatted strings.

@@ -13,10 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.biosentry.androidbridge.communication.*
-import com.biosentry.androidbridge.communication.NavSatStatus.Companion.SERVICE_GLONASS
-import com.biosentry.androidbridge.communication.NavSatStatus.Companion.SERVICE_GPS
-import com.biosentry.androidbridge.communication.NavSatStatus.Companion.STATUS_FIX
-import com.biosentry.androidbridge.communication.NavSatStatus.Companion.STATUS_NO_FIX
+
 
 class PhoneGPS(context: Context, activity: Activity) : ROSGPS("/android/phone/GPS")
 {
