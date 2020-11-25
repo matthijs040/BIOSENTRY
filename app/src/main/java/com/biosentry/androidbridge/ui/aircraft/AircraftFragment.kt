@@ -2,8 +2,10 @@ package com.biosentry.androidbridge.ui.aircraft
 
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
+import android.os.Build
 import android.os.Bundle
 import android.view.*
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.biosentry.androidbridge.MainActivity
@@ -13,6 +15,7 @@ import dji.sdk.sdkmanager.DJISDKManager
 import kotlinx.android.synthetic.main.fragment_aircraft.*
 import java.util.*
 
+@RequiresApi(Build.VERSION_CODES.M)
 class AircraftFragment : Fragment() {
 
     private lateinit var aircraftViewModel: AircraftViewModel

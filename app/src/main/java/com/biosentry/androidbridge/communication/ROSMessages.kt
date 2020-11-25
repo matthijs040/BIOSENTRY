@@ -72,6 +72,8 @@ data class StatusMessage( val op : String = "status",
 
 interface  ROSMessage
 
+class Empty : ROSMessage
+
 data class time(val sec : Long, val nsec: Long) : ROSMessage
 
 data class Header(val seq : Long, val stamp : time, val frame_id : String ): ROSMessage
@@ -79,7 +81,41 @@ data class Header(val seq : Long, val stamp : time, val frame_id : String ): ROS
 data class CameraInfo(val header: Header, val height: Long, val width: Long,
                       val distortion_model : String, val D : DoubleArray, val K : DoubleArray,
                       val R : DoubleArray, val P : DoubleArray,
-                      val binning_x : Long, val binning_y : Long ): ROSMessage
+                      val binning_x : Long, val binning_y : Long ): ROSMessage {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as CameraInfo
+
+        if (header != other.header) return false
+        if (height != other.height) return false
+        if (width != other.width) return false
+        if (distortion_model != other.distortion_model) return false
+        if (!D.contentEquals(other.D)) return false
+        if (!K.contentEquals(other.K)) return false
+        if (!R.contentEquals(other.R)) return false
+        if (!P.contentEquals(other.P)) return false
+        if (binning_x != other.binning_x) return false
+        if (binning_y != other.binning_y) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = header.hashCode()
+        result = 31 * result + height.hashCode()
+        result = 31 * result + width.hashCode()
+        result = 31 * result + distortion_model.hashCode()
+        result = 31 * result + D.contentHashCode()
+        result = 31 * result + K.contentHashCode()
+        result = 31 * result + R.contentHashCode()
+        result = 31 * result + P.contentHashCode()
+        result = 31 * result + binning_x.hashCode()
+        result = 31 * result + binning_y.hashCode()
+        return result
+    }
+}
 
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/Image.html

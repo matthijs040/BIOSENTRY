@@ -84,7 +84,8 @@
             app:layout_constraintBottom_toTopOf="@+id/TV_status_label3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/TV_camera_label" />
+            app:layout_constraintTop_toBottomOf="@+id/TV_camera_label"
+            android:contentDescription="@string/some_description" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

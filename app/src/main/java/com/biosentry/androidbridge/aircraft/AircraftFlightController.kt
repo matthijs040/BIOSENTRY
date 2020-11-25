@@ -58,26 +58,36 @@ class AircraftFlightController : IROSDevice
 
     private fun doWriteFlightControlData(msg : ROSMessage )
     {
-        if(msg is FlightControlData)
+        if(msg is Twist)
         {
             val product = DJISDKManager.getInstance().product
             if(product is Aircraft && product.isConnected)
             {
                 product.flightController.run {
 
-                    mFlightControlData.roll = msg.roll
-                    mFlightControlData.pitch = msg.pitch
-                    mFlightControlData.yaw = msg.yaw
-                    mFlightControlData.verticalThrottle = msg.verticalThrottle
+                    mFlightControlData.roll = msg.linear.x.toFloat()
+                    mFlightControlData.pitch = msg.linear.y.toFloat()
+                    mFlightControlData.yaw = msg.angular.z.toFloat()
+                    mFlightControlData.verticalThrottle = msg.linear.z.toFloat()
 
-                    sendVirtualStickFlightControlData(mFlightControlData, null)
+                    if(isVirtualStickControlModeAvailable)
+                        sendVirtualStickFlightControlData(mFlightControlData, mCallback)
                     // MIGHT NEED A CALLBACK TO RESPOND TO STATUS FROM DRONE.
+                    else
+                        setVirtualStickModeEnabled(true, mCallback)
                 }
             }
         }
     }
 
-    private val mCallback = CommonCallbacks.CompletionCallback<DJIError> { p0 -> println(p0) }
+    private val mCallback = CommonCallbacks.CompletionCallback<DJIError> {
+            it?.let { error ->
+                Log.e(
+                    this.javaClass.simpleName,
+                    error.errorCode.toString() + " | " + error.description
+                )
+            }
+    }
 
     private fun doAircraftFlightAction(msg : ROSMessage)
     {

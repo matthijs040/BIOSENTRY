@@ -12,6 +12,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -41,6 +43,8 @@ class MainActivity : AppCompatActivity() {
     private var mPhoneAccelerometer : PhoneAccelerometer? = null
     private var mPhoneGyroscope : PhoneGyroscope? = null
     private var mPhoneGPS : PhoneGPS? = null
+
+    private var mPhoneLoopback : PhoneLoopback? = null
     //var mROSCamera : ROSCamera? = null
     
     var mAircraftCamera : AircraftCamera? = null
@@ -57,19 +61,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
-
         setSupportActionBar(toolbar)
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
-
         fab.setOnClickListener { view ->
-          Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-          .setAction("Action", null).show()
+            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show()
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
-
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
 
@@ -79,15 +80,20 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
     }
 
     override fun onResume() {
+
+
+
 
         // Setup "ROS" hardware classes
          mPhoneAccelerometer   = PhoneAccelerometer(baseContext)
          mPhoneGyroscope       = PhoneGyroscope(baseContext)
          mPhoneGPS             = PhoneGPS(baseContext, this)
         //mROSCamera          = ROSCamera(this, this.baseContext)
+        mPhoneLoopback         = PhoneLoopback()
 
 
         mAircraftHandler = DJIAircraftHandler(this, null)
@@ -142,6 +148,8 @@ class MainActivity : AppCompatActivity() {
         mPhoneAccelerometer?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mPhoneGyroscope?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mPhoneGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
+        mPhoneLoopback?.let {   mROSMessageHandler?.attachDevice(it)
+                                mROSMessageHandler?.attachSensor(it, 0) }
        //mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
 
 

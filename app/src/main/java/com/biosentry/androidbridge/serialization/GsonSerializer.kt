@@ -69,6 +69,8 @@ class PublishMessageDeserializer : JsonDeserializer<PublishMessage?>
                         obj.get("msg").asJsonObject.get("angular").asJsonObject.get("z").asDouble
                     )
                 )
+
+                "/std_msgs/Empty" -> context.deserialize(json, Empty::class.java)
                 else -> null
             }
 
