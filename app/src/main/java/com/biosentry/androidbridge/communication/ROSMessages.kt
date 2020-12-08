@@ -131,15 +131,58 @@ data class CompressedImage(val header: Header, val format: String, val data: Str
 data class RegionOfInterest( val x_offset : Long, val y_offset : Long,
                              val height : Long, val width: Long, val do_rectify : Boolean): ROSMessage
 
+data class PoseWithCovariance(val pose : Pose, val covariance : DoubleArray = DoubleArray(36) ) : ROSMessage {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PoseWithCovariance
+
+        if (pose != other.pose) return false
+        if (!covariance.contentEquals(other.covariance)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = pose.hashCode()
+        result = 31 * result + covariance.contentHashCode()
+        return result
+    }
+}
+
+data class TwistWithCovariance(val twist: Twist, val covariance: DoubleArray = DoubleArray(36) ) : ROSMessage{
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TwistWithCovariance
+
+        if (twist != other.twist) return false
+        if (!covariance.contentEquals(other.covariance)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = twist.hashCode()
+        result = 31 * result + covariance.contentHashCode()
+        return result
+    }
+}
+
 /**
  * http://docs.ros.org/noetic/api/nav_msgs/html/msg/Odometry.html
  */
+
+data class Odometry(val header : Header, val child_frame_id : String, val pose : PoseWithCovariance, val twist : TwistWithCovariance) : ROSMessage
+
+
 data class Vector3( val x : Double, val y : Double, val z : Double): ROSMessage
 
-//geometry_msgs/Point
 data class Point( val x : Double, val y : Double, val z : Double): ROSMessage
 
-data class Quaternion( val x : Double, val y : Double, val z : Double, val w : Double): ROSMessage
+data class Quaternion(var x : Double = 0.0, var y : Double = 0.0, var z : Double = 0.0, var w : Double = 0.0): ROSMessage
 
 /**
  * http://docs.ros.org/noetic/api/geometry_msgs/html/msg/Pose.html

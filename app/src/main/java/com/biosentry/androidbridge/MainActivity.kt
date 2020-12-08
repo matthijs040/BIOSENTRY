@@ -156,9 +156,8 @@ class MainActivity : AppCompatActivity() {
         if(mAircraftHandler != null && mAircraftHandler!!.mAircraftConnected)
         {
             mAircraftFlightController?.let {
-                it.mAccelerometer.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
-                it.mGyroscope.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
                 it.mGPS.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
+                it.mOdom.let { sensor -> mROSMessageHandler?.attachSensor(sensor, 0) }
 
                 mROSMessageHandler?.attachDevice(it)
             }

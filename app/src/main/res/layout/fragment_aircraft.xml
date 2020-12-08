@@ -73,6 +73,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
         android:text="@string/TV_accelerometer_label"
+        android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/TV_aircraft_gps_label"
         app:layout_constraintTop_toTopOf="@+id/TV_aircraft_gps_label" />
 
@@ -82,6 +83,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/TVAccelXLabel"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/textView14"
         app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
@@ -91,6 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/TVAccelYLabel"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/textView16"
         app:layout_constraintTop_toBottomOf="@+id/textView16" />
 
@@ -100,6 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/TVAccelZLabel"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/textView18"
         app:layout_constraintTop_toBottomOf="@+id/textView18" />
 
@@ -109,6 +113,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/TV_aircraft_velocityX"
+        android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/textView16"
         app:layout_constraintTop_toTopOf="@+id/textView16" />
 
@@ -117,6 +122,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/TV_aircraft_velocityY"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/TV_aircraft_velocityX"
         app:layout_constraintTop_toTopOf="@+id/textView18" />
 
@@ -125,6 +131,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/TV_aircraft_velocityZ"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/TV_aircraft_velocityY"
         app:layout_constraintTop_toTopOf="@+id/textView23" />
 
@@ -134,6 +141,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="@string/TV_gyro_label"
+        android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/textView14"
         app:layout_constraintTop_toTopOf="@+id/textView14" />
 
@@ -143,6 +151,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/TVRollLabel"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/textView25"
         app:layout_constraintTop_toBottomOf="@+id/textView25" />
 
@@ -152,6 +161,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/TV_aircraft_roll"
+        android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/textView27"
         app:layout_constraintTop_toTopOf="@+id/textView27" />
 
@@ -161,6 +171,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/TVPitchLabel"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/textView27"
         app:layout_constraintTop_toBottomOf="@+id/textView27" />
 
@@ -170,6 +181,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/TV_aircraft_pitch"
+        android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/textView30"
         app:layout_constraintTop_toTopOf="@+id/textView30" />
 
@@ -179,6 +191,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/TVYawLabel"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/textView30"
         app:layout_constraintTop_toBottomOf="@+id/textView30" />
 
@@ -189,7 +202,8 @@
         android:layout_marginStart="8dp"
         android:text="@string/TV_aircraft_yaw"
         app:layout_constraintStart_toEndOf="@+id/textView33"
-        app:layout_constraintTop_toTopOf="@+id/textView33" />
+        app:layout_constraintTop_toTopOf="@+id/textView33"
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/textView35"

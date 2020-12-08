@@ -120,7 +120,7 @@
 
     // RTMP
     <string name="TV_RTMP_label">RTMP Server:</string>
-    <string name="TB_RTMP_URL">rtmp://matthijs-MS-7A38/LiveApp/250110064316771014427498</string>
+    <string name="TB_RTMP_URL">rtmp://matthijs-MS-7A38/live/android</string>
     <string name="RTMP_hint">Put URI for an RTMP server here.</string>
     <string name="BT_app_reboot">Reboot App</string>
     <string name="some_description">Some description</string>
