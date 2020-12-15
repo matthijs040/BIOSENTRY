@@ -11,7 +11,7 @@ import java.util.*
 import kotlin.concurrent.timerTask
 
 class ROSMessageHandler(private val bridge : IJSONTranceiver,
-                        private val mSerializer : IBridgeMessageSerializer)
+                        private val mSerializer : IBridgeMessageSerializer )
 {
     private val messagingTimer = Timer()
     private val devicePollingTimer = Timer()
@@ -77,7 +77,6 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
         if(rateInMs <= 0L)
         {
             sensor.mDataHandler = ::send
-
             println(this.javaClass.simpleName + " | attached sensor: " + sensor.javaClass.simpleName)
         }
         else

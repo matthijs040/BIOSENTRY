@@ -10,22 +10,24 @@ import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
 import dji.waypointv2.natives.util.NativeCallbackUtils
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 class AircraftFlightController : IROSDevice
 {
     // Cached instance of FlightControlData to remove need for reconstructing.
     private var mFlightControlData = FlightControlData(0.0F, 0.0F, 0.0F, 0.0F)
-    private val topicPrefix = "/android/drone"
+    private val mTopicPrefix = "/android/drone"
 
-    val mGPS : ROSGPS = ROSGPS( mMessageTopicName = "$topicPrefix/gps")
-    val mOdom = ROSOdomSensor(mMessageTopicName = "$topicPrefix/odom")
+    val mGPS : ROSGPS = ROSGPS( mMessageTopicName = "$mTopicPrefix/gps")
+    val mOdom = ROSOdomSensor(mMessageTopicName = "$mTopicPrefix/odom")
 
     override val mControls: List<ROSControl> = listOf(
-        ROSControl(SubscribeMessage(type = "/geometry_msgs/Twist", topic = "$topicPrefix/geometry_msgs/Twist"), ::doWriteFlightControlData),
-        ROSControl(SubscribeMessage(type = "/biosentry/AircraftFlightActions", topic = "$topicPrefix/biosentry/AircraftFlightActions"),     ::doAircraftFlightAction),
+        ROSControl(SubscribeMessage(type = "/geometry_msgs/Twist", topic = "$mTopicPrefix/geometry_msgs/Twist"), ::doWriteFlightControlData),
+        ROSControl(SubscribeMessage(type = "/biosentry/AircraftFlightActions", topic = "$mTopicPrefix/biosentry/AircraftFlightActions"),     ::doAircraftFlightAction),
     )
 
-    private var mLastCommandTime : Int = 0
+    // Can deadlock???? Write by mControllerVirtualStickCallback
+    private var mLastCommandTime : AtomicInteger = AtomicInteger(0)
 
     private val mControllerVirtualStickCallback = object : CommonCallbacks.CompletionCallbackWith<Boolean>
     {
@@ -34,8 +36,8 @@ class AircraftFlightController : IROSDevice
             if(p0 != null) {
                 if (p0)
                 {
-                    mLastCommandTime++
-                    if (mLastCommandTime >= 10) {
+                    val ticksWithoutControl = mLastCommandTime.incrementAndGet()
+                    if (ticksWithoutControl >= 10) {
                         val product = DJISDKManager.getInstance().product
                         if (product is Aircraft && product.isConnected) {
                             product.flightController.setVirtualStickModeEnabled(false, mCallback)
@@ -45,7 +47,7 @@ class AircraftFlightController : IROSDevice
                 }
                 else
                 {
-                    mLastCommandTime = 0
+                    mLastCommandTime.set(0)
                     Log.w(this.javaClass.simpleName, "V-stick command timeout reset. ")
                 }
             }
@@ -151,7 +153,7 @@ class AircraftFlightController : IROSDevice
                     if(!isVirtualStickControlModeAvailable)
                     {
                         setVirtualStickModeEnabled(true, mCallback)
-                        mLastCommandTime = 0
+                        mLastCommandTime.set(0)
                     }
 
 
@@ -179,7 +181,11 @@ class AircraftFlightController : IROSDevice
                     mFlightControlData.verticalThrottle = msg.linear.z.toFloat()
 
                     if(isVirtualStickControlModeAvailable)
+                    {
                         sendVirtualStickFlightControlData(mFlightControlData, mCallback)
+                        mLastCommandTime.set(0)
+                    }
+
                 }
             }
         }

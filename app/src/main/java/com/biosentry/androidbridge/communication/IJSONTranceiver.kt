@@ -25,8 +25,6 @@ interface IJSONTranceiver {
     fun invokeReceivers( data : String)
     { mReceivers.forEach{ it.invoke(data) } }
 
-
-
     fun attachHandler( handler : ((STATE) -> Unit) )
     { mStateHandlers.add(handler) }
 

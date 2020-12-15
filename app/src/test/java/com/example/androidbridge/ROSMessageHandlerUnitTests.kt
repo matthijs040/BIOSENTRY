@@ -17,10 +17,8 @@ class ROSMessageHandlerUnitTests {
     private val mSerializer = GsonSerializer()
     private val mROSMessageHandler = ROSMessageHandler(mTranceiver, mSerializer )
 
-
-
     @Test
-    fun messageHandler_test_advertise_on_attach()
+    fun advertises_when_sensor_is_attached()
     {
         // Create a copy of the expected serialized message.
         val mockSensor = ROSPointSensorMock()
@@ -41,31 +39,31 @@ class ROSMessageHandlerUnitTests {
     }
 
     @Test
-    fun messageHandler_test_publish_after_attach()
+    fun publishes_when_attached_with_specified_rate()
     {
         val mockSensor = ROSPointSensorMock()
-        val expected = mSerializer.toJson(mockSensor.mReading)
+        val expectedMessage = mSerializer.toJson(mockSensor.mReading)
+        val rate : Long = 10
+        val expectedCount = 10
         val actual = mutableListOf<String>()
         mTranceiver.attachReceiver {
             actual.add(it)
         }
         // Rate 100. messageHandler takes mock message every 100ms.
-        mROSMessageHandler.attachSensor(mockSensor, 10)
+        mROSMessageHandler.attachSensor(mockSensor, rate)
 
-        runBlocking {
-            while ( actual.size < 10) // once the sensor is done with advertising and is sending data.
-                Thread.sleep(50)
-        }
+        Thread.sleep(rate * expectedCount + 1000)
 
-
-        println("Expected: $expected")
-
+        println("Expected: $expectedMessage")
         print("Actual: ")
+
         actual.forEach {
             println(it)
         }
 
-        assert(actual.last() == expected)
+        assert(actual.subList(3, actual.size ).all{ it == expectedMessage } )
+        assert(expectedCount == actual.size)
+
     }
 
     @Test

@@ -24,6 +24,8 @@ class AircraftCamera(private val act: Activity) : TextureView.SurfaceTextureList
     private var dummyTexture : SurfaceTexture = SurfaceTexture(0)
     var mCodecManager : DJICodecManager = DJICodecManager(act.baseContext, dummyTexture , 640, 480 )
     private val mTimer = Timer()
+    private var mTask : TimerTask? = null
+
 
     // THIS BYTE BUFFER IS H264 ENCODED
     private val mVideoDataListener = VideoFeeder.VideoDataListener { p0, p1 ->
@@ -52,13 +54,18 @@ class AircraftCamera(private val act: Activity) : TextureView.SurfaceTextureList
         liveStreamManager.setAudioStreamingEnabled(true)
 
         val ret = liveStreamManager.startStream()
-        if(ret == 0)
+
+
+        if(ret == 0) {
+            mTask = timerTask {
+                Log.i( this.javaClass.simpleName, "video bitrate: " + liveStreamManager.liveVideoBitRate )
+                Log.i( this.javaClass.simpleName, "video frame-rate" + liveStreamManager.liveVideoFps
+                )
+            }
             mTimer.schedule(
-                timerTask {
-                    Log.i( this.javaClass.simpleName, "video bitrate: " + liveStreamManager.liveVideoBitRate)
-                    Log.i( this.javaClass.simpleName, "video frame-rate" + liveStreamManager.liveVideoFps)
-                }, 1000, 1000
+                mTask!!, 1000, 1000
             )
+        }
 
         return ret
     }
@@ -66,7 +73,7 @@ class AircraftCamera(private val act: Activity) : TextureView.SurfaceTextureList
     fun stopDJIStream()
     {
         DJISDKManager.getInstance().liveStreamManager.stopStream()
-        mTimer.cancel()
+        mTask?.cancel()
         mTimer.purge()
     }
 
