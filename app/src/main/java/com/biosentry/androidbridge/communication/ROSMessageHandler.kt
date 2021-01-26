@@ -1,20 +1,13 @@
 package com.biosentry.androidbridge.communication
 
-import android.app.ActivityManager
-import android.app.Application
-import android.util.Log
-import com.biosentry.androidbridge.MApplication
 import com.biosentry.androidbridge.serialization.IBridgeMessageSerializer
-import com.google.gson.*
-import java.lang.reflect.Type
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.timerTask
-import kotlin.random.Random
-import kotlin.random.nextInt
 
 class ROSMessageHandler(private val bridge : IJSONTranceiver,
-                        private val mSerializer : IBridgeMessageSerializer )
+                        private val mSerializer : IBridgeMessageSerializer,
+                        )
 {
 
     class HandledControl(val control : ROSControl, var canReceive : Boolean)
@@ -25,9 +18,7 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
     private val devicePollingTimer = Timer()
     private val mHandledControls = mutableListOf<HandledControl>()
     private val mHandledSensors  = mutableListOf<HandledSensor>()
-    private val retransmitDelay : Long = 50
     private var mCanSend : Boolean = true
-    private val retransmissionRate : Long = 100L
 
     fun send(data : BridgeMessage)
     {
@@ -155,5 +146,9 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
             mCanSend = it == STATE.CONNECTED
             send( SetStatusLevelMessage( level = "info" ) )
         }
+    }
+
+    companion object {
+        const val retransmissionRate : Long = 100L
     }
 }
