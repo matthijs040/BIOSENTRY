@@ -87,7 +87,7 @@
     <string name="BT_websocket_send">Send data</string>
     <string name="TV_websocket_status">Not Connected</string>
     <string name="TV_websocket_error">None</string>
-    <string name="TB_WebSocket_URL">ws://matthijs-MS-7A38:9090</string>
+    <string name="TB_WebSocket_URL">ws://192.168.178.23:9090</string>
 
     //Camera fields:
     <string name="TV_camera_label">Camera:</string>

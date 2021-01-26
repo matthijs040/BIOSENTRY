@@ -46,19 +46,6 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
         startSDKRegistration()
     }
 
-    private fun initComponents() {
-        if (mAircraftConnected) {
-            val product = DJISDKManager.getInstance().product
-            if (product is Aircraft) {
-                mNameHandler?.invoke(product.model.displayName)
-            }
-        }
-    }
-
-    private fun deinitComponents()
-    {
-        //Destruct instances of nested classes.
-    }
 
     /**
      * Checks if there is any missing permissions, and
@@ -124,16 +111,21 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
                                 if( newProduct is Aircraft && newProduct.model != null  )
                                 {
                                     mAircraftConnected = true
-                                    initComponents() //Valid controller with aircraft are active. Can now initialize class components.
+                                    mNameHandler?.invoke(newProduct.model.displayName) //Valid controller with aircraft are active. Can now initialize class components.
 
                                 }
                                 else
+                                {
                                     mAircraftConnected = false
+                                    mNameHandler?.invoke("none connected")
+                                }
+
                             }
                             else
                             {
                                 message = String.format("onProductConnect newProduct:%s", "NULL")
                                 mAircraftConnected = false
+                                mNameHandler?.invoke("none connected")
                             }
 
 
@@ -147,10 +139,10 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
                             if (p0 != null)
                             {
                                 message = String.format("onProductChanged: newProduct:%s", p0)
-                                if(p0.model != null && p0 is Aircraft)
+                                if(p0 is Aircraft && p0.isConnected)
                                 {
                                     mAircraftConnected = true
-                                    initComponents()
+                                    mNameHandler?.invoke(p0.model.displayName)
                                 }
                                 else
                                 {
@@ -164,6 +156,7 @@ class DJIAircraftHandler(private val act : Activity, statusCallback : ((String) 
                             {
                                 message = "onProductChanged: newProduct is null"
                                 mAircraftConnected = false
+                                mNameHandler?.invoke("none connected")
                             }
 
                             mStatusHandler?.invoke(message)

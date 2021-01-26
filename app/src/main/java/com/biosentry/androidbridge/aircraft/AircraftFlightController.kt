@@ -18,7 +18,7 @@ class AircraftFlightController : IROSDevice
     private var mFlightControlData = FlightControlData(0.0F, 0.0F, 0.0F, 0.0F)
     private val mTopicPrefix = "/android/drone"
 
-    val mGPS : ROSGPS = ROSGPS( mMessageTopicName = "$mTopicPrefix/gps")
+    val mGPS = ROSGPS( mMessageTopicName = "$mTopicPrefix/gps")
     val mOdom = ROSOdomSensor(mMessageTopicName = "$mTopicPrefix/odom")
 
     override val mControls: List<ROSControl> = listOf(
@@ -27,16 +27,16 @@ class AircraftFlightController : IROSDevice
     )
 
     // Can deadlock???? Write by mControllerVirtualStickCallback
-    private var mLastCommandTime : AtomicInteger = AtomicInteger(0)
+    private var mLastCommandCounter : AtomicInteger = AtomicInteger(0)
 
-    private val mControllerVirtualStickCallback = object : CommonCallbacks.CompletionCallbackWith<Boolean>
+    private val mVirtualStickCallback = object : CommonCallbacks.CompletionCallbackWith<Boolean>
     {
         override fun onSuccess(p0: Boolean?)
         {
             if(p0 != null) {
                 if (p0)
                 {
-                    val ticksWithoutControl = mLastCommandTime.incrementAndGet()
+                    val ticksWithoutControl = mLastCommandCounter.incrementAndGet()
                     if (ticksWithoutControl >= 10) {
                         val product = DJISDKManager.getInstance().product
                         if (product is Aircraft && product.isConnected) {
@@ -47,8 +47,8 @@ class AircraftFlightController : IROSDevice
                 }
                 else
                 {
-                    mLastCommandTime.set(0)
-                    Log.w(this.javaClass.simpleName, "V-stick command timeout reset. ")
+                    mLastCommandCounter.set(0)
+                    Log.w(this.javaClass.simpleName, "V-stick control timed out.")
                 }
             }
         }
@@ -65,13 +65,13 @@ class AircraftFlightController : IROSDevice
 
     }
 
-    private val mTimerVirtualStickCallback = object : TimerTask()
+    private val mTimerVirtualStickCaller = object : TimerTask()
     {
         override fun run() {
         val product = DJISDKManager.getInstance().product
             if(product is Aircraft && product.isConnected)
             {
-                product.flightController.getVirtualStickModeEnabled(mControllerVirtualStickCallback)
+                product.flightController.getVirtualStickModeEnabled(mVirtualStickCallback)
             }
         }
     }
@@ -79,6 +79,16 @@ class AircraftFlightController : IROSDevice
     private val mTimer = Timer()
 
     private var mOdomSequenceNumber : Long = 0
+
+    private val mCallback = CommonCallbacks.CompletionCallback<DJIError> {
+        it?.let { error ->
+            println(
+                this.javaClass.simpleName +
+                        "mCallback: " + error.errorCode.toString() + " | " + error.description
+            )
+        }
+    }
+
 
     private val mStateCallback = FlightControllerState.Callback { p0 ->
         p0?.let {
@@ -116,9 +126,9 @@ class AircraftFlightController : IROSDevice
                             0.0,
                             mFlightControlData.yaw.toDouble() ),
                         linear = Vector3(
-                            mFlightControlData.roll.toDouble(),
-                            mFlightControlData.pitch.toDouble(),
-                            mFlightControlData.verticalThrottle.toDouble() )
+                            it.velocityX.toDouble(),
+                            it.velocityY.toDouble(),
+                            it.velocityZ.toDouble() )
                         )
                     )
                 )
@@ -129,16 +139,6 @@ class AircraftFlightController : IROSDevice
 
     private fun doNothing() /* no-op */
     {}
-
-    private val mCallback = CommonCallbacks.CompletionCallback<DJIError> {
-        it?.let { error ->
-            println(
-                this.javaClass.simpleName +
-                "mCallback: " + error.errorCode.toString() + " | " + error.description
-            )
-        }
-    }
-
 
     private fun doWriteFlightControlData(msg : ROSMessage )
     {
@@ -153,7 +153,7 @@ class AircraftFlightController : IROSDevice
                     if(!isVirtualStickControlModeAvailable)
                     {
                         setVirtualStickModeEnabled(true, mCallback)
-                        mLastCommandTime.set(0)
+                        mLastCommandCounter.set(0)
                     }
 
 
@@ -183,7 +183,7 @@ class AircraftFlightController : IROSDevice
                     if(isVirtualStickControlModeAvailable)
                     {
                         sendVirtualStickFlightControlData(mFlightControlData, mCallback)
-                        mLastCommandTime.set(0)
+                        mLastCommandCounter.set(0)
                     }
 
                 }
@@ -237,7 +237,7 @@ class AircraftFlightController : IROSDevice
         else
         {
             product.flightController.setStateCallback(mStateCallback)
-            mTimer.schedule( mTimerVirtualStickCallback, 0, 1000)
+            mTimer.schedule( mTimerVirtualStickCaller, 0, 1000)
 
             // FOR TESTING!!
             // BREAK THIS OUT WHEN ACTUALLY FLYING THE DAMN THING!!

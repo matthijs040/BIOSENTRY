@@ -8,16 +8,26 @@ import com.biosentry.androidbridge.serialization.IBridgeMessageSerializer
 import com.google.gson.*
 import java.lang.reflect.Type
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.timerTask
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 class ROSMessageHandler(private val bridge : IJSONTranceiver,
                         private val mSerializer : IBridgeMessageSerializer )
 {
+
+    class HandledControl(val control : ROSControl, var canReceive : Boolean)
+    class HandledSensor( val sensor : IROSSensor, var canSend : Boolean, val rateInMs: Long)
+
+    private var nonce : AtomicInteger = AtomicInteger(0)
     private val messagingTimer = Timer()
     private val devicePollingTimer = Timer()
-    val mControls = mutableListOf<ROSControl>()
+    private val mHandledControls = mutableListOf<HandledControl>()
+    private val mHandledSensors  = mutableListOf<HandledSensor>()
     private val retransmitDelay : Long = 50
     private var mCanSend : Boolean = true
+    private val retransmissionRate : Long = 100L
 
     fun send(data : BridgeMessage)
     {
@@ -25,24 +35,30 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
             bridge.send(mSerializer.toJson(data))
     }
 
-    /**
-     * Function that sends out a subscribe message while no publisher is yet registered.
-     */
-    private fun resubscribe(msg : SubscribeMessage)
+    private fun handleStatus( msg : StatusMessage)
     {
-        messagingTimer.schedule(
-            timerTask {
-                    retransmit(msg, 3)
-            }, 20, retransmitDelay * 100
-        )
+        if(msg.msg == "advertise_ack")
+        {
+            val sensor = mHandledSensors.find { it.sensor.mAdvertiseMessage.id == msg.id }
+            sensor?.canSend = true
+        }
+        else if(msg.msg == "subscribe_ack")
+        {
+            val control = mHandledControls.find { it.control.message.id == msg.id }
+            control?.canReceive = true
+        }
     }
 
-    private fun retransmit(msg : BridgeMessage, times : Int)
+    private fun handlePublish( msg : PublishMessage)
     {
-        for( x in 0 .. times)
-        {
-            send(msg) // send second time in case of bad reception.
-            Thread.sleep(retransmitDelay)
+        // Iterate over all receivers.
+        mHandledControls.forEach{
+
+            // If the receiver is allowed to receive and its type matches the message
+            if(it.canReceive && msg.topic == it.control.message.topic )
+            {
+                it.control.behavior.invoke(msg.msg)
+            }
         }
     }
 
@@ -50,45 +66,58 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
     {
         val msg = mSerializer.fromJson(jsonData)
 
+        // If it is an advertise or subscribe response
+
+        if(msg is StatusMessage)
+            handleStatus(msg)
+
         // If it is a message for one of the devices to receive.
         if(msg is PublishMessage)
-        {
-            // Iterate over all receivers.
-            mControls.forEach{
-
-                // If the receiver's msg-data type matches the message
-                if(msg.topic == it.message.topic)
-                {
-                    it.behavior.invoke(msg.msg)
-                }
-            }
-        }
+            handlePublish(msg)
     }
+
 
     fun attachSensor(sensor: IROSSensor, rateInMs: Long ) : Boolean
     {
-        retransmit(sensor.mAdvertiseMessage, 2)
+        if( mHandledSensors.contains(HandledSensor(sensor, true, rateInMs) ) )
+        { return false }
+
+        sensor.mAdvertiseMessage.id = nonce.getAndIncrement().toString()
+        val handledSens = HandledSensor(sensor, false, rateInMs)
+        mHandledSensors.add(handledSens)
+
         messagingTimer.schedule(
             timerTask {
-                retransmit(sensor.mAdvertiseMessage, 2 )
-            }, 500, retransmitDelay * 10
+                val sens = mHandledSensors.find { it.sensor == handledSens.sensor }
+                if(sens != null) {
+                    if (sens.canSend)     // If ack has been received for this sensor and it can send.
+                    {
+                        if (sens.rateInMs == 0L)
+                        {
+                            sens.sensor.mDataHandler = ::send
+                        }
+                        else
+                            devicePollingTimer.schedule(
+                                timerTask {
+                                    send(sens.sensor.read())
+                                }, sens.rateInMs, sens.rateInMs
+                            )
+
+                        this.cancel()       // Cancel retransmissions of the advertisements.
+                        println(this.javaClass.simpleName + " | attached sensor: " + sensor.javaClass.simpleName)
+                    }
+                    else
+                        send(sens.sensor.mAdvertiseMessage) // Re-advertise.
+                }
+                else
+                {
+                    println("Server returned error response for sensor: " + handledSens.sensor.javaClass.simpleName)
+                    this.cancel()
+                }
+
+            }, retransmissionRate, retransmissionRate
         )
 
-        if(rateInMs <= 0L)
-        {
-            sensor.mDataHandler = ::send
-            println(this.javaClass.simpleName + " | attached sensor: " + sensor.javaClass.simpleName)
-        }
-        else
-        {
-           devicePollingTimer.schedule(
-               timerTask {
-                   send( sensor.read() )
-               },1000, rateInMs
-
-           )
-            println(this.javaClass.simpleName + " | attached sensor: " + sensor.javaClass.simpleName)
-        }
         return true
     }
 
@@ -99,11 +128,18 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
         }
     }
 
-    fun attachControl(control : ROSControl)
+    fun attachControl(control : ROSControl) : Boolean
     {
-        resubscribe(control.message) // Resubscribe for long term connection maintenance.
-        mControls.add(control)
+        if(mHandledControls.contains(HandledControl(control, true)) )
+        {
+            return false
+        }
+
+        control.message.id = nonce.getAndIncrement().toString()
+        mHandledControls.add(HandledControl(control, false))
         println(this.javaClass.simpleName + " | attached control: " + control.javaClass.simpleName)
+
+        return true
     }
 
     fun removeSensors()

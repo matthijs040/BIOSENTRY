@@ -9,7 +9,7 @@ data class AdvertiseMessage(
     val op : String = "advertise",
     val topic : String,
     val type : String,
-    val id : String? = null
+    var id : String? = null
 ) : BridgeMessage
 
 
@@ -25,8 +25,8 @@ open class PublishMessage(val op : String = "publish",
                              var msg : ROSMessage
 ) : BridgeMessage
 
-data class SubscribeMessage( val op : String = "subscribe",
-                            val id : String? = null,
+data class SubscribeMessage(val op : String = "subscribe",
+                            var id : String? = null,
                             val topic : String,
                             val type : String? = null,
                             val throttle_rate : Int? = null,

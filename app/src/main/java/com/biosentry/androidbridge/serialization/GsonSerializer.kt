@@ -108,11 +108,12 @@ class BridgeMessageDeserializer : JsonDeserializer<BridgeMessage?>
             val bridgeOp = obj.get("op")
 
             ret = when (bridgeOp.asString) {
-                "advertise" ->      context.deserialize(json, AdvertiseMessage::class.java)
-                "unadvertise" ->    context.deserialize(json, UnadvertiseMessage::class.java)
-                "publish" ->        context.deserialize(json, PublishMessage::class.java)
-                "subscribe" ->      context.deserialize(json, SubscribeMessage::class.java)
-                "unsubscribe" ->    context.deserialize(json, UnsubscribeMessage::class.java)
+                "status"        ->    context.deserialize(json, StatusMessage::class.java)
+                "advertise"     ->    context.deserialize(json, AdvertiseMessage::class.java)
+                "unadvertise"   ->    context.deserialize(json, UnadvertiseMessage::class.java)
+                "publish"       ->    context.deserialize(json, PublishMessage::class.java)
+                "subscribe"     ->    context.deserialize(json, SubscribeMessage::class.java)
+                "unsubscribe"   ->    context.deserialize(json, UnsubscribeMessage::class.java)
                 else -> null
             }
         }

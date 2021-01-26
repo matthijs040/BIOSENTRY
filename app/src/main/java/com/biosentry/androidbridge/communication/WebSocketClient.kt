@@ -20,8 +20,8 @@ class WebSocketClient(uri: String) : IJSONTranceiver {
             super.onFrame(websocket, frame)
 
             frame?.let {
+                Log.i("WebSocket", "textFrame: " + it.payloadText)
                 invokeReceivers(it.payloadText)
-                Log.i("WebSocket", it.payloadText)
             }
         }
 
@@ -57,9 +57,9 @@ class WebSocketClient(uri: String) : IJSONTranceiver {
         mWebSocket.connectAsynchronously()
     }
 
-    override fun send(data : String)
+    override fun send(data : String) 
     {
-        //println(data)
+        println(data)
         mWebSocket.sendFrame( WebSocketFrame.createTextFrame( data ) )
     }
 

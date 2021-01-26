@@ -21,9 +21,9 @@ class PhoneGyroscope(context: Context ) : ROSGyroscope("/android/phone/gyroscope
     private val mGyroscopeListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {
 
-            this@PhoneGyroscope.updateData( Point( event.values[0].toDouble(),
-                                                   event.values[1].toDouble(),
-                                                   event.values[2].toDouble() ) )
+            updateData( Point( event.values[0].toDouble(),
+                               event.values[1].toDouble(),
+                               event.values[2].toDouble() ) )
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
