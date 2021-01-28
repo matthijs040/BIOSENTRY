@@ -286,4 +286,5 @@ enum class FlightActions()
 //type: "biosentry/AircraftFlightActions"
 data class AircraftFlightActions(val flightActions: FlightActions): ROSMessage
 
+// To be compatible with C/++ enums.
 data class AircraftFlightActionsInt(val flightActions: Int ) : ROSMessage

@@ -4,8 +4,8 @@ import com.biosentry.androidbridge.communication.*
 
 class MultiControlDeviceMock : IROSDevice
 {
-    var mTwist : Twist? = null
-    var mFActions : AircraftFlightActions? = null
+    var mTwist = Twist(Vector3(0.0,0.0,0.0),Vector3(0.0,0.0,0.0))
+    var mFActions = AircraftFlightActions(FlightActions.Reboot)
 
     private fun handleTwist(msg : ROSMessage)
     {

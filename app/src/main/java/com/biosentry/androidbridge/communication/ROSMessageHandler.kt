@@ -127,8 +127,32 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
         }
 
         control.message.id = nonce.getAndIncrement().toString()
-        mHandledControls.add(HandledControl(control, false))
+        val controlToAdd = HandledControl(control, false)
+        mHandledControls.add(controlToAdd)
+        send(control.message)
         println(this.javaClass.simpleName + " | attached control: " + control.javaClass.simpleName)
+
+        messagingTimer.schedule(
+            timerTask {
+                val ctrl = mHandledControls.find { it.control == controlToAdd.control }
+                if(ctrl != null) {
+                    if (ctrl.canReceive)     // If ack has been received for this ctrl.
+                    {
+                        this.cancel()       // Cancel retransmissions of the subscribees.
+                        println(this.javaClass.simpleName + " | attached control: " + ctrl.control.javaClass.simpleName)
+                    }
+                    else
+                        send(ctrl.control.message) // Re-advertise.
+                }
+                else
+                {
+                    println("Server returned error response for control: " + controlToAdd.control.javaClass.simpleName)
+                    this.cancel()
+                }
+
+            }, retransmissionRate, retransmissionRate
+        )
+
 
         return true
     }

@@ -86,8 +86,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
 
 
-
-
         // Setup "ROS" hardware classes
          mPhoneAccelerometer   = PhoneAccelerometer(baseContext)
          mPhoneGyroscope       = PhoneGyroscope(baseContext)
