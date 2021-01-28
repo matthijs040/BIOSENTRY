@@ -20,11 +20,15 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-feature android:name="android.hardware.camera.any" />
     <uses-feature android:name="android.hardware.camera2.full" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
+    
+    <uses-permission android:name="vendor.camera.aux.packagelist" />
+    <uses-permission android:name="vendor.camera.aux.packagelist2" />
+    <uses-permission android:name="persist.vendor.camera.privapp.list" />
     <uses-feature
         android:name="android.hardware.usb.host"
         android:required="false" />

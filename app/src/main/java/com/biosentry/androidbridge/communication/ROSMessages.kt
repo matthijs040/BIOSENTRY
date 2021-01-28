@@ -126,7 +126,7 @@ data class Image(val header : Header, val height : Long, val width : Long, val e
 /**
  * http://docs.ros.org/noetic/api/sensor_msgs/html/msg/CameraInfo.html
  */
-data class CompressedImage(val header: Header, val format: String, val data: String): ROSMessage
+data class CompressedImage constructor(val header: Header, val format: String, val data: ByteArray): ROSMessage
 
 data class RegionOfInterest( val x_offset : Long, val y_offset : Long,
                              val height : Long, val width: Long, val do_rectify : Boolean): ROSMessage

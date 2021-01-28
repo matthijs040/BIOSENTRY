@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
     private var mPhoneGPS : PhoneGPS? = null
 
     private var mPhoneLoopback : PhoneLoopback? = null
-    //var mROSCamera : ROSCamera? = null
+    private var mPhoneCamera : PhoneCamera? = null
     
     var mAircraftCamera : AircraftCamera? = null
     private var mAircraftFlightController : AircraftFlightController? = null
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
          mPhoneAccelerometer   = PhoneAccelerometer(baseContext)
          mPhoneGyroscope       = PhoneGyroscope(baseContext)
          mPhoneGPS             = PhoneGPS(baseContext, this)
-        //mROSCamera          = ROSCamera(this, this.baseContext)
+        mPhoneCamera           = PhoneCamera(baseContext, this)
         mPhoneLoopback         = PhoneLoopback()
 
 
