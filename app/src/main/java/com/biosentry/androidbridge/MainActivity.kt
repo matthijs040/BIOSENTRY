@@ -87,9 +87,9 @@ class MainActivity : AppCompatActivity() {
 
 
         // Setup "ROS" hardware classes
-         mPhoneAccelerometer   = PhoneAccelerometer(baseContext)
-         mPhoneGyroscope       = PhoneGyroscope(baseContext)
-         mPhoneGPS             = PhoneGPS(baseContext, this)
+        mPhoneAccelerometer   = PhoneAccelerometer(baseContext)
+        mPhoneGyroscope       = PhoneGyroscope(baseContext)
+        mPhoneGPS             = PhoneGPS(baseContext, this)
         mPhoneCamera           = PhoneCamera(baseContext, this)
         mPhoneLoopback         = PhoneLoopback()
 
@@ -180,7 +180,7 @@ class MainActivity : AppCompatActivity() {
         }
         catch (e: Exception)
         {
-            Log.println(Log.ERROR, "MainActivity", e.toString())
+            Log.e(this.javaClass.simpleName, "error in creating ROS message handler")
             return
         }
 

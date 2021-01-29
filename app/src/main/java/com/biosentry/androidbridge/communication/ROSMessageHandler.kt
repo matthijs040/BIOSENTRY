@@ -58,7 +58,6 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
         val msg = mSerializer.fromJson(jsonData)
 
         // If it is an advertise or subscribe response
-
         if(msg is StatusMessage)
             handleStatus(msg)
 
