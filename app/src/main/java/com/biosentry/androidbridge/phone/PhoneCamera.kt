@@ -6,41 +6,43 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.ImageFormat
-import android.graphics.PixelFormat
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.hardware.camera2.CameraDevice.TEMPLATE_RECORD
 import android.hardware.camera2.params.OutputConfiguration
 import android.hardware.camera2.params.RecommendedStreamConfigurationMap
 import android.hardware.camera2.params.SessionConfiguration
+import android.media.Image
 import android.media.MediaCodec
 import android.media.MediaCodec.createEncoderByType
-import android.media.MediaCodecList
 import android.media.MediaFormat
 import android.util.Log
 import android.util.Size
 import android.view.Surface
-import android.view.SurfaceControl
 import androidx.core.app.ActivityCompat
 import com.biosentry.androidbridge.communication.CompressedImage
 import com.biosentry.androidbridge.communication.Header
 import com.biosentry.androidbridge.communication.ROSCamera
 import com.biosentry.androidbridge.communication.time
 
+
 /**
  * Can provide optional camera. Will select a rear-facing camera by default.
  */
 @SuppressLint("NewApi", "InlinedApi")
-class PhoneCamera(private val mContext : Context, private val mActivity : Activity, private var cameraID : String = String()) : ROSCamera("android/phone/camera"){
+class PhoneCamera(
+    private val mContext: Context,
+    private val mActivity: Activity,
+    private var cameraID: String = String()
+) : ROSCamera("android/phone/camera"){
 
     private val mCameraManager = mContext.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     private val mSelectableCameras = mCameraManager.cameraIdList
 
 
-    private val mVideoFormatMime : String = "image/jpeg"
+    private val mFrameFormat     = ImageFormat.JPEG
+    private val mVideoFormatMime = MediaFormat.MIMETYPE_VIDEO_MPEG4
     private val mMediaCodec = createEncoderByType(mVideoFormatMime)
-
-
 
     private val mUnderlyingSurface = Surface(SurfaceTexture(0))
 
@@ -60,13 +62,20 @@ class PhoneCamera(private val mContext : Context, private val mActivity : Activi
         ) {
             Log.d(this.javaClass.simpleName, "onOutputBufferAvailable with info: $info")
 
-            updateData(CompressedImage(
-                header = Header(0L, time(System.currentTimeMillis() / 1000, System.currentTimeMillis() * 1000), "phone_camera"),
-                format = "jpeg",
-                data = mMediaCodec.getOutputBuffer(index)!!.array()
-            ))
 
 
+            updateData(
+                CompressedImage(
+                    header = Header(
+                        0L, time(
+                            System.currentTimeMillis() / 1000,
+                            System.currentTimeMillis() * 1000
+                        ), "phone_camera"
+                    ),
+                    format = "jpeg",
+                    data = mMediaCodec.getOutputBuffer(index)!!.array()
+                )
+            )
         }
 
         override fun onError(codec: MediaCodec, e: MediaCodec.CodecException) {
@@ -114,7 +123,11 @@ class PhoneCamera(private val mContext : Context, private val mActivity : Activi
              * Specifically, this means that a stable frame rate is used, and post-processing is set for recording quality.
              * These requests would commonly be used with the CameraCaptureSession#setRepeatingRequest method.
              */
-            session.setRepeatingRequest(session.device.createCaptureRequest(TEMPLATE_RECORD).build(), mCameraCaptureSessionCaptureCallback, null )
+            session.setRepeatingRequest(
+                session.device.createCaptureRequest(TEMPLATE_RECORD).build(),
+                mCameraCaptureSessionCaptureCallback,
+                null
+            )
         }
 
         override fun onConfigureFailed(session: CameraCaptureSession) {
@@ -127,31 +140,40 @@ class PhoneCamera(private val mContext : Context, private val mActivity : Activi
         SessionConfiguration(
             SessionConfiguration.SESSION_REGULAR,
             mutableListOf(),
-            {  },
-            mCameraCaptureSessionStateCallback )
+            { },
+            mCameraCaptureSessionStateCallback
+        )
 
     private val mCameraDeviceStateCallback = object : CameraDevice.StateCallback()  // https://developer.android.com/reference/android/hardware/camera2/CameraDevice
     {
         override fun onOpened(camera: CameraDevice)
         {
             val characteristics = mCameraManager.getCameraCharacteristics(camera.id)
-            val recommendations = characteristics.getRecommendedStreamConfigurationMap(RecommendedStreamConfigurationMap.USECASE_RECORD)!!
-            val availableSizes = recommendations.getOutputSizes(ImageFormat.JPEG)!!
-            var sizeToUse = Size(0,0)
+            val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
+
+
+            for (size in map.getOutputSizes(mFrameFormat)) {
+                Log.i(this.javaClass.simpleName, "imageDimension $size")
+            }
+            val availableSizes =  map.getOutputSizes(mFrameFormat)
+            val max_latency = 330867200L
+
+            var sizeToUse = Size(0, 0)
 
             availableSizes.forEach{
-                if( ( it.width * it.height) > ( sizeToUse.width * sizeToUse.height) ) // Look for resolution with most pixels.
+                if( ( it.width * it.height) > ( sizeToUse.width * sizeToUse.height)
+                    && map.getOutputMinFrameDuration(mFrameFormat, it )
+                    +  map.getOutputStallDuration(mFrameFormat, it) < max_latency) // Look for resolution with most pixels.
                 {
                     sizeToUse = it
                 }
             }
 
-            mMediaCodec.configure( MediaFormat.createVideoFormat( mVideoFormatMime
-                                                                , sizeToUse.width
-                                                                , sizeToUse.height )
-                                 , mUnderlyingSurface
-                                 , 0
-                                 ,null )
+            mMediaCodec.configure(
+                MediaFormat.createVideoFormat(
+                    mVideoFormatMime, sizeToUse.width, sizeToUse.height
+                ), mUnderlyingSurface, 0, null
+            )
 
             mMediaCodec.setCallback(mMediaCodecCallback)
 
@@ -159,7 +181,7 @@ class PhoneCamera(private val mContext : Context, private val mActivity : Activi
 
             mMediaCodec.start()
 
-            camera.createCaptureSession (mSessionConfiguration)
+            camera.createCaptureSession(mSessionConfiguration)
         }
 
         override fun onDisconnected(camera: CameraDevice) {
@@ -199,7 +221,7 @@ class PhoneCamera(private val mContext : Context, private val mActivity : Activi
             mCameraManager.openCamera(cameraID, mCameraDeviceStateCallback, null)   // Uses current thread if null. Might make UI thread hang???
         }
         catch (ex: SecurityException) {
-            Log.e("PhoneCamera", "Android system is rude. No permission for camera" )
+            Log.e("PhoneCamera", "Android system is rude. No permission for camera")
         }
 
     }
