@@ -59,7 +59,7 @@ class WebSocketClient(uri: String) : IJSONTranceiver {
 
     override fun send(data : String) 
     {
-        println(data)
+        //println(data)
         mWebSocket.sendFrame( WebSocketFrame.createTextFrame( data ) )
     }
 

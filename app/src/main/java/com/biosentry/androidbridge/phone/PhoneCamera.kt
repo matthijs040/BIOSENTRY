@@ -6,20 +6,19 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.ImageFormat
-import android.graphics.SurfaceTexture
+import android.hardware.HardwareBuffer
 import android.hardware.camera2.*
 import android.hardware.camera2.CameraDevice.TEMPLATE_RECORD
 import android.hardware.camera2.params.OutputConfiguration
-import android.hardware.camera2.params.RecommendedStreamConfigurationMap
 import android.hardware.camera2.params.SessionConfiguration
-import android.media.Image
-import android.media.MediaCodec
-import android.media.MediaCodec.createEncoderByType
-import android.media.MediaFormat
+import android.media.ImageReader
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.Log
 import android.util.Size
 import android.view.Surface
 import androidx.core.app.ActivityCompat
+import com.biosentry.androidbridge.BuildConfig
 import com.biosentry.androidbridge.communication.CompressedImage
 import com.biosentry.androidbridge.communication.Header
 import com.biosentry.androidbridge.communication.ROSCamera
@@ -40,53 +39,39 @@ class PhoneCamera(
     private val mSelectableCameras = mCameraManager.cameraIdList
 
 
+
     private val mFrameFormat     = ImageFormat.JPEG
-    private val mVideoFormatMime = MediaFormat.MIMETYPE_VIDEO_MPEG4
-    private val mMediaCodec = createEncoderByType(mVideoFormatMime)
-
-    private val mUnderlyingSurface = Surface(SurfaceTexture(0))
 
 
-    /**
-     * The callback on which events about the real underlying, encoded data occur.
-     * This is the callback that creates the byteBuffer that will be sent out.
-     */
-    private val mMediaCodecCallback = object : MediaCodec.Callback()
-    {
-        override fun onInputBufferAvailable(codec: MediaCodec, index: Int) { }
+    private val mHandlerThread : HandlerThread = HandlerThread("thread_name")
+    private lateinit var mImageHandler : Handler
 
-        override fun onOutputBufferAvailable(
-            codec: MediaCodec,
-            index: Int,
-            info: MediaCodec.BufferInfo
-        ) {
-            Log.d(this.javaClass.simpleName, "onOutputBufferAvailable with info: $info")
+    private var mImagereader : ImageReader? = null
+    private var mFinalBufferSize = 0
+    private var mOutputBuffer = ByteArray(mFinalBufferSize)
 
+    private val mOnImageAvailableListener =
+        ImageReader.OnImageAvailableListener { reader ->
+            val data = reader!!.acquireNextImage()
 
+            //      Needed if i'm going to stitch the image.
+            // Check if the size of outputbuffer is correct.
+            // Reconstruct buffer if not.
+            // if(mFinalBufferSize != ( data.planes.size * data.planes.first().buffer.array().size ) )
+            // {
+            //     mFinalBufferSize = (data.planes.size * data.planes.first().buffer.array().size)
+            //     mOutputBuffer = ByteArray(mFinalBufferSize)
+            // }
 
-            updateData(
-                CompressedImage(
-                    header = Header(
-                        0L, time(
-                            System.currentTimeMillis() / 1000,
-                            System.currentTimeMillis() * 1000
-                        ), "phone_camera"
-                    ),
-                    format = "jpeg",
-                    data = mMediaCodec.getOutputBuffer(index)!!.array()
-                )
-            )
+            // Going to try the first plane of the image first.
+            // From: https://cmsdk.com/android/how-to-convert-android-media-image-to-bitmap-object.html
+            // Might need to stitch planes.
+            updateData( CompressedImage(
+                Header( mSeq, time(mTimeInSeconds, mTimeInNanos), mFrameID),
+                "jpeg",
+                data = data.planes.first().buffer.array()
+            ))
         }
-
-        override fun onError(codec: MediaCodec, e: MediaCodec.CodecException) {
-            TODO("Not yet implemented")
-        }
-
-        override fun onOutputFormatChanged(codec: MediaCodec, format: MediaFormat) {
-            Log.w(this.javaClass.simpleName, "onOutputFormatChanged to: $format")
-        }
-
-    }
 
     private val mCameraCaptureSessionCaptureCallback = object : CameraCaptureSession.CaptureCallback()
     {
@@ -96,7 +81,6 @@ class PhoneCamera(
             result: TotalCaptureResult
         ) {
             val data = result.physicalCameraResults
-
 
             super.onCaptureCompleted(session, request, result)
         }
@@ -113,6 +97,10 @@ class PhoneCamera(
 
     private val mCameraCaptureSessionStateCallback = object : CameraCaptureSession.StateCallback()
     {
+        override fun onReady(session: CameraCaptureSession) {
+            Log.i(this.javaClass.simpleName, "CameraCaptureSession::onReady")
+            super.onReady(session)
+        }
 
         override fun onConfigured(session: CameraCaptureSession) {
             Log.d(this.javaClass.simpleName, "session is configured.")
@@ -130,24 +118,26 @@ class PhoneCamera(
             )
         }
 
+        override fun onActive(session: CameraCaptureSession) {
+            Log.i(this.javaClass.simpleName, "CameraCaptureSession::onActive")
+        }
+
+        override fun onSurfacePrepared(session: CameraCaptureSession, surface: Surface) {
+            Log.i(this.javaClass.simpleName, "CameraCaptureSession::onSurfacePrepared")
+            super.onSurfacePrepared(session, surface)
+        }
+
         override fun onConfigureFailed(session: CameraCaptureSession) {
             Log.e(this.javaClass.simpleName, "session configuration failed.")
         }
 
     }
 
-    private val mSessionConfiguration : SessionConfiguration =
-        SessionConfiguration(
-            SessionConfiguration.SESSION_REGULAR,
-            mutableListOf(),
-            { },
-            mCameraCaptureSessionStateCallback
-        )
-
     private val mCameraDeviceStateCallback = object : CameraDevice.StateCallback()  // https://developer.android.com/reference/android/hardware/camera2/CameraDevice
     {
-        override fun onOpened(camera: CameraDevice)
-        {
+
+
+        override fun onOpened(camera: CameraDevice) {
             val characteristics = mCameraManager.getCameraCharacteristics(camera.id)
             val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
 
@@ -155,31 +145,35 @@ class PhoneCamera(
             for (size in map.getOutputSizes(mFrameFormat)) {
                 Log.i(this.javaClass.simpleName, "imageDimension $size")
             }
-            val availableSizes =  map.getOutputSizes(mFrameFormat)
+            val availableSizes = map.getOutputSizes(mFrameFormat)
             val max_latency = 330867200L
 
             var sizeToUse = Size(0, 0)
 
-            availableSizes.forEach{
-                if( ( it.width * it.height) > ( sizeToUse.width * sizeToUse.height)
-                    && map.getOutputMinFrameDuration(mFrameFormat, it )
-                    +  map.getOutputStallDuration(mFrameFormat, it) < max_latency) // Look for resolution with most pixels.
+            availableSizes.forEach {
+                if ((it.width * it.height) > (sizeToUse.width * sizeToUse.height)
+                    && map.getOutputMinFrameDuration(mFrameFormat, it)
+                    + map.getOutputStallDuration(mFrameFormat, it) < max_latency
+                ) // Look for resolution with most pixels.
                 {
                     sizeToUse = it
                 }
             }
 
-            mMediaCodec.configure(
-                MediaFormat.createVideoFormat(
-                    mVideoFormatMime, sizeToUse.width, sizeToUse.height
-                ), mUnderlyingSurface, 0, null
-            )
+            mImagereader =
+                ImageReader.newInstance(sizeToUse.width, sizeToUse.height, mFrameFormat, 1)
+            mImagereader!!.setOnImageAvailableListener(mOnImageAvailableListener, mImageHandler)
+            val surface = mImagereader!!.surface
+            if (BuildConfig.DEBUG && !surface.isValid) {
+                error("Assertion failed")
+            }
+            val conf = OutputConfiguration(surface)
 
-            mMediaCodec.setCallback(mMediaCodecCallback)
-
-            mSessionConfiguration.outputConfigurations.add(OutputConfiguration(mMediaCodec.createInputSurface()))
-
-            mMediaCodec.start()
+            val mSessionConfiguration = SessionConfiguration(
+                                        SessionConfiguration.SESSION_REGULAR,
+                                        mutableListOf(conf),
+                                        { },
+                                        mCameraCaptureSessionStateCallback )
 
             camera.createCaptureSession(mSessionConfiguration)
         }
@@ -212,13 +206,16 @@ class PhoneCamera(
 
 
     init {
+        mHandlerThread.start()
+        mImageHandler = Handler(mHandlerThread.looper)
+
         askForPermissions()
         if(!mSelectableCameras.contains(cameraID))
             cameraID = mSelectableCameras.first()
 
         try
         {
-            mCameraManager.openCamera(cameraID, mCameraDeviceStateCallback, null)   // Uses current thread if null. Might make UI thread hang???
+            mCameraManager.openCamera(cameraID, mCameraDeviceStateCallback, mImageHandler)   // Uses current thread if null. Might make UI thread hang???
         }
         catch (ex: SecurityException) {
             Log.e("PhoneCamera", "Android system is rude. No permission for camera")

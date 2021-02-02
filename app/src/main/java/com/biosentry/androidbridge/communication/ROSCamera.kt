@@ -21,10 +21,13 @@ open class ROSCamera(
         mSeq++
     }
 
-    private var mSeq = 0L
-    private var mTimeInSeconds = System.currentTimeMillis() / 1000
-    private var mTimeInNanos = System.currentTimeMillis() * 1000
-    private val mFrameID = "phone_camera"
+    protected var mSeq = 0L
+    protected val mTimeInSeconds : Long
+    get() { return System.currentTimeMillis() / 1000 }
+    protected val mTimeInNanos : Long
+    get() { return System.currentTimeMillis() * 1000 }
+
+    protected val mFrameID = "phone_camera"
 
 
     private var mReading : PublishMessage =
@@ -33,7 +36,7 @@ open class ROSCamera(
             topic = mMessageTopicName,
             msg = CompressedImage(
                 header = Header(mSeq, time(mTimeInSeconds, mTimeInNanos ), mFrameID),
-                format = "png",
+                format = "jpeg",
                 ByteArray(0)
             )
         )

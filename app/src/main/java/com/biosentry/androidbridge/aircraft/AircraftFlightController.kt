@@ -48,7 +48,9 @@ class AircraftFlightController : IROSDevice
                 else
                 {
                     mLastCommandCounter.set(0)
-                    Log.w(this.javaClass.simpleName, "V-stick control timed out.")
+                    // This print is too verbose. It happens whenever no commands are coming in within the timeout.
+                    // This can go on for long if the drone is inactive for other testing.
+                    // Log.w(this.javaClass.simpleName, "V-stick control timed out.")
                 }
             }
         }

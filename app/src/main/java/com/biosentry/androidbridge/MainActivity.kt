@@ -85,14 +85,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
 
-
         // Setup "ROS" hardware classes
         mPhoneAccelerometer   = PhoneAccelerometer(baseContext)
         mPhoneGyroscope       = PhoneGyroscope(baseContext)
         mPhoneGPS             = PhoneGPS(baseContext, this)
         mPhoneCamera           = PhoneCamera(baseContext, this)
         mPhoneLoopback         = PhoneLoopback()
-
 
         mAircraftHandler = DJIAircraftHandler(this, null)
 
@@ -148,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         mPhoneGPS?.let { mROSMessageHandler?.attachSensor(it, 0) }
         mPhoneLoopback?.let {   mROSMessageHandler?.attachDevice(it)
                                 mROSMessageHandler?.attachSensor(it, 0) }
-       //mROSCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
+        mPhoneCamera?.let { mROSMessageHandler?.attachSensor(it, 0L) }
 
 
         if(mAircraftHandler != null && mAircraftHandler!!.mAircraftConnected)
