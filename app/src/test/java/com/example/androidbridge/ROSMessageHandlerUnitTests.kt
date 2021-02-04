@@ -182,7 +182,7 @@ class ROSMessageHandlerUnitTests {
     }
 
     @Test
-    fun device_keeps_subscribing_if_not_acknowledged() {
+    fun device_keeps_subscribing_if_not_responded_to() {
         val mTransceiver = JsonTranceiverMock()
         val mSerializer = GsonSerializer()
         val mROSMessageHandler = ROSMessageHandler(mTransceiver, mSerializer)
@@ -378,7 +378,106 @@ class ROSMessageHandlerUnitTests {
         assert( mockDevice.mTwist == msg2.msg)
     }
 
+    @Test
+    fun sensor_stops_advertising_when_nAck_ed_without_reason()
+    {
+        val mSerializer = GsonSerializer()
+        val mTransceiver = JsonTranceiverMock()
 
+        mTransceiver.attachReceiver {
+            Thread.sleep(50)
+            val input = mSerializer.fromJson(it)
+            if(input is AdvertiseMessage)
+                mTransceiver.send(mSerializer.toJson(StatusMessage(id=input.id,level = "error",msg = "advertise_nack") ))
+        }
+
+        val mROSMessageHandler = ROSMessageHandler(mTransceiver, mSerializer )
+
+        val mockSensor = ROSTwistSensorMock()
+
+        val expected = mockSensor.mAdvertiseMessage
+        val actual = mutableListOf<BridgeMessage>()
+        mTransceiver.attachReceiver {
+            actual.add(mSerializer.fromJson(it))
+        }
+
+        mROSMessageHandler.attachSensor(mockSensor, 0L)
+
+        Thread.sleep(transmissionDelay * 3)
+
+        assert( actual.size == 2)           // The initial advertise and the response.
+        assert( actual[1] == expected)      // The initial advertise should be:
+
+        // The docs say that mutableList.add() is a push_back operation.
+        // https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/add.html
+        // Unsure why the request is the second element instead of the response.
+        // Irrelevant for validating the functionality of the interfaces though.
+        // Might just be a timing or multithreading related inconsistency.
+    }
+
+    @Test
+    fun sensor_stops_advertising_when_nAck_ed_with_appended_reason()
+    {
+        val mSerializer = GsonSerializer()
+        val mTransceiver = JsonTranceiverMock()
+
+        mTransceiver.attachReceiver {
+            Thread.sleep(50)
+            val input = mSerializer.fromJson(it)
+            if(input is AdvertiseMessage)
+                mTransceiver.send(mSerializer.toJson(StatusMessage(id=input.id,level = "error",msg = "advertise_nack_some_given_reason") ))
+        }
+
+        val mROSMessageHandler = ROSMessageHandler(mTransceiver, mSerializer )
+
+        val mockSensor = ROSTwistSensorMock()
+
+        val expected = mockSensor.mAdvertiseMessage
+        val actual = mutableListOf<BridgeMessage>()
+        mTransceiver.attachReceiver {
+            actual.add(mSerializer.fromJson(it))
+        }
+
+        mROSMessageHandler.attachSensor(mockSensor, 0L)
+
+        Thread.sleep(transmissionDelay * 3)
+
+        assert( actual.size == 2)           // The initial advertise and the response.
+        assert( actual[1] == expected)      // The initial advertise should be:
+
+    }
+
+    @Test
+    fun device_stops_subscribing_after_nAck_ed()
+    {
+        val mSerializer = GsonSerializer()
+        val mTransceiver = JsonTranceiverMock()
+
+        mTransceiver.attachReceiver {
+            Thread.sleep(50)
+            val input = mSerializer.fromJson(it)
+            if(input is SubscribeMessage)
+                mTransceiver.send(mSerializer.toJson(StatusMessage(id=input.id,level = "error",msg = "subscribe_nack_some_given_reason") ))
+        }
+
+        val mROSMessageHandler = ROSMessageHandler(mTransceiver, mSerializer )
+
+        val mockDevice = ROSTwistDeviceMock()
+        assert(mockDevice.mControls.size == 1)
+        val expected = mockDevice.mControls.first().message
+
+        val actual = mutableListOf<BridgeMessage>()
+        mTransceiver.attachReceiver {
+            actual.add(mSerializer.fromJson(it))
+        }
+
+        mROSMessageHandler.attachDevice(mockDevice)
+
+        Thread.sleep(transmissionDelay * 3)
+
+        assert( actual.size == 2)           // The initial advertise and the response.
+        assert( actual[1] == expected)      // The initial advertise should be:
+    }
 
     companion object {
         const val transmissionDelay = ROSMessageHandler.retransmissionRate + 20

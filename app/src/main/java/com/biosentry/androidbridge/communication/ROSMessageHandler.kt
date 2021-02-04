@@ -1,5 +1,6 @@
 package com.biosentry.androidbridge.communication
 
+import android.util.Log
 import com.biosentry.androidbridge.serialization.IBridgeMessageSerializer
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
@@ -30,13 +31,28 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
     {
         if(msg.msg == "advertise_ack")
         {
-            val sensor = mHandledSensors.find { it.sensor.mAdvertiseMessage.id == msg.id }
-            sensor?.canSend = true
+            val foundSensor = mHandledSensors.find { it.sensor.mAdvertiseMessage.id == msg.id }
+
+            if( foundSensor != null)
+                foundSensor.canSend = true
+            else
+                Log.w(this.javaClass.simpleName, "received an ack for an advertise that was not sent. Ignoring.")
+
+        }
+        else if(msg.msg.contains("advertise_nack"))
+        {
+            if(!mHandledSensors.remove( mHandledSensors.find { it.sensor.mAdvertiseMessage.id == msg.id } ) )
+                Log.w(this.javaClass.simpleName, "received a nAck for an advertise that was not sent. Ignoring.")
         }
         else if(msg.msg == "subscribe_ack")
         {
-            val control = mHandledControls.find { it.control.message.id == msg.id }
-            control?.canReceive = true
+           mHandledControls.find { it.control.message.id == msg.id }?.canReceive = true
+
+        }
+        else if(msg.msg.contains("subscribe_nack"))
+        {
+            if(!mHandledControls.remove( mHandledControls.find { it.control.message.id == msg.id } ) )
+                Log.w(this.javaClass.simpleName, "received a nack for an unregistered / not subscribe-requested sensor. ignoring.")
         }
     }
 
@@ -57,13 +73,14 @@ class ROSMessageHandler(private val bridge : IJSONTranceiver,
     {
         val msg = mSerializer.fromJson(jsonData)
 
+        // If it is a message for one of the devices to receive.
+        if(msg is PublishMessage)
+            handlePublish(msg)
+
         // If it is an advertise or subscribe response
         if(msg is StatusMessage)
             handleStatus(msg)
 
-        // If it is a message for one of the devices to receive.
-        if(msg is PublishMessage)
-            handlePublish(msg)
     }
 
 
